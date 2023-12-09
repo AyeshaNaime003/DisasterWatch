@@ -1,0 +1,41 @@
+{% load static %}
+<div class="d-flex flex-column align-items-center p-3 bg-light text-dark" 
+    style="width: 150px; height: 100%; position: fixed; left: 0;">
+    <a href="/"><img src="{% static '/assets/logo.png' %}" alt="logo" style="width: 60px;"></a>
+    <ul class="nav nav-pills flex-column justify-items-even mb-auto" style="height: 75%;">
+      <li class="nav-item">
+        <a href="#" class="nav-link text-dark">
+            <i class="bi bi-person-circle"></i>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="#" class="nav-link text-dark">
+            <i class="bi bi-bell-fill"></i>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="#" class="nav-link text-dark">
+            <i class="bi bi-house-fill"></i>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="#" class="nav-link text-dark">
+            <i class="bi bi-speedometer"></i>
+        </a>
+      </li>
+
+    </ul>
+    <div class="dropdown">
+      <a href="#" class="d-flex align-items-center link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+        <img src="https://github.com/mdo.png" alt="" width="32" height="32" class="rounded-circle me-2">
+        <strong>mdo</strong>
+      </a>
+      <ul class="dropdown-menu text-small shadow">
+        <li><a class="dropdown-item" href="#">New project...</a></li>
+        <li><a class="dropdown-item" href="#">Settings</a></li>
+        <li><a class="dropdown-item" href="#">Profile</a></li>
+        <li><hr class="dropdown-divider"></li>
+        <li><a class="dropdown-item" href="#">Sign out</a></li>
+      </ul>
+    </div>
+  </div>
