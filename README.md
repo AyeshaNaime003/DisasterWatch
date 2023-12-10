@@ -22,3 +22,5 @@ confugure the app in the settings
  get sentinel2 imagery form,
  stats,
  map
+
+ login: get to go to the page, post to sent form data to view, using django's builtin functions, authenticate the valid user and then login(create session id)
