@@ -1,4 +1,4 @@
-{% load static %}
+<!-- {% load static %}
 <div class="d-flex flex-column align-items-center p-3 bg-light text-dark" 
     style="width: 150px; height: 100%; position: fixed; left: 0;">
     <a href="/"><img src="{% static '/assets/logo.png' %}" alt="logo" style="width: 60px;"></a>
@@ -38,4 +38,22 @@
         <li><a class="dropdown-item" href="#">Sign out</a></li>
       </ul>
     </div>
-  </div>
+  </div> -->
+{% load static %}
+<div class="d-flex flex-column flex-shrink-0 p-3 bg-body-tertiary" style="width: 10%; position: fixed; top: 0; left: 0; bottom: 0;">
+  <img src="{% static 'assets/logo.png' %}" alt="logo" width="70px" class="d-block mx-auto my-3">
+  <ul class="nav nav-pills flex-column mb-auto">
+    <li class="nav-item">
+      <a href="#" class="nav-link active text-center my-3">Home</a>
+    </li>
+    <li class="nav-item">
+      <a href="#" class="nav-link active text-center my-3">Profile</a>
+    </li>
+    <li class="nav-item">
+      <a href="#" class="nav-link active text-center my-3">Setting</a>
+    </li>
+    <li class="nav-item">
+      <a href="{% url 'logout' %}" class="nav-link active text-center my-3">Logout</a>
+    </li>
+  </ul>
+</div>

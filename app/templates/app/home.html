@@ -2,8 +2,21 @@
 {% block title %}Home{% endblock title %}
 {% block body %}
 {% include 'app/navbar.html' %}
-<div class="container">
-    <h1>home</h1>
+<div class="container-fluid">
+    <h1 class="px-0 my-5">Home</h1>
+    <div class="container">
+        {% if reports %}
+            <ul>
+                {% for report in reports %}
+                    <li>
+                        <a href="{{ report.fields.href }}" target="_blank">{{ report.fields.title }}</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No earthquake reports available.</p>
+        {% endif %}
+    </div>
 </div>
 
 {% endblock body %}
