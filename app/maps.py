@@ -1,4 +1,5 @@
 import folium
+import os
 
 # Center of Karachi
 karachi_center = [24.8607, 67.0011]
@@ -28,5 +29,7 @@ for rectangle in rectangles:
                    fill=True, 
                    fill_opacity=0.7).add_to(map)
 
+# print(os.getcwd())
 # Save the map as an HTML file
-map.save("map.html")
+html_code = map._repr_html_()
+# map.save("./app/templates/app/saved_map.html")

@@ -24,3 +24,8 @@ confugure the app in the settings
  map
 
  login: get to go to the page, post to sent form data to view, using django's builtin functions, authenticate the valid user and then login(create session id)
+
+ news api: reliefweb, no ai key, just use get url to get news related to certain topics, rn only doing earthquakes, latest first
+
+ map api: 
+ 1) folium: create colored polygons, send the html code to view which will embed

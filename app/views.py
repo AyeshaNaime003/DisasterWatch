@@ -5,6 +5,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 import requests
 
+from .maps import html_code
+
 # Create your views here.
 @login_required(login_url="login/")
 def home(request):
@@ -48,4 +50,4 @@ def logoutPage(request):
     return redirect("login")
 
 def map(request):
-    return render(request, "app/map.html")
+    return render(request, "app/map.html", {"html_code":html_code})
