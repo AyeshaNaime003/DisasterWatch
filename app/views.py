@@ -5,8 +5,6 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 import requests
 
-
-
 # Create your views here.
 @login_required(login_url="login/")
 def home(request):
@@ -44,6 +42,10 @@ def loginPage(request):
             messages.error(request, "Invalid credentials")
     return render(request, "app/login.html")
 
+@login_required(login_url="login/")
 def logoutPage(request):
     logout(request)
     return redirect("login")
+
+def map(request):
+    return render(request, "app/map.html")
