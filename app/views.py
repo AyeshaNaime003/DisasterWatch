@@ -6,6 +6,7 @@ from django.contrib import messages
 import requests
 
 from .folium_maps import html_code
+from .plotly_maps import html_code
 
 # Create your views here.
 @login_required(login_url="login/")
