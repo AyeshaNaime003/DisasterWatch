@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 import requests
 
-from .maps import html_code
+from .folium_maps import html_code
 
 # Create your views here.
 @login_required(login_url="login/")

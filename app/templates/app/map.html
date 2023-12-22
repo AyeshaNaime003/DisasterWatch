@@ -1,9 +1,37 @@
 {% extends "index.html" %}
 {% block title %}Maps{% endblock title %}
 {% block body %}
-{% include 'app/navbar.html' %}
-<h1>haha map</h1>
-{{ html_code|safe }}
+  {% include 'app/navbar.html' %}
+  <h1>haha map</h1>
+
+  {{ html_code|safe }}
+
+  <script>
+    function showClickInfo(e) {
+      alert("Latitude: " + e.latlng.lat + "\nLongitude: " + e.latlng.lng);
+
+      // You can also use a geocoding service to get street map information
+      // Example using OpenStreetMap Nominatim
+      fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${e.latlng.lat}&lon=${e.latlng.lng}`)
+        .then(response => response.json())
+        .then(data => {
+          const address = data.display_name;
+          alert("Street Address: " + address);
+        })
+        .catch(error => console.error('Error:', error));
+    }
+    // Set mymap as a global variable
+    var mymap = null;
+
+    // Function to initialize mymap
+    function initializeMap() {
+      // Set mymap to the Folium map object
+      mymap = L.map('map').setView([24.8607, 67.0011], 14);
+
+    }
+    // Attach the function to the click event of the map
+    window.onload = function() {
+      mymap.on('click', showClickInfo);
+    };
+  </script>
 {% endblock body %}
-
-
