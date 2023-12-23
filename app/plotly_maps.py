@@ -3,6 +3,9 @@ import plotly.graph_objects as go
 import pandas as pd
 import plotly.io as pio
 
+from numpy import average
+from .geopy_address import get_street_name
+
 mapbox_token = "pk.eyJ1IjoiYW5haW1lIiwiYSI6ImNscWdpeGhwZTEyMG4ydW1rY3l1aXRmdWYifQ.1NbqsFXFOcooQaqxAZ-DSA"
 data = {
     'color': ['red', 'yellow', 'green'] * 6,
@@ -20,26 +23,33 @@ colors = {"red":"rgba(255,0,0, 0.5)",
           "yellow":"rgba(255,255,0, 0.5)"
           }
 for index,row in df.iterrows():
-    polygon_lat = [row['coordinate1'][1], 
-                   row['coordinate2'][1],
-                   row['coordinate3'][1],
-                   row['coordinate4'][1]]
-    polygon_lon = [row['coordinate1'][0], 
-                   row['coordinate2'][0],
-                   row['coordinate3'][0],
-                   row['coordinate4'][0]]
-    polygon_lat.append(polygon_lat[0])
-    polygon_lon.append(polygon_lon[0])
-    fillcolor = colors[row['color']]
-    polygon = go.Scattermapbox(
-        lat=polygon_lat,
-        lon=polygon_lon,
-        mode='lines',
-        fill='toself',  # Fills the area defined by the polygon
-        fillcolor=fillcolor,  
-        line=dict(color=fillcolor, width=2),  
-    )
-    fig.add_trace(polygon)
+    if index<5:
+        polygon_lat = [row[f'coordinate{i}'][1] for i in range(1, 5)]
+        polygon_lon = [row[f'coordinate{i}'][0] for i in range(1, 5)]
+        midpoint = (average(polygon_lat),average(polygon_lon))
+        fillcolor = colors[row['color']]
+        ( landmark, street_name, locality, sublocality, district, city, region, postal_code, country ) = get_street_name(midpoint[0], midpoint[1])
+        # polygon trace
+        polygon_trace = go.Scattermapbox(
+            lat=polygon_lat,
+            lon=polygon_lon,
+            mode='lines',
+            fill='toself',  
+            fillcolor=fillcolor,  
+            line=dict(color=fillcolor, width=2),  
+            hoverinfo='none'
+        )
+        # hover trace
+        hover_trace = go.Scattermapbox(
+            lat=[midpoint[0]],
+            lon=[midpoint[1]],
+            mode='markers',
+            hoverinfo='text',
+            text=f"{ landmark if landmark+', ' is not None else '' }{street_name}",
+            marker=dict(color=row['color'])
+        )
+        fig.add_trace(polygon_trace)
+        fig.add_trace(hover_trace)
 
 karachi_center = [24.8607, 67.0011]
 fig.update_layout(
@@ -52,8 +62,11 @@ fig.update_layout(
 )
 
 
+
 # Get the HTML code
 html_code = pio.to_html(fig)
 
 # fig.write_html('file.html', auto_open=True)
+# for i, trace in enumerate(fig.data):
+    # print(f"Layer {i + 1}: {trace}")
 

@@ -28,4 +28,8 @@ confugure the app in the settings
  news api: reliefweb, no ai key, just use get url to get news related to certain topics, rn only doing earthquakes, latest first
 
  map api: 
- 1) folium: create colored polygons, send the html code to view which will embed
+ 2) plotly: real time, satellite style using mapbox token, draw polygons, hover in the midpoint
+geopy to get address from the latitude and lonitude of the polygon midpoint, display only landmark(if any) and street name
+
+ISSUES:
+page wont load until all the addressses are retrived
