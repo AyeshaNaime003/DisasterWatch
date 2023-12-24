@@ -7,6 +7,8 @@ import requests
 
 from .folium_maps import html_code
 from .plotly_maps import html_code
+# from .plotly_maps import dash_app
+
 
 # Create your views here.
 @login_required(login_url="login/")
@@ -51,4 +53,4 @@ def logoutPage(request):
     return redirect("login")
 
 def map(request):
-    return render(request, "app/map.html", {"html_code":html_code})
+    return render(request, 'app/map.html', context={'html_code': html_code,})
