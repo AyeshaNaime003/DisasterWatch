@@ -1,4 +1,4 @@
-/* Color Variables */
+Color Variables
 :root {
     --black: #000000;
     --gray-600: #45545F;
@@ -10,29 +10,9 @@
     --white: #FFFFFF;
 }
 
-
-/* Set the width of the vertical menu on large screens */
-@media (min-width: 992px) {
-    .vertical-menu {
-        width: 10%;
-        position: fixed;
-        height: 100%;
-        left: 0;
-        overflow-x: hidden;
-        transition: 0.5s;
-        padding-top: 16px;
-    }
-
-    .vertical-menu a {
-        padding: 8px 8px;
-        text-decoration: none;
-        font-size: 18px;
-        color: white;
-        display: block;
-        transition: 0.3s;
-    }
-
-    .vertical-menu a:hover {
-        background-color: #555;
-    }
+body{
+    padding: 0;
+    margin: 0;
 }
+
+    

@@ -3,7 +3,7 @@ from rasterio.windows import Window
 import numpy as np
 
 # Replace 'your_tiff_file.tif' with the actual path to your TIFF file
-tiff_file_path = 'hurricane-harvey_00000428_post_disaster.tif'
+tiff_file_path = 'hurricane-florence_00000004_post_disaster.tif'
 
 # Open the TIFF file using rasterio
 with rasterio.open(tiff_file_path) as tif:
@@ -17,8 +17,8 @@ with rasterio.open(tiff_file_path) as tif:
     bottom_right_x, bottom_right_y = transform * (tif.width, tif.height)
 
     # Print the results
-    # print(f"Top-left pixel - Longitude: {top_left_x}, Latitude: {top_left_y}")
-    # print(f"Bottom-right pixel - Longitude: {bottom_right_x}, Latitude: {bottom_right_y}")
+    print(f"Top-left pixel - Longitude: {top_left_x}, Latitude: {top_left_y}")
+    print(f"Bottom-right pixel - Longitude: {bottom_right_x}, Latitude: {bottom_right_y}")
 
 
 # Open a raster dataset for reading
@@ -68,4 +68,8 @@ Top-left pixel
 Longitude: -95.54183692483139, Latitude: 29.740561879769132     
 Bottom-right pixel - 
 Longitude: -95.53718503013677, Latitude: 29.73590998507452
+
+
+Top-left pixel - Longitude: -79.0370213189266, Latitude: 33.60739228649503
+Bottom-right pixel - Longitude: -79.03236854506585, Latitude: 33.60273951263427
 """

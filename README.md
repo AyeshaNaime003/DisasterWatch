@@ -30,6 +30,10 @@ confugure the app in the settings
  map api: 
  2) plotly: real time, satellite style using mapbox token, draw polygons, hover in the midpoint
 geopy to get address from the latitude and lonitude of the polygon midpoint, display only landmark(if any) and street name
+from the tiff file get the top left lat and lon, use these to calculate the affine trasnform matrix, xy->lan and lon, draw polygons
 
+
+SUGGESTIONS:
+let user toggle between two styles of map viewing: satellite and open-street-map
 ISSUES:
 page wont load until all the addressses are retrived

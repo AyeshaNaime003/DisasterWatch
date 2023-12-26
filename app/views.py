@@ -54,3 +54,9 @@ def logoutPage(request):
 
 def map(request):
     return render(request, 'app/map.html', context={'html_code': html_code,})
+
+def adminPanel(request):
+     return render(request, "app/adminPanel.html")
+
+def dashboard(request):
+    return render(request, "app/dashboard.html")
