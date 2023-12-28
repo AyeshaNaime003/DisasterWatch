@@ -6,7 +6,8 @@ from django.contrib import messages
 import requests
 
 from .folium_maps import html_code
-from .plotly_maps import html_code
+# from .plotly_maps import html_code
+from .map_segmentation import html_code
 # from .plotly_maps import dash_app
 
 

@@ -7,7 +7,9 @@ import rasterio
 from rasterio.transform import from_origin
 from rasterio.crs import CRS
 
-from geopy_address import get_street_name
+from .geopy_address import get_street_name
+
+import plotly.io as pio
 
 # manually
 # top_left_lon = -95.32313692483139
@@ -288,6 +290,8 @@ updatemenu = dict(
     yanchor="top",
 )
 fig.update_layout(
+    width=1000, height=500, 
+    margin=dict(l=10, r=10, t=30, b=10),
     mapbox=dict(
         style="satellite",
         accesstoken=mapbox_token,
@@ -335,6 +339,8 @@ for i in range(len(data)):
     fig.add_trace(polygon_trace)
     fig.add_trace(hover_trace)
 
-fig.write_html("./file.html", auto_open=True)
+# fig.write_html("./file.html", auto_open=True)
 
-
+# Get the HTML code
+html_code = pio.to_html(fig)
+pio.write_html(fig, file='file.html')
