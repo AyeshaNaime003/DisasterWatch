@@ -22,11 +22,11 @@ with rasterio.open('hurricane-florence_00000004_post_disaster.tif') as tif:
     top_left_lon, top_left_lat = transform * (0, 0)
     bottom_right_lon, bottom_right_lat = transform * (tif.width, tif.height)
 
-print("top left coordinates: ",top_left_lat, top_left_lon)
-print("Bottom right coordinates: ",bottom_right_lat, bottom_right_lon)
+# print("top left coordinates: ",top_left_lat, top_left_lon)
+# print("Bottom right coordinates: ",bottom_right_lat, bottom_right_lon)
 
 center_lat, center_lon = average([top_left_lat, bottom_right_lat]), average([top_left_lon, bottom_right_lon])
-print("Center coordinates: ",center_lat, center_lon)
+# print("Center coordinates: ",center_lat, center_lon)
 
 
 # polygons
@@ -243,7 +243,7 @@ data = [
 
 
 transform = from_origin(top_left_lon, top_left_lat, (top_left_lon-bottom_right_lon)/1024, (top_left_lat-bottom_right_lat)/1024)
-print(transform)
+# print(transform)
 
 
 # DISPLAY PURPOSES
@@ -252,7 +252,7 @@ print(transform)
 #     x_coords, y_coords = zip(*polygons)
 #     lon, lat = rasterio.transform.xy(transform, x_coords, y_coords)
 #     for i in list(zip(lat, lon)):
-#         print(i)
+        # print(i)
 #     print()
 
 latitudes = []
