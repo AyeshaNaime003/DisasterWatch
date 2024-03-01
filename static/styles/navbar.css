@@ -1,0 +1,20 @@
+.dw-navbar{
+    position: fixed; 
+    top: 1vh; 
+    left: 1vw; 
+    margin-bottom: 1px; 
+    bottom: 0; 
+    /* height: 100vh;   */
+    /* width: 100%;  */
+    border-radius: 10px;
+    padding: 0;
+    box-sizing: border-box; 
+    /* border-right: solid 10px var(--lovely-blue-lighter); */
+    background-color: whitesmoke;
+}
+.dw-navbar ul{
+    overflow: hidden;
+}
+.dw-navbar ul a svg{
+    color: black;
+}

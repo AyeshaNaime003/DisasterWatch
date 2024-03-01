@@ -7,6 +7,7 @@
     --zinc-100: #F4F4F4;
     --red-500: #FF3333;
     --white: #FFFFFF;
+    --lovely-blue-lighter:#b3d2ea;
     --lovely-blue:#6AACDE;
     --lovely-blue-deeper:#1f5782
 }
@@ -14,13 +15,9 @@
 body{
     padding: 0;
     margin: 0;
+    /* background-color: whitesmoke; */
 }
 
-
-.my-bg-gray{
-    background-color: red;
-
-}
-.my-bg-whitesmoke{
-    background-color: whitesmoke;
+h2, h3{
+    font-family: "Assistant", sans-serif
 }

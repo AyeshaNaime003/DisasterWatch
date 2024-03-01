@@ -1,32 +1,44 @@
 {% extends 'index.html' %}
+{% load static %}
 {% block title %}Home{% endblock title %}
 {% block body %}
-{% include 'app/navbar.html' %}
-<div class="container-fluid">
-    <h1 class="px-0 my-5">Home</h1>
-    <div class="container">
-        {% if reports %}
-            <ul>
-                {% for report in reports %}
-                    <li>
-                        <a href="{{ report.fields.href }}" target="_blank">{{ report.fields.title }}</a>
-                    </li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <p>No earthquake reports available.</p>
-        {% endif %}
+<link rel="stylesheet" href="{% static '/styles/home.css' %}">
+<div class="home-container row ">
+    <!-- <div class="top-bar"></div> -->
+    <div class="col-md-1 d-md-block d-none">
+        {% include 'app/navbar.html' %}
     </div>
-    <div class="container">
-        <div class="row text-center">
-            <div class="col">
-                <a href="{% url 'map' %}"><button class="btn btn-primary">map</button></a>
+    <div class="col-md-11 container-2">
+        <h3 class="px-0 my-1 mt-3">Recent Disaster Related News:</h3>
+        <div class="container">
+            {% if reports %}
+                <ul>
+                    {% for report in reports %}
+                        <li>
+                            <a href="{{ report.fields.href }}" target="_blank">{{ report.fields.title }}</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No earthquake reports available.</p>
+            {% endif %}
+        </div>
+        <div class="container">
+            <div class="row text-center">
+                <div class="col">
+                    <a href="{% url 'map' %}"><button class="btn btn-primary">map</button></a>
+                </div>
+                <div class="col">
+                    <a href=""><button class="btn btn-primary">search</button></a>
+                </div>
             </div>
-            <div class="col">
-                <a href=""><button class="btn btn-primary">search</button></a>
-            </div>
+        </div>
+        <div>
         </div>
     </div>
 </div>
 
+
 {% endblock body %}
+
+
