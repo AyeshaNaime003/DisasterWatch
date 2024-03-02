@@ -16,4 +16,5 @@
 .active{
     background-color: var(--lovely-blue);
     color: whitesmoke;
+    border-radius: 10px;
 }

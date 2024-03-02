@@ -18,8 +18,8 @@ configure so the server can see the template:   BASE_DIR/'templates' in setting.
 will house index.html which load main css file and extend different templates
 
 pages:
-login,
-home,
+login_>authenticate, login(carries user info)
+home->sidebar,[LINKS NOT WORKING]
 get sentinel2 imagery form,
 stats,
 map
@@ -40,6 +40,7 @@ from the tiff file get the top left lat and lon, use these to calculate the affi
 
 
 SUGGESTIONS:
+home page links not working
 let user toggle between two styles of map viewing: satellite and open-street-map
 ISSUES:
 page wont load until all the addressses are retrived
