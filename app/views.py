@@ -14,7 +14,7 @@ from .map_segmentation import html_code
 # Create your views here.
 @login_required(login_url="login/")
 def home(request):
-    api_url = "https://api.reliefweb.int/v1/reports?appname=apidoc&preset=latest&query[value]=earthquake&limit=5"
+    api_url = "https://api.reliefweb.int/v1/reports?appname=apidoc&preset=latest&query[value]=earthquake&limit=6"
     response = requests.get(api_url)
     
     # Check if the request was successful (status code 200)

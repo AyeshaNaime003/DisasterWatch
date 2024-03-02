@@ -1,24 +1,52 @@
 .home-container{
     display: flex;    
-    padding: 1vh 1vw;
     background-color: var(--lovely-blue-lighter);
-}
-.top-bar{
     position: fixed;
     top: 0;
     left: 0;
-    height: 1vh;
-    width: 100vw;
-    /* background-color: var(--lovely-blue-lighter); */
-}
-.home-container .col-md-1{
-
+    bottom: 0;
+    right: 0;
+    overflow-y: scroll; 
 }
 .home-container .container-2{
-    /* margin: 1vh 1vw 0px; */
-    /* margin-left: 100px; */
-    margin-top: 1vh;
-    border-radius: 10px;
-    background-color: whitesmoke;
-    /* height: 100%; */
+        border-radius: 10px;
+        background-color: whitesmoke;
+        /* margin-top: 1vh;
+        margin-right: 1vw;
+        margin-left: 9vw; */
+        position: absolute;
+        top: 1vh;
+        left: 9vw;
+        right: 1vw;
 }
+.home-container .aboutus div{
+    background-image: url('../assets/bannerbg.jpg');
+    background-color: rgba(0, 0, 0, 0.8 ); /* Adjust opacity as needed */
+    background-size: cover; 
+    background-position: center; 
+    background-repeat: no-repeat;
+}
+.home-container .aboutus div h1,
+.home-container .aboutus div p{
+    color: white;
+}
+
+.home-container .news{
+    a {
+        color: inherit; /* Use the default text color */
+        text-decoration: none; /* Remove underline */
+    }
+
+    /* Optionally, you can style visited links differently */
+    a:hover {
+        color: inherit; /* Change color on hover */
+    }
+}
+.home-container .form{}
+
+@media (max-width: 768px) {
+    .home-container .container-2 {
+      left: 1vw !important;
+      right: 1vw !important;
+    }
+  }
