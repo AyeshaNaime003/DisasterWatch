@@ -13,3 +13,7 @@
 .dw-navbar ul a svg{
     color: black;
 }
+.active{
+    background-color: var(--lovely-blue);
+    color: whitesmoke;
+}

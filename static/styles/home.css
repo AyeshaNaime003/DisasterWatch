@@ -8,7 +8,7 @@
     right: 0;
     overflow-y: scroll; 
 }
-.home-container .container-2{
+.home-container .right-container{
         border-radius: 10px;
         background-color: whitesmoke;
         /* margin-top: 1vh;
@@ -42,7 +42,7 @@
         color: inherit; /* Change color on hover */
     }
 }
-.home-container .form{}
+/* .home-container .form{} */
 
 @media (max-width: 768px) {
     .home-container .container-2 {

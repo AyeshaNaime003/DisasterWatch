@@ -7,7 +7,7 @@
     <!-- SIDEBAR -->
     {% include 'app/navbar.html' %}
     <!-- RIGHT PANEL -->
-    <div class="container-2">
+    <div class="right-container">
         <!-- ABOUT US -->
         <div class="aboutus">
             <div class="m-3 p-2 p-md-3 mb-4 rounded">
@@ -24,7 +24,7 @@
                 {% for report in reports %}
                 <div class="co-12 col-md-4 col-xl-2 mb-2">
                     <div class="p-1 h-100 border rounded overflow-hidden">
-                        <a href="{{ report.filds.href }}" class=" icon-link gap-1 icon-link-hover stretched-link">
+                        <a href="{{ report.fileds.href }}" class=" icon-link gap-1 icon-link-hover stretched-link">
                             {{ report.fields.title }}
                         </a>
                     </div>
@@ -36,14 +36,10 @@
             </div>
         </div>
 
-        <!-- TAKE TO FORM -->
         <div class="taketoform mt-4 p-2">
-            <!-- <div class="m-3 mb-4 rounded"> -->
-                <h3 class="m-3">Try our model and view the results in interative maps and dashboard:</h3>
-                <a href="{% url 'map' %}" class=""><button class="btn btn-primary">Go to Form:   </button></a>
-            </div>
-            <a href="{% url 'map' %}">m a p</a>
-        <!-- </div> -->
+            <h3 class="m-3">Try our model and view the results in interative maps and dashboard:</h3>
+            <a href="map.html"><button class="btn btn-primary">Go to Form: </button></a>
+        </div>
     </div>
 </div>
 
