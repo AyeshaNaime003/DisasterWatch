@@ -65,7 +65,26 @@ def dashboard(request):
     return render(request, "app/dashboard.html")
 
 def profile(request):
-    return render(request, "app/profile.html")
+    user = request.user
+
+    if request.method == 'POST':
+        print("Reuest to update profile")
+         # Get the data from the form
+        first_name = request.POST.get('first_name')
+        last_name = request.POST.get('last_name')
+        email = request.POST.get('email')
+        
+        # Update user attributes
+        user.first_name = first_name
+        user.last_name = last_name
+        user.email = email
+        
+        # Save the changes
+        user.save()
+        messages.success(request, 'Profile updated successfully!')
+        return redirect('profile')
+    else:
+        return render(request, "app/profile.html", context={'user': user,})
 
 def help(request):
     return render(request, "app/help.html")
