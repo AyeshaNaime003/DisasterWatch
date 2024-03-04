@@ -43,3 +43,9 @@ h2, h3{
         left: 9vw;
         right: 1vw;
 }
+@media (max-width: 768px) {
+    .home-container .right-container {
+      left: 1vw !important;
+      right: 1vw !important;
+    }
+  }

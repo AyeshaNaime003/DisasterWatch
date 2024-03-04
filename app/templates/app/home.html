@@ -6,11 +6,10 @@
 <div class="home-container">
     <!-- SIDEBAR -->
     {% include 'app/navbar.html' %}
-    <!-- RIGHT PANEL -->
     <div class="right-container">
         <!-- ABOUT US -->
         <div class="aboutus">
-            <div class="m-3 p-2 p-md-3 mb-4 rounded">
+            <div class="m-3 p-2 rounded">
                 <h1 class="display-4 fw-normal fst-italic">DisasterWatch</h1>
                 <p class="lead my-3">An AI-Driven Web Service for Disaster Damage Assessment
                 </p>
@@ -20,27 +19,28 @@
         <div class="news mt-4 p-2">
             <h3 class="m-3">Recent Disaster Related News:</h3>
             {% if reports %}
-            <div class="row m-1 mb-2">
+             <div class="row m-1 mb-2">
                 {% for report in reports %}
                 <div class="co-12 col-md-4 col-xl-2 mb-2">
                     <div class="p-1 h-100 border rounded overflow-hidden">
-                        <a href="{{ report.fileds.href }}" class=" icon-link gap-1 icon-link-hover stretched-link">
+                        <!-- <a href="{{ report.fields.href }}" class=" icon-link gap-1 icon-link-hover stretched-link"> -->
                             {{ report.fields.title }}
-                        </a>
+                        <!-- </a> -->
                     </div>
                 </div>
                 {% endfor %}
-                {% else %}
-                <p>No earthquake reports available.</p>
-                {% endif %}
-            </div>
+             </div>
+             {% else %}
+             <p>No earthquake reports available.</p>
+             {% endif %}
         </div>
-
+        <!-- TAKE TO FORM -->
         <div class="taketoform mt-4 p-2">
             <h3 class="m-3">Try our model and view the results in interative maps and dashboard:</h3>
-            <a href="map.html"><button class="btn btn-primary">Go to Form: </button></a>
+            <a href="{% url 'form' %}"><button class="btn btn-primary">Go to Form: </button></a>
         </div>
     </div>
+
 </div>
 
 

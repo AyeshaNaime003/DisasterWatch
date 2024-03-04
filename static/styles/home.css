@@ -23,9 +23,3 @@
 }
 /* .home-container .form{} */
 
-@media (max-width: 768px) {
-    .home-container .container-2 {
-      left: 1vw !important;
-      right: 1vw !important;
-    }
-  }
