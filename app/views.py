@@ -3,7 +3,24 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.http import HttpResponse
 import requests
+import os
+from osgeo import gdal
+
+# Import sys module to manipulate Python path
+import sys
+import os
+
+# Add the parent directory of 'server' and 'app' to the Python path
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
+server_dir = os.path.join(parent_dir, 'server')
+sys.path.append(parent_dir)
+sys.path.append(server_dir)
+
+# Now you can import variables from settings.py
+from server.settings import *
 
 from .folium_maps import html_code
 # from .plotly_maps import html_code
@@ -66,7 +83,6 @@ def dashboard(request):
 
 def profile(request):
     user = request.user
-
     if request.method == 'POST':
         print("Reuest to update profile")
          # Get the data from the form
@@ -93,4 +109,35 @@ def notifications(request):
     return render(request, "app/notifications.html")
 
 def form(request):
+    if request.method == 'POST' and request.FILES['imageFile']:
+        image_file = request.FILES['imageFile']
+        city = request.POST['city']
+        date = request.POST['date']
+
+        # Save the uploaded TIFF file to a temporary location
+        file_path = os.path.join(STATICFILES_DIRS, 'temp', 'temp.tif')
+        with open(file_path, 'wb') as f:
+            for chunk in image_file.chunks():
+                f.write(chunk)
+
+        # Open the TIFF file and read its metadata
+        dataset = gdal.Open(file_path)
+        metadata = dataset.GetMetadata()
+
+        # Close the dataset
+        dataset = None
+
+        # Delete the temporary file
+        os.remove(file_path)
+
+        # Display the city, date, and metadata
+        print("City:", city)
+        print("Date:", date)
+        print("Metadata:")
+        for key, value in metadata.items():
+            print(f"{key}: {value}")
+
+        return HttpResponse("Processing completed. Check the server console for details.")
+    else:
+        return HttpResponse("No file uploaded or invalid request method.")
     return render(request, "app/form.html")

@@ -7,11 +7,11 @@
     {% include 'app/navbar.html' %}
     <div class="right-container">
         <div class="m-1 p-1">
-            <form method="POST" enctype="multipart/form-data">
+            <form method="POST" enctype="multipart/form-data" action="">
                 {% csrf_token %}
                 <div class="mb-3">
                     <label for="imageFile" class="form-label">Upload TIFF File:</label>
-                    <input type="file" class="form-control" id="imageFile" name="imageFile" accept=".tiff">
+                    <input type="file" class="form-control" id="imageFile" name="imageFile" accept=".tif">
                 </div>
                 <div class="mb-3">
                     <label for="city" class="form-label">City:</label>
@@ -25,7 +25,6 @@
             </form>
         </div>    
     </div>
-
 </div>
 
 

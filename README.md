@@ -44,3 +44,22 @@ home page links not working
 let user toggle between two styles of map viewing: satellite and open-street-map
 ISSUES:
 page wont load until all the addressses are retrived
+To run this project, you need to install GDAL. Follow the steps below:
+
+### 1. Download GDAL Wheel File
+
+- Visit [Python Extension Packages for Windows - Christoph Gohlke](https://www.lfd.uci.edu/~gohlke/pythonlibs/).
+- Search for GDAL and download the appropriate wheel file based on your Python version and system architecture. For example, for Python 3.9 on a 64-bit system, download `GDAL-3.4.3-cp39-cp39-win_amd64.whl`.
+
+### 2. Place Wheel File in Your Project Directory
+
+- Move the downloaded wheel file (`GDAL-3.4.3-cp39-cp39-win_amd64.whl`) into your project directory.
+
+### 3. Install GDAL Using pip
+
+- Open a command prompt or terminal.
+- Navigate to your project directory using the `cd` command.
+- Run the following command to install GDAL using `pip`:
+
+  ```bash
+  pip install GDAL-3.4.3-cp39-cp39-win_amd64.whl
