@@ -1,0 +1,57 @@
+{% extends 'index.html' %}
+{% load static %}
+{% block title %}Home{% endblock title %}
+{% block body %}
+<link rel="stylesheet" href="{% static '/styles/inference_form.css' %}">
+
+<div class="home-container">
+    <!-- SIDEBAR -->
+    {% include 'app/navbar.html' %}
+    <div class="right-container">
+        <div class="inferenceform m-2 p-2">
+            <form method="POST" enctype="multipart/form-data">
+                <div class="row my-1">
+                    <div class="col">
+                        <label for="pre_image">Pre-disaster Image:</label>
+                        <input type="file" class="form-control-file" id="pre_image" name="pre_image" accept=".tif">
+                    </div>
+                    <div class="col">
+                        <label for="post_image">Post-disaster Image:</label>
+                        <input type="file" class="form-control-file" id="post_image" name="post_image" accept=".tif">
+                    </div>
+                </div>
+                <div class="my-4">
+                    <label for="city">City:</label>
+                    <input type="text" class="form-control" id="city" name="city">
+                </div>
+                <div class="my-4">
+                    <label for="date">Date of Satellite Imagery:</label>
+                    <input type="date" class="form-control" id="date" name="date">
+                </div>
+                <div class="my-4">
+                    <label for="disaster_type">Type of Disaster:</label>
+                    <select class="form-control" id="disaster_type" name="disaster_type">
+                        <option value="earthquake">Earthquake</option>
+                        <option value="flood">Flood</option>
+                        <option value="fire">Fire</option>
+                        <!-- Add more options as needed -->
+                    </select>
+                </div>
+                <div class="my-4">
+                    <label for="disaster_description">Description of Disaster:</label>
+                    <textarea class="form-control" id="disaster_description" name="disaster_description"
+                        rows="3"></textarea>
+                </div>
+                <div class="my-4">
+                    <label for="comments">Additional Comments:</label>
+                    <textarea class="form-control" id="comments" name="comments" rows="3"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary bg-lovely-blue-deeper mt-3">Submit</button>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+
+{% endblock body %}

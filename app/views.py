@@ -84,7 +84,6 @@ def dashboard(request):
 def profile(request):
     user = request.user
     if request.method == 'POST':
-        print("Reuest to update profile")
          # Get the data from the form
         first_name = request.POST.get('first_name')
         last_name = request.POST.get('last_name')
@@ -108,14 +107,15 @@ def help(request):
 def notifications(request):
     return render(request, "app/notifications.html")
 
-def form(request):
+def inferenceform(request):
     if request.method == 'POST' and request.FILES['imageFile']:
+        print()
         image_file = request.FILES['imageFile']
         city = request.POST['city']
         date = request.POST['date']
 
-        # Save the uploaded TIFF file to a temporary location
-        file_path = os.path.join(STATICFILES_DIRS, 'temp', 'temp.tif')
+        
+        file_path = os.path.join(STATICFILES_DIRS[0], 'temp', 'temp.tif')
         with open(file_path, 'wb') as f:
             for chunk in image_file.chunks():
                 f.write(chunk)
@@ -139,5 +139,5 @@ def form(request):
 
         return HttpResponse("Processing completed. Check the server console for details.")
     else:
-        return HttpResponse("No file uploaded or invalid request method.")
-    return render(request, "app/form.html")
+        return render(request, "app/inferenceform.html")
+        

@@ -13,5 +13,5 @@ urlpatterns = [
     path('update-profile/', views.profile, name="update-profile"),
     path('notifications/', views.notifications, name="notifications"),
     path('help/', views.help, name="help"),
-    path('form/', views.form, name="form"),
+    path('inferenceform/', views.inferenceform, name="inferenceform"),
 ]

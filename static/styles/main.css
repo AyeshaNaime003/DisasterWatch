@@ -21,6 +21,12 @@ h2, h3{
     font-family: "Assistant", sans-serif
 }
 
+.bg-lovely-blue{
+    background-color: var(--lovely-blue);
+}
+.bg-lovely-blue-deeper{
+    background-color: var(--lovely-blue-deeper);
+}
 .home-container{
     display: flex;    
     background-color: var(--lovely-blue-lighter);
