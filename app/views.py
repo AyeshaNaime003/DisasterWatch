@@ -6,26 +6,32 @@ from django.contrib import messages
 from django.http import HttpResponse
 import requests
 import os
+import sys
+
 from osgeo import gdal
 
-# Import sys module to manipulate Python path
-import sys
-import os
-
-# Add the parent directory of 'server' and 'app' to the Python path
 current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.dirname(current_dir)
 server_dir = os.path.join(parent_dir, 'server')
+model_dir = os.path.join(parent_dir, 'model')
+
+
 sys.path.append(parent_dir)
 sys.path.append(server_dir)
+sys.path.append(model_dir)
 
-# Now you can import variables from settings.py
+# print(f"paths to check for module: {sys.path}")
+
 from server.settings import *
+from model.models import SeResNext50_Unet_MultiScale
+from model.data_preprocessing import tif_to_img
 
 from .folium_maps import html_code
 # from .plotly_maps import html_code
 from .map_segmentation import html_code
 # from .plotly_maps import dash_app
+
+os.environ['TORCH_HOME'] = model_dir
 
 def loginPage(request):
     if request.method=="POST":
@@ -108,36 +114,39 @@ def notifications(request):
     return render(request, "app/notifications.html")
 
 def inferenceform(request):
-    if request.method == 'POST' and request.FILES['imageFile']:
-        print()
-        image_file = request.FILES['imageFile']
-        city = request.POST['city']
-        date = request.POST['date']
+    if request.method == 'POST' and request.FILES['pre_image'] and request.FILES['post_image']:
 
-        
-        file_path = os.path.join(STATICFILES_DIRS[0], 'temp', 'temp.tif')
-        with open(file_path, 'wb') as f:
-            for chunk in image_file.chunks():
+        pre_image = request.FILES['pre_image']
+        post_image = request.FILES['post_image']
+        city = request.POST['city']  
+        date = request.POST['date']
+        disaster_type = request.POST['disaster_type']
+
+        pre_path = os.path.join(STATICFILES_DIRS[0], 'temp', 'pre.tif')
+        post_path = os.path.join(STATICFILES_DIRS[0], 'temp', 'post.tif')
+        with open(pre_path, 'wb') as f:
+            for chunk in pre_image.chunks():
+                f.write(chunk)
+        with open(post_path, 'wb') as f:
+            for chunk in post_image.chunks():
                 f.write(chunk)
 
-        # Open the TIFF file and read its metadata
-        dataset = gdal.Open(file_path)
-        metadata = dataset.GetMetadata()
+        pre_image = gdal.Open(pre_path)
+        post_image = gdal.Open(post_path)
+        pre, post = tif_to_img(pre_image), tif_to_img(pre_image)
+        print(f"pre image: {type([pre_image]),pre_image.shape}")
+        print(f"post image: {type([post_image]),post_image.shape}")
+        
 
-        # Close the dataset
-        dataset = None
+        model = SeResNext50_Unet_MultiScale()
+        print("model created")
+        type(f"pre image type: {pre_image}")
 
-        # Delete the temporary file
-        os.remove(file_path)
-
-        # Display the city, date, and metadata
-        print("City:", city)
-        print("Date:", date)
-        print("Metadata:")
-        for key, value in metadata.items():
-            print(f"{key}: {value}")
-
-        return HttpResponse("Processing completed. Check the server console for details.")
+        content = f"City: {city}\n"
+        content += f"Date: {date}\n"
+        content += f"Disaster: {disaster_type}\n"
+        content += "Metadata:\n"
+        return HttpResponse(content)
     else:
         return render(request, "app/inferenceform.html")
         

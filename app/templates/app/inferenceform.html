@@ -10,6 +10,7 @@
     <div class="right-container">
         <div class="inferenceform m-2 p-2">
             <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
                 <div class="row my-1">
                     <div class="col">
                         <label for="pre_image">Pre-disaster Image:</label>
