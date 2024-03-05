@@ -1,6 +1,6 @@
 .home-container .aboutus div{
     background-image: url('../assets/bannerbg.jpg');
-    background-color: rgba(0, 0, 0, 0.8 ); /* Adjust opacity as needed */
+    background-color: rgba(0, 0, 0, 0.8 ); 
     background-size: cover; 
     background-position: center; 
     background-repeat: no-repeat;
@@ -12,14 +12,10 @@
 
 .home-container .news{
     a {
-        color: inherit; /* Use the default text color */
-        text-decoration: none; /* Remove underline */
+        color: inherit; 
+        text-decoration: none; 
     }
-
-    /* Optionally, you can style visited links differently */
     a:hover {
-        color: inherit; /* Change color on hover */
+        color: inherit; 
     }
 }
-/* .home-container .form{} */
-

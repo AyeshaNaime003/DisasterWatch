@@ -92,5 +92,5 @@ def help(request):
 def notifications(request):
     return render(request, "app/notifications.html")
 
-def settings(request):
-    return render(request, "app/settings.html")
+def form(request):
+    return render(request, "app/form.html")

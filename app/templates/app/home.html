@@ -8,7 +8,7 @@
     {% include 'app/navbar.html' %}
     <div class="right-container">
         <!-- ABOUT US -->
-        <div class="aboutus">
+        <div class="aboutus m-1 p-1">
             <div class="m-3 p-2 rounded">
                 <h1 class="display-4 fw-normal fst-italic">DisasterWatch</h1>
                 <p class="lead my-3">An AI-Driven Web Service for Disaster Damage Assessment
@@ -16,28 +16,33 @@
             </div>
         </div>
         <!-- NEWS -->
-        <div class="news mt-4 p-2">
+        <div class="news m-1 p-1 ">
             <h3 class="m-3">Recent Disaster Related News:</h3>
             {% if reports %}
-             <div class="row m-1 mb-2">
+            <div class="row m-1 mb-2">
                 {% for report in reports %}
                 <div class="co-12 col-md-4 col-xl-2 mb-2">
                     <div class="p-1 h-100 border rounded overflow-hidden">
                         <!-- <a href="{{ report.fields.href }}" class=" icon-link gap-1 icon-link-hover stretched-link"> -->
-                            {{ report.fields.title }}
+                        {{ report.fields.title }}
                         <!-- </a> -->
                     </div>
                 </div>
                 {% endfor %}
-             </div>
-             {% else %}
-             <p>No earthquake reports available.</p>
-             {% endif %}
+            </div>
+            {% else %}
+            <p>No earthquake reports available.</p>
+            {% endif %}
         </div>
         <!-- TAKE TO FORM -->
-        <div class="taketoform mt-4 p-2">
-            <h3 class="m-3">Try our model and view the results in interative maps and dashboard:</h3>
-            <a href="{% url 'form' %}"><button class="btn btn-primary">Go to Form: </button></a>
+        <div class="taketoform m-1 p-1 mt-4 p-2 px-4">
+            <div class="d-flex flex-column align-items-start">
+                    <h2 class="fw-bold  mt-2">Experience DisasterWatch's Cutting-Edge AI Model</h2>
+                    <p class="text-body-secondary mt-2">
+                        Dive into the innovative world of DisasterWatch's AI-driven model, offering real-time disaster prediction and analysis. Navigate through interactive maps and dashboards to gain valuable insights, empowering you to make informed decisions and take proactive measures. Join us in our mission to create a safer, more resilient world.
+                    </p>
+                    <a href="{% url 'form' %}" class="btn btn-primary">Start Model Inference</a>
+            </div>
         </div>
     </div>
 
