@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 from modules import * 
+import torch.nn.functional as F
 from torchvision.models import resnet50
 
 class SeResNext50_Unet_MultiScale(nn.Module):

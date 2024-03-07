@@ -63,3 +63,6 @@ To run this project, you need to install GDAL. Follow the steps below:
 
   ```bash
   pip install GDAL-3.4.3-cp39-cp39-win_amd64.whl
+
+
+  python manage.py test tests.test_cases

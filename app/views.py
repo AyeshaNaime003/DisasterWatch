@@ -7,6 +7,8 @@ from django.http import HttpResponse
 import requests
 import os
 import sys
+from PIL import Image
+import torch
 
 from osgeo import gdal
 
@@ -39,15 +41,19 @@ def loginPage(request):
         password = request.POST.get('password')
         try:
             user = User.objects.get(username=username)
-        except:
-            messages.error(request, "No user with this username")
+        except User.DoesNotExist:
+            messages.error(request, "Invalid credentials")
+            return render(request, "app/login.html")
+        
         user = authenticate(request=request, username=username, password=password)
         if user is not None:
             login(request, user)
             print("LOGIN SUCCESSFUL, REDIRECTING TO HOME")
             return redirect('home')
-        else:
+        else: 
             messages.error(request, "Invalid credentials")
+            return render(request, "app/login.html")
+        
     return render(request, "app/login.html")
 
 # Create your views here.
@@ -114,39 +120,41 @@ def notifications(request):
     return render(request, "app/notifications.html")
 
 def inferenceform(request):
-    if request.method == 'POST' and request.FILES['pre_image'] and request.FILES['post_image']:
+    if True:
+    # if request.method == 'POST' and request.FILES['pre_image'] and request.FILES['post_image']:
 
-        pre_image = request.FILES['pre_image']
-        post_image = request.FILES['post_image']
-        city = request.POST['city']  
-        date = request.POST['date']
-        disaster_type = request.POST['disaster_type']
+        # pre_image = request.FILES['pre_image']
+        # post_image = request.FILES['post_image']
+        # city = request.POST['city']  
+        # date = request.POST['date']
+        # disaster_type = request.POST['disaster_type']
 
         pre_path = os.path.join(STATICFILES_DIRS[0], 'temp', 'pre.tif')
         post_path = os.path.join(STATICFILES_DIRS[0], 'temp', 'post.tif')
-        with open(pre_path, 'wb') as f:
-            for chunk in pre_image.chunks():
-                f.write(chunk)
-        with open(post_path, 'wb') as f:
-            for chunk in post_image.chunks():
-                f.write(chunk)
+        # with open(pre_path, 'wb') as f:
+        #     for chunk in pre_image.chunks():
+        #         f.write(chunk)
+        # with open(post_path, 'wb') as f:
+        #     for chunk in post_image.chunks():
+        #         f.write(chunk)
 
-        pre_image = gdal.Open(pre_path)
-        post_image = gdal.Open(post_path)
-        pre, post = tif_to_img(pre_image), tif_to_img(pre_image)
-        print(f"pre image: {type([pre_image]),pre_image.shape}")
-        print(f"post image: {type([post_image]),post_image.shape}")
+        pre_image = gdal.open(pre_path)
+        post_image = gdal.open(post_path)
         
+        pre, post = tif_to_img(pre_image), tif_to_img(post_image)        
+        pre_post = torch.cat((pre, post), dim=-1).unsqueeze(0)
 
         model = SeResNext50_Unet_MultiScale()
-        print("model created")
-        type(f"pre image type: {pre_image}")
+        output = model(pre_post)
 
-        content = f"City: {city}\n"
-        content += f"Date: {date}\n"
-        content += f"Disaster: {disaster_type}\n"
-        content += "Metadata:\n"
-        return HttpResponse(content)
+        print(f"\n\ninfereed successfully, output shape: {output.shape}")
+        type(f"pre image type: {pre}")
+
+
+        print(f"pre image: {type([pre]),pre.shape}")
+        print(f"post image: {type([post]),post.shape}")
+        print(f"output image: {type([output]),output.shape}")
+        # return HttpResponse(content)
     else:
         return render(request, "app/inferenceform.html")
         
