@@ -1,6 +1,7 @@
 from django.urls import path
 from django.conf.urls import handler404
 from . import views
+from django.views.generic import TemplateView
 
 
 urlpatterns = [
@@ -15,5 +16,6 @@ urlpatterns = [
     path('notifications/', views.notifications, name="notifications"),
     path('help/', views.help, name="help"),
     path('inferenceform/', views.inferenceform, name="inferenceform"),
+    path('<path:not_found>', TemplateView.as_view(template_name='app/404.html'), name='not_found'),
 ]
 handler404 = 'app.views.custom_404_view'

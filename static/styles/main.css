@@ -9,7 +9,8 @@
     --white: #FFFFFF;
     --lovely-blue-lighter:#b3d2ea;
     --lovely-blue:#6AACDE;
-    --lovely-blue-deeper:#1f5782
+    --lovely-blue-deeper:#1f5782;
+    --light-black: #1b1c1d; 
 }
 body{
     padding: 0;

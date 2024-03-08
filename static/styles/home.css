@@ -1,3 +1,4 @@
+/* HOME------------------------------------ */
 .home-container .aboutus div{
     background-image: url('../assets/bannerbg.jpg');
     background-color: rgba(0, 0, 0, 0.8 ); 
@@ -18,4 +19,12 @@
     a:hover {
         color: inherit; 
     }
+}
+
+/* 404 PAGE---------------------------------- */
+section.errorpage h2{
+    color: var(--light-black);
+}
+section.errorpage h2 i{
+    color: var(--lovely-blue-deeper);
 }

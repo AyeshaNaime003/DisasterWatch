@@ -57,24 +57,21 @@ def loginPage(request):
         
     return render(request, "app/login.html")
 
-# Create your views here.
+
+
 @login_required(login_url="login/")
 def home(request):
     print(f"HII {request.user.username}, welcome to home page")
     api_url = "https://api.reliefweb.int/v1/reports?appname=apidoc&preset=latest&query[value]=earthquake&limit=6"
     api_response = requests.get(api_url)
     
-    # Check if the request was successful (status code 200)
     if api_response.status_code == 200:
         api_response_json = api_response.json()        
-        print(json.dumps(api_response_json, indent=4))
         reports = api_response_json.get("data", [])    
-        print(json.dumps(reports, indent=3))
-        # for key
+        # print(json.dumps(reports, indent=3))
         return render(request, 'app/home.html', {'reports': reports})
     else:
-        # Handle the error gracefully
-        messages.error(request, f"Failed to fetch data from API. Status code: {response.status_code}")
+        messages.error(request, f"Failed to fetch data from API. Status code: {api_response.status_code}")
         return render(request, 'app/home.html')
 
 
