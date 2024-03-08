@@ -4,6 +4,7 @@ from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import HttpResponse
+import json
 import requests
 import os
 import sys
@@ -61,18 +62,20 @@ def loginPage(request):
 def home(request):
     print(f"HII {request.user.username}, welcome to home page")
     api_url = "https://api.reliefweb.int/v1/reports?appname=apidoc&preset=latest&query[value]=earthquake&limit=6"
-    response = requests.get(api_url)
+    api_response = requests.get(api_url)
     
     # Check if the request was successful (status code 200)
-    if response.status_code == 200:
-        api_data = response.json()        
-        reports = api_data.get("data", [])    
+    if api_response.status_code == 200:
+        api_response_json = api_response.json()        
+        print(json.dumps(api_response_json, indent=4))
+        reports = api_response_json.get("data", [])    
+        print(json.dumps(reports, indent=3))
         # for key
         return render(request, 'app/home.html', {'reports': reports})
     else:
         # Handle the error gracefully
-        error_message = f"Failed to fetch data from API. Status code: {response.status_code}"
-        return render(request, 'app/home.html', {'error_message': error_message})
+        messages.error(request, f"Failed to fetch data from API. Status code: {response.status_code}")
+        return render(request, 'app/home.html')
 
 
 
@@ -116,27 +119,25 @@ def profile(request):
 def help(request):
     return render(request, "app/help.html")
 
-def notifications(request):
-    return render(request, "app/notifications.html")
 
 def inferenceform(request):
-    if True:
-    # if request.method == 'POST' and request.FILES['pre_image'] and request.FILES['post_image']:
+    # if True:
+    if request.method == 'POST' and request.FILES['pre_image'] and request.FILES['post_image']:
 
-        # pre_image = request.FILES['pre_image']
-        # post_image = request.FILES['post_image']
-        # city = request.POST['city']  
-        # date = request.POST['date']
-        # disaster_type = request.POST['disaster_type']
+        pre_image = request.FILES['pre_image']
+        post_image = request.FILES['post_image']
+        city = request.POST['city']  
+        date = request.POST['date']
+        disaster_type = request.POST['disaster_type']
 
         pre_path = os.path.join(STATICFILES_DIRS[0], 'temp', 'pre.tif')
         post_path = os.path.join(STATICFILES_DIRS[0], 'temp', 'post.tif')
-        # with open(pre_path, 'wb') as f:
-        #     for chunk in pre_image.chunks():
-        #         f.write(chunk)
-        # with open(post_path, 'wb') as f:
-        #     for chunk in post_image.chunks():
-        #         f.write(chunk)
+        with open(pre_path, 'wb') as f:
+            for chunk in pre_image.chunks():
+                f.write(chunk)
+        with open(post_path, 'wb') as f:
+            for chunk in post_image.chunks():
+                f.write(chunk)
 
         pre_image = gdal.open(pre_path)
         post_image = gdal.open(post_path)
@@ -154,7 +155,11 @@ def inferenceform(request):
         print(f"pre image: {type([pre]),pre.shape}")
         print(f"post image: {type([post]),post.shape}")
         print(f"output image: {type([output]),output.shape}")
-        # return HttpResponse(content)
     else:
         return render(request, "app/inferenceform.html")
         
+def custom_404_view(request, exception):
+    return render(request, '404.html', status=404)
+
+def notifications(request):
+    pass

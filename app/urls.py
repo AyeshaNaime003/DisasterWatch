@@ -1,4 +1,5 @@
 from django.urls import path
+from django.conf.urls import handler404
 from . import views
 
 
@@ -15,3 +16,4 @@ urlpatterns = [
     path('help/', views.help, name="help"),
     path('inferenceform/', views.inferenceform, name="inferenceform"),
 ]
+handler404 = 'app.views.custom_404_view'

@@ -16,6 +16,16 @@
             <div class="col-lg-7 col-12 py-3 form-container text-center">
                 <img class="logo" src="{% static '/assets/logo.png' %}" alt="logo">
                 <h2 class="text-center">Login</h2>
+                <div class="container">
+                    {% if messages %}
+                    {% for message in messages %}
+                    <p class="alert {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% endif %}"
+                      role="alert">
+                      {{ message }}
+                      {% endfor %}
+                      </ul>
+                      {% endif %}
+                  </div>
                 <form action="" method="POST">
                     {% csrf_token %}
                    <div class="form-group px-5 flex-column text-center">
