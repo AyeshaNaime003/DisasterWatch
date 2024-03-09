@@ -1,11 +1,21 @@
-{% extends "index.html" %}
-{% block title %}Maps{% endblock title %}
-{% block body %}
-    {% include 'app/navbar.html' %}
-    <h1>Interactive Map</h1>
-    <div class="container" style="padding: 0px; margin: 0;">
-    {{ html_code|safe }}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Interactive Map</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        #map { height: 400px; }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
 
-    </div>
-    <!-- {{ dash_html|safe }} -->
-{% endblock body %}
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        var map = L.map('map').setView([51.505, -0.09], 50);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+        }).addTo(map);
+    </script>
+</body>
+</html>
