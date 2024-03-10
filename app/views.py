@@ -127,12 +127,20 @@ def profile(request):
         last_name = request.POST.get('last_name')
         email = request.POST.get('email')
         contact_number = request.POST.get('contact-number')
+        bio = request.POST.get('bio')
+        profile_picture = request.FILES.get('profile_picture')
         
+
         # Update user attributes
         user.first_name = first_name
         user.last_name = last_name
         user.email = email
-        
+        user.contact = contact_number
+        user.bio = bio
+        if profile_picture:
+            user.profile_picture.delete()
+            user.profile_picture = profile_picture
+            print("picture saved")
         # Save the changes
         user.save()
         messages.success(request, 'Profile updated successfully!')

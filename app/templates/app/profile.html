@@ -20,7 +20,7 @@
           {% endif %}
       </div>
      <div class="container form-container">
-      <form action="{% url 'update-profile' %}" method="POST">
+      <form action="{% url 'update-profile' %}" method="POST" enctype="multipart/form-data">
         {% csrf_token %}
         <div class="row">
           <div class="col-lg-4">
@@ -30,7 +30,7 @@
                   <div class="profile-picture-container">
                     <img id="profile-picture" src="{{ user.profile_picture.url }}" class="d-block w-100"
                       alt="Profile Picture">
-                    <input type="file" id="profile-picture-input" style="display: none;" accept="image/*">
+                    <input type="file" id="profile-picture-input" name="profile_picture" style="display: none;" accept="image/*" >
                   </div>
                 </div>
 
