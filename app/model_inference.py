@@ -44,6 +44,8 @@ def polygons_to_masks(polygons, image_shape=(1024,1024)):
 def one_hot_encoding_mask(mask):
     # convert mask to hsv
     hsv = cv2.cvtColor(mask, cv2.COLOR_BGR2HSV)
+    plt.imshow(mask)
+    plt.show()
     # define color ranges
     lower_red = np.array([0, 50, 50])
     upper_red = np.array([10, 255, 255])
@@ -58,6 +60,14 @@ def one_hot_encoding_mask(mask):
     msky = cv2.inRange(hsv, lower_yellow, upper_yellow)
     msko = cv2.inRange(hsv, lower_orange, upper_orange)
     mskg = cv2.inRange(hsv, lower_green, upper_green)
+    plt.imshow(mskr)
+    plt.show()
+    plt.imshow(msky)
+    plt.show()
+    plt.imshow(msko)
+    plt.show()
+    plt.imshow(mskg)
+    plt.show()
     # Stack the masks along the channel axis to create one-hot encoded representation
     one_hot_encoded = np.stack([mskr, msko, msky, mskg])
     return one_hot_encoded
@@ -77,19 +87,19 @@ print(pre_post.dtype, pre_post.shape, "\n\n\n")
 # model = SeResNext50_Unet_MultiScale()
 # output = model(pre_post).squeeze()
 print("DUMMY OUTPUT")
-mask = plt.imread("woolsey-fire_00000715_post_disaster.png")
-masks = create_channel_masks("woolsey-fire_00000715_post_disaster.png")[1:]
+classes=["green", "yellow", "orange","red"]
+mask = cv2.imread("woolsey-fire_00000715_post_disaster.png")
+masks = one_hot_encoding_mask(mask)
 print(masks.shape, "\n\n")
 
 
-classes=["green", "yellow", "orange","red"]
-# plt.figure(figsize=(15, 5))  # Adjust the figure size as needed
-# for i in range(4):
-#     plt.subplot(1, 4, i + 1)
-#     plt.imshow(masks[i], cmap='gray')
-#     plt.title(classes[i])
-#     plt.axis('off')
-# plt.show()
+# # plt.figure(figsize=(15, 5))  # Adjust the figure size as needed
+# # for i in range(4):
+# #     plt.subplot(1, 4, i + 1)
+# #     plt.imshow(masks[i], cmap='gray')
+# #     plt.title(classes[i])
+# #     plt.axis('off')
+# # plt.show()
 
 print("MASKS TO POLYGON")
 os.makedirs("./masks", exist_ok=True)

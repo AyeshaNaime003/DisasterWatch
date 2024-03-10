@@ -8,41 +8,39 @@ def tif_to_img(tif_file):
                   tif_file.GetRasterBand(3).ReadAsArray()))
   return disaster_img
 
-def create_channel_masks(mask_path):
-    # Read the image
-    output = cv2.imread(mask_path)
+def mask_to_polygons(mask, rdp=True):
+    contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    polygons = []
+    for contour in contours:
+        contour_points = np.squeeze(contour)
+        epsilon = 0.01 * cv2.arcLength(contour_points, True)
+        approx = np.squeeze(cv2.approxPolyDP(contour_points, epsilon, True)).tolist()
+        polygons.append(approx)
+    return polygons
 
-    # Convert image to HSV
-    hsv = cv2.cvtColor(output, cv2.COLOR_BGR2HSV)
+def polygons_to_masks(polygons, image_shape=(1024,1024)):
+    mask = np.zeros(image_shape, dtype=np.uint8)
+    for polygon in polygons:
+        cv2.fillPoly(mask, [polygon], 255)  # Fill each polygon with white color (255)
+    return mask
 
-    # Define color thresholds in HSV (Hue, Saturation, Value) space
+def one_hot_encoding_mask(mask):
+    # convert mask to hsv
+    hsv = cv2.cvtColor(mask, cv2.COLOR_BGR2HSV)
+    # define color ranges
     lower_red = np.array([0, 50, 50])
     upper_red = np.array([10, 255, 255])
-
     lower_yellow = np.array([20, 50, 50])
-    upper_yellow = np.array([30, 255, 255])  # Adjusted upper limit for yellow
-
+    upper_yellow = np.array([30, 255, 255])
     lower_orange = np.array([10, 50, 50])
     upper_orange = np.array([20, 255, 255])
-
-    lower_green = np.array([31, 50, 50])     # Adjusted lower limit for green
+    lower_green = np.array([31, 50, 50])
     upper_green = np.array([80, 255, 255])
-
-    # Create masks
-    mask_red = cv2.inRange(hsv, lower_red, upper_red)
-    mask_yellow = cv2.inRange(hsv, lower_yellow, upper_yellow)
-    mask_orange = cv2.inRange(hsv, lower_orange, upper_orange)
-    mask_green = cv2.inRange(hsv, lower_green, upper_green)
-
-    # Make a mask array that contains all the masks in one array
-    msk = np.zeros((5, output.shape[0], output.shape[1]), dtype=np.uint8)
-    # msk[0, :, :] = 255 - np.max(output, axis=2)  # Invert the binary image
-    msk[1, :, :] = mask_green
-    msk[2, :, :] = mask_yellow
-    msk[3, :, :] = mask_orange
-    msk[4, :, :] = mask_red
-
-    # Threshold to make binary
-    msk = msk > 5
-
-    return msk
+    # Create masks for each class using inRange function
+    mskr = cv2.inRange(hsv, lower_red, upper_red)
+    msky = cv2.inRange(hsv, lower_yellow, upper_yellow)
+    msko = cv2.inRange(hsv, lower_orange, upper_orange)
+    mskg = cv2.inRange(hsv, lower_green, upper_green)
+    # Stack the masks along the channel axis to create one-hot encoded representation
+    one_hot_encoded = np.stack([mskr, msko, msky, mskg])
+    return one_hot_encoded
