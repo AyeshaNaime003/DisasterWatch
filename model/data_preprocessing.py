@@ -1,5 +1,15 @@
 import cv2
 import numpy as np
+import rasterio
+
+def get_tif_transform(file_name):
+    # Open the TIFF file using rasterio
+    with rasterio.open(file_name) as tif:
+        return tif.transform
+
+def pixels_to_coordinates(transform, pixel):
+    longitude, latitude = transform * pixel
+    return latitude, longitude
 
 # FUNCTION TO GET IMAGE FROM TIF PATH
 def tif_to_img(tif_file):
@@ -8,14 +18,17 @@ def tif_to_img(tif_file):
                   tif_file.GetRasterBand(3).ReadAsArray()))
   return disaster_img
 
-def mask_to_polygons(mask, rdp=True):
+def mask_to_polygons(mask, transform, rdp=True):
     contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     polygons = []
     for contour in contours:
         contour_points = np.squeeze(contour)
         epsilon = 0.01 * cv2.arcLength(contour_points, True)
         approx = np.squeeze(cv2.approxPolyDP(contour_points, epsilon, True)).tolist()
-        polygons.append(approx)
+        approx_latlong = [pixels_to_coordinates(transform, (x, y)) for x, y in approx]
+        
+        # Convert back to numpy array and append to polygons list
+        polygons.append(approx_latlong)
     return polygons
 
 def polygons_to_masks(polygons, image_shape=(1024,1024)):

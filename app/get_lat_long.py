@@ -58,11 +58,11 @@ import numpy as np
 
 
 
-def get_important_coordinates(file_name):
+def get_tif_transform(file_name):
     # Open the TIFF file using rasterio
-    with rasterio.open("./"+file_name) as tif:
-        transform = tif.transform
-        topleft_x, topleft_y = transform * (0, 0)
-        middle_x, middle_y = transform * (tif.width//2, tif.height//2)
-        bottomright_x, bottomright_y = transform * (tif.width, tif.height)
-    return (topleft_x, topleft_y),(middle_x, middle_y),(bottomright_x, bottomright_y)
+    with rasterio.open(file_name) as tif:
+        return tif.transform
+
+def pixels_to_coordinates(transform, pixel):
+    longitude, latitude = transform * pixel
+    return latitude, longitude

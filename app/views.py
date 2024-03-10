@@ -31,8 +31,8 @@ sys.path.append(model_dir)
 
 from server.settings import *
 from model.models import SeResNext50_Unet_MultiScale
-from model.data_preprocessing import tif_to_img, one_hot_encoding_mask, mask_to_polygons, polygons_to_masks
-from .get_lat_long import get_important_coordinates
+from model.data_preprocessing import tif_to_img, one_hot_encoding_mask, mask_to_polygons, polygons_to_masks, get_tif_transform
+# from .get_lat_long import get_important_coordinates
 
 from .folium_maps import html_code
 # from .plotly_maps import html_code
@@ -46,8 +46,8 @@ def loginPage(request):
         username = request.POST.get('username')
         password = request.POST.get('password')
         try:
-            user = User.objects.get(username=username)
-        except User.DoesNotExist:
+            user = CustomUser.objects.get(username=username)
+        except CustomUser.DoesNotExist:
             messages.error(request, "Invalid credentials")
             return render(request, "app/login.html")
         
@@ -90,21 +90,38 @@ def logoutPage(request):
 
 
 @login_required(login_url="login/")
-def map(request):
-    with open('./masks/data.json') as f:
-        polygon_data = json.load(f)
-    
-    (topleft_x, topleft_y),(middle_x, middle_y),(bottomright_x, bottomright_y) = get_important_coordinates('woolsey-fire_00000715_pre_disaster.tif')
-    print((topleft_x, topleft_y),(middle_x, middle_y),(bottomright_x, bottomright_y))
+def map(request): 
+    # get data from database
+    json_data = json.loads(JsonFileModel.objects.filter(user=request.user).first().json_file)
+    date = json_data.get("date")   
+    city = json_data["city"]   
+    disaster_type = json_data["disaster_type"]   
+    disaster_description = json_data["disaster_description"]   
+    comments = json_data["comments"]   
+    pre_path = json_data["pre_path"]   
+    post_path = json_data["post_path"]   
+    polygon_data = json_data["polygon_data"]   
+        
+    (topleft_x, topleft_y),(middle_x, middle_y),(bottomright_x, bottomright_y) = get_important_coordinates(pre_path)
     context = {
-        'polygon_data': json.dumps(polygon_data),
-        'topleft' : (topleft_x, topleft_y),
-        'middle':     (middle_x, middle_y),
-        'bottomright':             (bottomright_x, bottomright_y)
+        'date': date,
+        'city': city,
+        'disaster_type': disaster_type,
+        'disaster_description': disaster_description,
+        'comments': comments,
+        'pre_path': pre_path,
+        'post_path': post_path,
+        'polygon_data': polygon_data,
+        'important_coordinates': {
+            'topleft_x': topleft_x,
+            'topleft_y': topleft_y,
+            'middle_x': middle_x,
+            'middle_y': middle_y,
+            'bottomright_x': bottomright_x,
+            'bottomright_y': bottomright_y
+        }
     }
-    print(context)
-
-    return render(request, 'app/map.html', context={'html_code': html_code,})
+    return render(request, 'app/map.html', context={'context': context})
 
 
 @login_required(login_url="login/")
@@ -166,6 +183,7 @@ def inferenceform(request):
         disaster_type = request.POST['disaster_type']
         disaster_description = request.POST['disaster_description']
         comments = request.POST['comments']
+
         # save the tiff files temporarily in media root
         file_name = f"{date}_{city}_{disaster_type}"
         pre_path = os.path.join(MEDIA_ROOT, 'tiff', file_name+"_pre.tif")
@@ -177,6 +195,7 @@ def inferenceform(request):
             for chunk in post_image.chunks():
                 f.write(chunk)
         print("pre and post tifs saved")
+        
         # convert the tiff files to RGB images to run for inference
         pre_tif, post_tif = gdal.Open(pre_path), gdal.Open(post_path)
         pre_image, post_image = torch.from_numpy(tif_to_img(pre_tif)), torch.from_numpy(tif_to_img(post_tif))
@@ -185,47 +204,45 @@ def inferenceform(request):
         # INFERENCE------------------------------------------------------------------
         # model = SeResNext50_Unet_MultiScale()
         # output = model(pre_post)
+       
         # DUMMY DATA----------------------------------------------------------------------
         dummy_mask = cv2.imread("woolsey-fire_00000715_post_disaster.png") 
-        # plt.imshow(dummy_mask)
-        # plt.show()
         print(f"Dummy mask shape an type {dummy_mask.shape}, {dummy_mask.dtype}")
         dummy_masks = one_hot_encoding_mask(dummy_mask)
         print(f"Dummy mask after hot encoding  {dummy_masks.shape}, {dummy_masks.dtype}")
-        # classes=["green", "yellow", "orange","red"]
+        tranform = get_tif_transform(pre_path)
         classes=["red","orange","yellow","green"]
-        # plt.figure(figsize=(15, 5))  # Adjust the figure size as needed
-        # for i in range(4):
-        #     plt.subplot(1, 4, i + 1)
-        #     plt.imshow(dummy_masks[i], cmap='gray')
-        #     plt.title(classes[i])
-        #     plt.axis('off')
-        # plt.show()
         # format the inference for database
         polygons_data={}
         for i, mask in enumerate(dummy_masks):
             color=classes[i]
             _, mask = cv2.threshold(mask.astype('uint8'), 0, 255, cv2.THRESH_BINARY)
             print(f"{color} mask {mask.shape} {mask.dtype} {mask.max()}")
-            polygons_in_mask = mask_to_polygons(mask, rdp=False)
+            polygons_in_mask = mask_to_polygons(mask, tranform, rdp=False)
+            print(polygons_in_mask[:5])
             print(f"{color}: {len(polygons_in_mask)}")
             polygons_data[color]=polygons_in_mask
-            # mask_from_polygon = polygons_to_masks(polygons_in_mask)
-            # print(f"mask from polygon done, shape is {mask_from_polygon.shape}")
-            # cv2.imwrite(f"./masks/og_{color}_mask.png", mask)
-            # cv2.imwrite(f"./masks/approx_{color}_mask.png", mask_from_polygon)
-            # print("masks written")
-        json_data = {
-            "date": date,
-            "city":city,
-            "disaster_type":disaster_type, 
-            "disaster_description":disaster_description, 
-            "comments":comments,
-            "polygon_data": polygons_data
-        }
-        with open(os.path.join(MEDIA_ROOT, "json", file_name+".json") , 'w') as json_file:
-            json.dump(json_data, json_file)
-        return redirect("home")
+
+        # # Convert the dictionary to JSON format
+        # json_data = json.dumps({
+        #     "date": date,
+        #     "city":city,
+        #     "disaster_type":disaster_type, 
+        #     "disaster_description":disaster_description, 
+        #     "comments":comments,
+        #     "polygon_data": polygons_data, 
+        #     "pre_path":pre_path, 
+        #     "post_path":post_path, 
+        # })
+        # try:
+        #     # Create and save an instance of JsonFileModel
+        #     json_model_instance = JsonFileModel.objects.create(user=request.user, json_file=json_data)
+        #     json_model_instance.save()
+        #     messages.success(request, "JsonFileModel model created")
+        #     return redirect("home")
+        # except:
+        #     messages.error(request, "Unable to save inference")
+            return redirect("inferenceform")
     else:
         return render(request, "app/inferenceform.html")
         

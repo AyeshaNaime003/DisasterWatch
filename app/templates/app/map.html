@@ -16,48 +16,64 @@
 
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script>
-        var lat = 34.03287074235187
-        var long = -118.8328874071490
+        var context = {{ context| safe }};
+        var polygonData = context.polygon_data;
+        var long = context.important_coordinates.middle_x;
+        var lat = context.important_coordinates.middle_y;
         var map = L.map('map').setView([lat, long], 50);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
         }).addTo(map);
-        // Add a marker
-        var marker = L.marker([lat, long]).addTo(map);
-        marker.bindPopup("<b>Hello!</b><br>" + lat + ", " + long).openPopup();
+        // var marker = L.marker([lat, long]).addTo(map);
+        // marker.bindPopup("<b>Hello!</b><br>" + lat + ", " + long).openPopup();
+        for (var color in polygonData) {
+            alert(color)
+            if (polygonData.hasOwnProperty(color)) {
+                var colorPolygonData = polygonData[color];
+                for (var i = 0; i < colorPolygonData.length; i++) {
+                    var coordinates = colorPolygonData[i];
+                    alert(coordinates)
+                    var polygon = L.polygon(coordinates, {
+                        fillColor: color,
+                        fillOpacity: 0.5
+                    }).addTo(map);
+                    // Add popup content if needed
+                    polygon.bindPopup('Popup content goes here');
+                }
+            }
+        }
 
 
         // Add a polygon marker
-        var redPolygon = L.polygon([
-            [lat + 0.0005, long - 0.0005],
-            [lat + 0.0005, long + 0.0005],
-            [lat - 0.0005, long + 0.0005],
-            [lat - 0.0005, long - 0.0005],
-        ], {
-            fillColor: 'red', color: 'red', fillOpacity: 0.3
-        }).addTo(map);
+        // var redPolygon = L.polygon([
+        //     [lat + 0.0005, long - 0.0005],
+        //     [lat + 0.0005, long + 0.0005],
+        //     [lat - 0.0005, long + 0.0005],
+        //     [lat - 0.0005, long - 0.0005],
+        // ], {
+        //     fillColor: 'red', color: 'red', fillOpacity: 0.3
+        // }).addTo(map);
 
-        var greenPolygon = L.polygon([
-        [lat + 0.0006, long - 0.0006],
-            [lat + 0.0006, long + 0.0006],
-            [lat - 0.0006, long + 0.0006],
-            [lat - 0.0006, long - 0.0006],
-        ], { fillColor: 'green', color: "green", fillOpacity: 0.5 }).addTo(map);
+        // var greenPolygon = L.polygon([
+        //     [lat + 0.0006, long - 0.0006],
+        //     [lat + 0.0006, long + 0.0006],
+        //     [lat - 0.0006, long + 0.0006],
+        //     [lat - 0.0006, long - 0.0006],
+        // ], { fillColor: 'green', color: "green", fillOpacity: 0.5 }).addTo(map);
 
-        var yellowPolygon = L.polygon([
-        [lat + 0.0008, long - 0.0008],
-            [lat + 0.0008, long + 0.0008],
-            [lat - 0.0008, long + 0.0008],
-            [lat - 0.0008, long - 0.0008],
-        ], { fillColor: 'yellow', color: "yellow", fillOpacity: 0.5 }).addTo(map);
+        // var yellowPolygon = L.polygon([
+        //     [lat + 0.0008, long - 0.0008],
+        //     [lat + 0.0008, long + 0.0008],
+        //     [lat - 0.0008, long + 0.0008],
+        //     [lat - 0.0008, long - 0.0008],
+        // ], { fillColor: 'yellow', color: "yellow", fillOpacity: 0.5 }).addTo(map);
 
-        var orangePolygon = L.polygon([
-        [lat + 0.0010, long - 0.0010],
-            [lat + 0.0010, long + 0.0010],
-            [lat - 0.0010, long + 0.0010],
-            [lat - 0.0010, long - 0.0010],
-        ], { fillColor: 'orange', color: "orange", fillOpacity: 0.5 }).addTo(map);
-        toggler
+        // var orangePolygon = L.polygon([
+        //     [lat + 0.0010, long - 0.0010],
+        //     [lat + 0.0010, long + 0.0010],
+        //     [lat - 0.0010, long + 0.0010],
+        //     [lat - 0.0010, long - 0.0010],
+        // ], { fillColor: 'orange', color: "orange", fillOpacity: 0.5 }).addTo(map);
         var toggler = document.createElement('div');
         toggler.innerHTML = `
     <input type="checkbox" id="redToggle" onclick="togglePolygon('red')"> Red
