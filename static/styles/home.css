@@ -28,3 +28,16 @@ section.errorpage h2{
 section.errorpage h2 i{
     color: var(--lovely-blue-deeper);
 }
+/* PROFILE---------------------------------- */
+.profile-picture-container img{
+    border-radius: 50%;
+    position: relative;
+
+}
+.profile-picture-container img {
+    transition: filter 0.3s;
+}
+
+.profile-picture-container:hover img {
+    filter: brightness(0.6);
+}   

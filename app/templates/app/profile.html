@@ -2,14 +2,14 @@
 {% load static %}
 {% block title %}Profile{% endblock title %}
 {% block body %}
-<link rel="stylesheet" href="{% static '/styles/profile.css' %}">
+<link rel="stylesheet" href="{% static '/styles/home.css' %}">
 <div class="home-container">
   <!-- SIDEBAR -->
   {% include 'app/navbar.html' %}
   <!-- RIGHT PANEL -->
   <div class="right-container">
     <div class="container py-5">
-      <div class="container">
+      <div class="container error-container">
         {% if messages %}
         {% for message in messages %}
         <p class="alert {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% endif %}"
@@ -19,23 +19,34 @@
           </ul>
           {% endif %}
       </div>
+     <div class="container form-container">
+      <form action="{% url 'update-profile' %}" method="POST">
+        {% csrf_token %}
+        <div class="row">
+          <div class="col-lg-4">
+            <div class="card mb-4">
+              <div class="card-body text-center">
+                <div class="profile-picture-container">
+                  <div class="profile-picture-container">
+                    <img id="profile-picture" src="{{ user.profile_picture.url }}" class="d-block w-100"
+                      alt="Profile Picture">
+                    <input type="file" id="profile-picture-input" style="display: none;" accept="image/*">
+                  </div>
+                </div>
 
-      <div class="row">
-        <div class="col-lg-4">
-          <div class="card mb-4">
-            <div class="card-body text-center">
-              <h5 class="my-3">Name: {{ user.username }}</h5>
+                <h5 class="my-3">{{ user.username }}</h5>
+
+                <textarea class="form-control" name="bio">{{ user.bio }}</textarea>
+              </div>
             </div>
           </div>
-        </div>
-        <div class="col-lg-8">
-          <div class="card mb-4">
-            <div class="card-body">
-              <form action="{% url 'update-profile' %}" method="POST">
-                {% csrf_token %}
+          <div class="col-lg-8">
+            <div class="card mb-4">
+              <div class="card-body">
+
                 <div class="row">
                   <div class="col-sm-3">
-                    <p class="mb-0">Full Name</p>
+                    <p class="mb-0">Full Name:</p>
                   </div>
                   <div class="col-sm-9">
                     <input type="text" class="form-control" name="first_name" value="{{ user.first_name }}">
@@ -44,7 +55,7 @@
                 <hr>
                 <div class="row">
                   <div class="col-sm-3">
-                    <p class="mb-0">Last Name</p>
+                    <p class="mb-0">Last Name:</p>
                   </div>
                   <div class="col-sm-9">
                     <input type="text" class="form-control" name="last_name" value="{{ user.last_name }}">
@@ -53,25 +64,60 @@
                 <hr>
                 <div class="row">
                   <div class="col-sm-3">
-                    <p class="mb-0">Email</p>
+                    <p class="mb-0">Email:</p>
                   </div>
                   <div class="col-sm-9">
                     <input type="text" class="form-control" name="email" value="{{ user.email }}">
                   </div>
                 </div>
                 <hr>
+                <div class="row">
+                  <div class="col-sm-3">
+                    <p class="mb-0">Contact Number:</p>
+                  </div>
+                  <div class="col-sm-9">
+                    <input type="text" class="form-control" name="contact-number" value="{{ user.contact }}">
+                  </div>
+                </div>
+                <hr>
                 <!-- Repeat the same for other fields -->
                 <div class="row">
                   <div class="col-sm-12">
-                    <button type="submit" class="btn btn-primary">Update Done</button>
+                    <button type="submit" class="btn btn-primary">Update</button>
                   </div>
                 </div>
-              </form>
+            </div>
             </div>
           </div>
         </div>
-      </div>
+      </form>
     </div>
   </div>
-</div>
+  </div>
+
+<script>
+  // JavaScript
+  document.addEventListener('DOMContentLoaded', function () {
+    const profilePicture = document.getElementById('profile-picture');
+    const profilePictureInput = document.getElementById('profile-picture-input');
+    profilePicture.addEventListener('click', function () {
+      profilePictureInput.click();
+    });
+
+    profilePictureInput.addEventListener('change', function (event) {
+      const file = event.target.files[0];
+      const reader = new FileReader();
+
+      reader.onload = function (e) {
+        profilePicture.src = e.target.result;
+      };
+
+      reader.readAsDataURL(file);
+    });
+  });
+
+
+</script>
+
+
 {% endblock body %}

@@ -4,6 +4,7 @@ from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import HttpResponse
+from .models import CustomUser, JsonFileModel
 import json
 import requests
 import os
@@ -119,11 +120,13 @@ def dashboard(request):
 @login_required(login_url="login/")
 def profile(request):
     user = request.user
+    print(user.email, user.first_name, user.last_name, user.contact, user.profile_picture.url)
     if request.method == 'POST':
          # Get the data from the form
         first_name = request.POST.get('first_name')
         last_name = request.POST.get('last_name')
         email = request.POST.get('email')
+        contact_number = request.POST.get('contact-number')
         
         # Update user attributes
         user.first_name = first_name
@@ -205,7 +208,7 @@ def inferenceform(request):
             # cv2.imwrite(f"./masks/approx_{color}_mask.png", mask_from_polygon)
             # print("masks written")
         json_data = {
-            "time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "date": date,
             "city":city,
             "disaster_type":disaster_type, 
             "disaster_description":disaster_description, 

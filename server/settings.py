@@ -134,3 +134,6 @@ print(f"base directory: ", BASE_DIR)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 print(f"media root: ", MEDIA_ROOT)
+
+
+AUTH_USER_MODEL = 'app.CustomUser'
