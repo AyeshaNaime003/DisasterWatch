@@ -103,7 +103,7 @@ def map(request):
     polygon_data = json_data["polygon_data"]   
         
     transform = get_tif_transform(pre_path)
-    middle_x, middle_y = pixels_to_coordinates(transform, (612,612))
+    middle_lat, middle_long = pixels_to_coordinates(transform, (612,612))
     context = {
         'date': date,
         'city': city,
@@ -114,12 +114,8 @@ def map(request):
         'post_path': post_path,
         'polygon_data': polygon_data,
         'important_coordinates': {
-        #     'topleft_x': topleft_x,
-        #     'topleft_y': topleft_y,
-            'middle_x': middle_x,
-            'middle_y': middle_y,
-        #     'bottomright_x': bottomright_x,
-        #     'bottomright_y': bottomright_y
+            'middle_lat': middle_lat,
+            'middle_long': middle_long,
         }
     }
     return render(request, 'app/map.html', context={'context': context})
@@ -218,31 +214,30 @@ def inferenceform(request):
         for i, mask in enumerate(dummy_masks):
             color=classes[i]
             _, mask = cv2.threshold(mask.astype('uint8'), 0, 255, cv2.THRESH_BINARY)
-            print(f"{color} mask {mask.shape} {mask.dtype} {mask.max()}")
+            # print(f"{color} mask {mask.shape} {mask.dtype} {mask.max()}")
             polygons_in_mask = mask_to_polygons(mask, tranform, rdp=False)
-            print(polygons_in_mask[:5])
+            # print(polygons_in_mask[:5])
             print(f"{color}: {len(polygons_in_mask)}")
             polygons_data[color]=polygons_in_mask
-
-        # # Convert the dictionary to JSON format
-        # json_data = json.dumps({
-        #     "date": date,
-        #     "city":city,
-        #     "disaster_type":disaster_type, 
-        #     "disaster_description":disaster_description, 
-        #     "comments":comments,
-        #     "polygon_data": polygons_data, 
-        #     "pre_path":pre_path, 
-        #     "post_path":post_path, 
-        # })
-        # try:
-        #     # Create and save an instance of JsonFileModel
-        #     json_model_instance = JsonFileModel.objects.create(user=request.user, json_file=json_data)
-        #     json_model_instance.save()
-        #     messages.success(request, "JsonFileModel model created")
-        #     return redirect("home")
-        # except:
-        #     messages.error(request, "Unable to save inference")
+        # Convert the dictionary to JSON format
+        json_data = json.dumps({
+            "date": date,
+            "city":city,
+            "disaster_type":disaster_type, 
+            "disaster_description":disaster_description, 
+            "comments":comments,
+            "polygon_data": polygons_data, 
+            "pre_path":pre_path, 
+            "post_path":post_path, 
+        })
+        try:
+            # Create and save an instance of JsonFileModel
+            json_model_instance = JsonFileModel.objects.create(user=request.user, json_file=json_data)
+            json_model_instance.save()
+            messages.success(request, "JsonFileModel model created")
+            return redirect("map")
+        except:
+            messages.error(request, "Unable to save inference")
             return redirect("inferenceform")
     else:
         return render(request, "app/inferenceform.html")

@@ -19,14 +19,19 @@ def tif_to_img(tif_file):
   return disaster_img
 
 def mask_to_polygons(mask, transform, rdp=True):
+    lat_offset, long_offset = 0.0003994844315009516, 0.0004862524671978008  
     contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     polygons = []
     for contour in contours:
         contour_points = np.squeeze(contour)
         epsilon = 0.01 * cv2.arcLength(contour_points, True)
         approx = np.squeeze(cv2.approxPolyDP(contour_points, epsilon, True)).tolist()
-        approx_latlong = [pixels_to_coordinates(transform, (x, y)) for x, y in approx]        
-        polygons.append(approx_latlong)
+        polygon=[]
+        for x,y in approx:
+            approx_lat, approx_long = pixels_to_coordinates(transform, (x, y))   
+            correct_lat, correct_long = approx_lat+lat_offset, approx_long+long_offset
+            polygon.append((correct_lat, correct_long))
+        polygons.append(polygon)
     return polygons
 
 def polygons_to_masks(polygons, image_shape=(1024,1024)):

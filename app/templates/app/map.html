@@ -18,8 +18,8 @@
     <script>
         var context = {{ context| safe }};
         var polygonData = context.polygon_data;
-        var lat = context.important_coordinates.middle_x;
-        var long = context.important_coordinates.middle_y;
+        var lat = context.important_coordinates.middle_lat;
+        var long = context.important_coordinates.middle_long;
         console.log(lat, long)
         var map = L.map('map').setView([lat, long], 50);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
