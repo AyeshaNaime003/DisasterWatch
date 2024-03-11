@@ -25,9 +25,7 @@ def mask_to_polygons(mask, transform, rdp=True):
         contour_points = np.squeeze(contour)
         epsilon = 0.01 * cv2.arcLength(contour_points, True)
         approx = np.squeeze(cv2.approxPolyDP(contour_points, epsilon, True)).tolist()
-        approx_latlong = [pixels_to_coordinates(transform, (x, y)) for x, y in approx]
-        
-        # Convert back to numpy array and append to polygons list
+        approx_latlong = [pixels_to_coordinates(transform, (x, y)) for x, y in approx]        
         polygons.append(approx_latlong)
     return polygons
 

@@ -31,12 +31,12 @@ sys.path.append(model_dir)
 
 from server.settings import *
 from model.models import SeResNext50_Unet_MultiScale
-from model.data_preprocessing import tif_to_img, one_hot_encoding_mask, mask_to_polygons, polygons_to_masks, get_tif_transform
+from model.data_preprocessing import tif_to_img, one_hot_encoding_mask, mask_to_polygons, polygons_to_masks, get_tif_transform, pixels_to_coordinates
 # from .get_lat_long import get_important_coordinates
 
-from .folium_maps import html_code
-# from .plotly_maps import html_code
-from .map_segmentation import html_code
+# from .folium_maps import html_code
+# # from .plotly_maps import html_code
+# from .map_segmentation import html_code
 # from .plotly_maps import dash_app
 
 os.environ['TORCH_HOME'] = model_dir
@@ -92,7 +92,7 @@ def logoutPage(request):
 @login_required(login_url="login/")
 def map(request): 
     # get data from database
-    json_data = json.loads(JsonFileModel.objects.filter(user=request.user).first().json_file)
+    json_data = json.loads(JsonFileModel.objects.filter(user=request.user).last().json_file)
     date = json_data.get("date")   
     city = json_data["city"]   
     disaster_type = json_data["disaster_type"]   
@@ -102,7 +102,8 @@ def map(request):
     post_path = json_data["post_path"]   
     polygon_data = json_data["polygon_data"]   
         
-    (topleft_x, topleft_y),(middle_x, middle_y),(bottomright_x, bottomright_y) = get_important_coordinates(pre_path)
+    transform = get_tif_transform(pre_path)
+    middle_x, middle_y = pixels_to_coordinates(transform, (612,612))
     context = {
         'date': date,
         'city': city,
@@ -113,12 +114,12 @@ def map(request):
         'post_path': post_path,
         'polygon_data': polygon_data,
         'important_coordinates': {
-            'topleft_x': topleft_x,
-            'topleft_y': topleft_y,
+        #     'topleft_x': topleft_x,
+        #     'topleft_y': topleft_y,
             'middle_x': middle_x,
             'middle_y': middle_y,
-            'bottomright_x': bottomright_x,
-            'bottomright_y': bottomright_y
+        #     'bottomright_x': bottomright_x,
+        #     'bottomright_y': bottomright_y
         }
     }
     return render(request, 'app/map.html', context={'context': context})

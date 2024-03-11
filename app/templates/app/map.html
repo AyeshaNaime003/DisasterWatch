@@ -18,8 +18,9 @@
     <script>
         var context = {{ context| safe }};
         var polygonData = context.polygon_data;
-        var long = context.important_coordinates.middle_x;
-        var lat = context.important_coordinates.middle_y;
+        var lat = context.important_coordinates.middle_x;
+        var long = context.important_coordinates.middle_y;
+        console.log(lat, long)
         var map = L.map('map').setView([lat, long], 50);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
@@ -27,14 +28,15 @@
         // var marker = L.marker([lat, long]).addTo(map);
         // marker.bindPopup("<b>Hello!</b><br>" + lat + ", " + long).openPopup();
         for (var color in polygonData) {
-            alert(color)
+            // alert(color)
             if (polygonData.hasOwnProperty(color)) {
                 var colorPolygonData = polygonData[color];
                 for (var i = 0; i < colorPolygonData.length; i++) {
                     var coordinates = colorPolygonData[i];
-                    alert(coordinates)
+                    console.log(coordinates)
                     var polygon = L.polygon(coordinates, {
                         fillColor: color,
+                        color: color,
                         fillOpacity: 0.5
                     }).addTo(map);
                     // Add popup content if needed
