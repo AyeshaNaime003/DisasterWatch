@@ -38,7 +38,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "app.apps.AppConfig"
+    "app.apps.AppConfig",
+    # 'django_leaflet',
 ]
 
 MIDDLEWARE = [
@@ -137,3 +138,12 @@ print(f"media root: ", MEDIA_ROOT)
 
 
 AUTH_USER_MODEL = 'app.CustomUser'
+
+
+LEAFLET_CONFIG = {
+    'default': {
+        'attribution': '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
+        'maxZoom': 19,
+        'minZoom': 13,
+    },
+}

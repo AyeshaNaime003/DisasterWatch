@@ -49,7 +49,7 @@ def loginPage(request):
             user = CustomUser.objects.get(username=username)
         except CustomUser.DoesNotExist:
             messages.error(request, "Invalid credentials")
-            return render(request, "app/login.html")
+            return redirect("login")
         
         user = authenticate(request=request, username=username, password=password)
         if user is not None:
@@ -58,8 +58,10 @@ def loginPage(request):
             return redirect('home')
         else: 
             messages.error(request, "Invalid credentials")
-            return render(request, "app/login.html")
-    return render(request, "app/login.html")
+            return redirect("login")
+    else:
+        messages.error(request, None)
+        return render(request, "app/login.html")
 
 
 @login_required(login_url="login/")
@@ -243,11 +245,4 @@ def inferenceform(request):
         return render(request, "app/inferenceform.html")
         
 
-@login_required(login_url="login/")
-def custom_404_view(request, exception):
-    return render(request, '404.html', status=404)
 
-
-@login_required(login_url="login/")
-def notifications(request):
-    pass
