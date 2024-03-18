@@ -1,10 +1,10 @@
 {% load static %}
-<link href="{% static '/styles/navbar.css' %}" rel="stylesheet"/>
+<link href="{% static '/styles/navbar.css' %}" rel="stylesheet" />
 
-<nav class="navbar d-none d-md-flex flex-row flex-md-column flex-shrink-0 dw-navbar">
-  <img class="logo d-block mx-auto mt-3" src="{% static '/assets/logo.png' %}" width="50px">
-  <button class="navbar-toggler d-md-none" type="button" ><span class="navbar-toggler-icon"></span></button>
-    <ul class="nav nav-pills flex-column my-auto text-center">
+<nav class="col-md-1 dw-nav">
+  <div class="">
+    <img class="logo d-none d-md-block mx-auto mt-1" src="{% static '/assets/logo.png' %}" width="50px">
+    <ul class="nav nav-pills flex-row flex-md-column my-auto justify-content-evenly text-center">
       <li class="nav-item {% if request.path == '/' %} active {% endif %}">
         <a href="{% url 'home' %}" class="nav-link">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-house my-1" viewBox="0 0 16 16">
@@ -37,5 +37,5 @@
         </a>
       </li>
     </ul>  
-</nav>  
-
+  </div>
+</nav>

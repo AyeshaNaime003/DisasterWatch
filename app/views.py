@@ -132,7 +132,6 @@ def adminPanel(request):
 def dashboard(request):
     return render(request, "app/dashboard.html")
 
-
 @login_required(login_url="login/")
 def profile(request):
     user = request.user

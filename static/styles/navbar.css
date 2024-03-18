@@ -1,20 +1,25 @@
-.dw-navbar{
-    position: fixed; 
-    top: 1vh; 
-    left: 1vw; 
-    bottom: 0; 
-    border-radius: 10px;
-    width: 7vw;
+.dw-nav{
     background-color: whitesmoke;
-}
-.dw-navbar ul{
-    overflow: hidden;
-}
-.dw-navbar ul a svg{
-    color: black;
-}
-.active{
-    background-color: var(--lovely-blue);
-    color: whitesmoke;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    position: relative;
     border-radius: 10px;
+}
+.dw-av div ul{
+    margin: auto;
+}
+@media (min-width: 768px) {
+    .dw-nav{
+        display: flex;
+        flex-direction: column;
+      }
+      .dw-nav div .logo{
+          margin-bottom: 70%;
+      }
+      .dw-nav div{
+          position: fixed;
+          top: 50%;
+          transform: translate(0, -50%);
+      }
 }

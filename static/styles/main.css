@@ -15,7 +15,6 @@
 body{
     padding: 0;
     margin: 0;
-    /* background-color: whitesmoke; */
 }
 
 h2, h3{
@@ -28,30 +27,3 @@ h2, h3{
 .bg-lovely-blue-deeper{
     background-color: var(--lovely-blue-deeper);
 }
-.home-container{
-    display: flex;    
-    background-color: var(--lovely-blue-lighter);
-    position: fixed;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
-    overflow-y: scroll; 
-}
-.home-container .right-container{
-        border-radius: 10px;
-        background-color: whitesmoke;
-        /* margin-top: 1vh;
-        margin-right: 1vw;
-        margin-left: 9vw; */
-        position: absolute;
-        top: 1vh;
-        left: 9vw;
-        right: 1vw;
-}
-@media (max-width: 768px) {
-    .home-container .right-container {
-      left: 1vw !important;
-      right: 1vw !important;
-    }
-  }
