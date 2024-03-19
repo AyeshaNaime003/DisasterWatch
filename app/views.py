@@ -6,6 +6,7 @@ from django.contrib import messages
 from django.http import HttpResponse
 from django.forms.models import model_to_dict
 from .models import CustomUser, JsonFileModel
+from django.http import JsonResponse
 import json
 import requests
 import os
@@ -41,6 +42,21 @@ from model.data_preprocessing import tif_to_img, one_hot_encoding_mask, mask_to_
 # from .plotly_maps import dash_app
 
 os.environ['TORCH_HOME'] = model_dir
+
+
+from geopy.geocoders import Nominatim
+
+def get_address(request):
+    if request.method == 'GET':
+        lat = request.GET.get('lat')
+        lon = request.GET.get('lon')
+        
+        geolocator = Nominatim(user_agent="my_geocoder")
+        location = geolocator.reverse((lat, lon), exactly_one=True)
+        
+        return JsonResponse({'address': location.address})
+
+    return JsonResponse({'error': 'Invalid request'})
 
 def loginPage(request):
     if request.method=="POST":
@@ -96,8 +112,8 @@ def logoutPage(request):
 def map(request): 
     # get data from database
     json_file_model = JsonFileModel.objects.filter(user=request.user).last()
-    print("JSON FILE MODEL")
-    print(model_to_dict(json_file_model))
+    # print("JSON FILE MODEL")
+    # print(model_to_dict(json_file_model))
     json_data = json.loads(json_file_model.json_file)
     
     date = json_data.get("date")   

@@ -18,25 +18,92 @@
                     </ul>
                     {% endif %}
             </div>
-            <div id="cityinfo" class="my-2 d-flex">
+            <div id="cityinfo" class="my-2 d-flex rounded py-2 px-1">
                 <h1>islamabad</h1>
                 <h1>temp</h1>
                 <h1>humidiy</h1>
                 <h1>temp</h1>
                 <h1>temp</h1>
             </div>
-            <div id="map"></div>
-            <div id="toggler">
-                <input type="checkbox" id="redToggle" checked onclick="togglePolygon('red')"> Red
-                <input type="checkbox" id="greenToggle" checked onclick="togglePolygon('green')"> Green
-                <input type="checkbox" id="yellowToggle" checked onclick="togglePolygon('yellow')"> Yellow
-                <input type="checkbox" id="orangeToggle" checked onclick="togglePolygon('orange')"> Orange
+            <div class="row">
+                <div class="col-12 col-md-6">
+                    <div id="map"></div>
+                </div>
+                <div class="col-12 col-md-6">
+                    <div id="table">
+                        <table>
+                            <tr>
+                                <th>hiiii</th>
+                                <th>hiiii</th>
+                                <th>hiiii</th>
+                                <th>hiiii</th>
+                                <th>hiiii</th>
+                            </tr>
+                            <tr>
+                                <th>hiiii</th>
+                                <th>hiiii</th>
+                                <th>hiiii</th>
+                                <th>hiiii</th>
+                                <th>hiiii</th>
+                            </tr>
+                            <tr>
+                                <th>hiiii</th>
+                                <th>hiiii</th>
+                                <th>hiiii</th>
+                                <th>hiiii</th>
+                                <th>hiiii</th>
+                            </tr>
+                            <tr>
+                                <th>hiiii</th>
+                                <th>hiiii</th>
+                                <th>hiiii</th>
+                                <th>hiiii</th>
+                                <th>hiiii</th>
+                            </tr>
+                            <tr>
+                                <th>hiiii</th>
+                                <th>hiiii</th>
+                                <th>hiiii</th>
+                                <th>hiiii</th>
+                                <th>hiiii</th>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div id="toggler" class="my-2 py-2 px-1">
+                <input type="checkbox" id="redToggle" checked onclick="togglePolygon('red')"> Destroyed
+                <input type="checkbox" id="orangeToggle" checked onclick="togglePolygon('orange')"> Majorly Damaged
+                <input type="checkbox" id="yellowToggle" checked onclick="togglePolygon('yellow')"> Minorly Damaged
+                <input type="checkbox" id="greenToggle" checked onclick="togglePolygon('green')"> Undamaged
             </div>
         </div>
     </div>
 </div>
 
-
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script>
+         jQuery(document).ready(function($) {
+        function getAddress(lat, lon) {
+            $.ajax({
+                url: '{% url "get_address" %}',
+                data: { lat: lat, lon: lon },
+                dataType: 'json',
+                success: function (data) {
+                    if (data.address) {
+                        // Display address in tooltip or popup
+                        // Example using Leaflet
+                        L.marker([lat, lon]).addTo(map)
+                            .bindTooltip(data.address)
+                            .openTooltip();
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error(error);
+                }
+            });
+        }})
+</script>
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script>
     var context = {{ context| safe }};
@@ -44,18 +111,12 @@
     var lat = context.important_coordinates.middle_lat;
     var long = context.important_coordinates.middle_long;
     console.log(lat, long)
-    var map = L.map('map').setView([lat, long], 50);
+    var map = L.map('map').setView([lat, long], 18);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
-    // var marker = L.marker([lat, long]).addTo(map);
-    // marker.bindPopup("<b>Hello!</b><br>" + lat + ", " + long).openPopup();
-
-    var redPolygons = [];
-    var greenPolygons = [];
-    var yellowPolygons = [];
-    var orangePolygons = [];
-
+    // red, orange, yellow, green
+    var allPolygons = [];
     for (var color in polygonData) {
-        // alert(color)
+        polygons = []
         if (polygonData.hasOwnProperty(color)) {
             var colorPolygonData = polygonData[color];
             for (var i = 0; i < colorPolygonData.length; i++) {
@@ -66,42 +127,29 @@
                     color: color,
                     fillOpacity: 0.5
                 }).addTo(map);
-                // Add popup content if needed
-                polygon.bindPopup('Popup content goes here');
+                polygons.push(polygon)
+                polygon.on('mouseover', function () {
+                    var center = polygon.getBounds().getCenter();
+                    getAddress(center.lat, center.lng);
+                });
             }
         }
-        switch (color) {
-            case 'red':
-                redPolygons.push(polygon);
-                break;  
-            case 'green':
-                greenPolygons.push(polygon);
-                break;
-            case 'yellow':
-                yellowPolygons.push(polygon);
-                break;
-            case 'orange':
-                orangePolygons.push(polygon);
-                break;
-            default:
-                break;
-        }
+        allPolygons.push(polygons)
     }
-        // Function to toggle visibility of polygons based on color
-        function togglePolygon(color) {
+    function togglePolygon(color) {
         switch (color) {
             case 'red':
                 console.log("red clicked ")
-                togglePolygonsVisibility(redPolygons);
-                break;
-            case 'green':
-                togglePolygonsVisibility(greenPolygons);
-                break;
-            case 'yellow':
-                togglePolygonsVisibility(yellowPolygons);
+                togglePolygonsVisibility(allPolygons[0]);
                 break;
             case 'orange':
-                togglePolygonsVisibility(orangePolygons);
+                togglePolygonsVisibility(allPolygons[1]);
+                break;
+            case 'yellow':
+                togglePolygonsVisibility(allPolygons[2]);
+                break;
+            case 'green':
+                togglePolygonsVisibility(allPolygons[3]);
                 break;
             default:
                 break;
@@ -109,8 +157,10 @@
     }
     // Function to toggle visibility of polygons in an array
     function togglePolygonsVisibility(polygonsArray) {
-        polygonsArray.forEach(function(polygon) {
+        polygonsArray.forEach(function (polygon) {
+            console.log(polygonsArray)
             var currentOpacity = polygon.options.fillOpacity || 0;
+            console.log(currentOpacity)
             polygon.setStyle({ fillOpacity: currentOpacity ? 0 : 0.3 });
             polygon.setStyle({ opacity: currentOpacity ? 0 : 1 });
         });

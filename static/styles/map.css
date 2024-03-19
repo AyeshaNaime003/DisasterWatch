@@ -2,9 +2,12 @@
     background-color: var(--lovely-blue-lighter);
     padding: 1%;
 }
-#cityinfo{
+#cityinfo, #toggler{
     background-color: whitesmoke;
+    /* border-radius: 10px; */
 }
 #map{
-    height: 400px;
+    height: 100%;
+    min-height: 512px;
+    width: 100%;
 }

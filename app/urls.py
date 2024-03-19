@@ -19,6 +19,7 @@ urlpatterns = [
     path('help/', views.help, name="help"),
     path('inferenceform/', views.inferenceform, name="inferenceform"),
     # path('<path:not_found>', TemplateView.as_view(template_name='app/404.html'), name='not_found'),
+    path('get-address/', views.get_address, name='get_address'),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
