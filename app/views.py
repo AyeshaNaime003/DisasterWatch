@@ -4,6 +4,7 @@ from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import HttpResponse
+from django.forms.models import model_to_dict
 from .models import CustomUser, JsonFileModel
 import json
 import requests
@@ -94,7 +95,11 @@ def logoutPage(request):
 @login_required(login_url="login/")
 def map(request): 
     # get data from database
-    json_data = json.loads(JsonFileModel.objects.filter(user=request.user).last().json_file)
+    json_file_model = JsonFileModel.objects.filter(user=request.user).last()
+    print("JSON FILE MODEL")
+    print(model_to_dict(json_file_model))
+    json_data = json.loads(json_file_model.json_file)
+    
     date = json_data.get("date")   
     city = json_data["city"]   
     disaster_type = json_data["disaster_type"]   

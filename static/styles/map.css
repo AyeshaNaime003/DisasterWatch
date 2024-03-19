@@ -1,0 +1,10 @@
+#row{
+    background-color: var(--lovely-blue-lighter);
+    padding: 1%;
+}
+#cityinfo{
+    background-color: whitesmoke;
+}
+#map{
+    height: 400px;
+}
