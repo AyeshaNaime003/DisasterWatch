@@ -3,7 +3,7 @@ import numpy as np
 import rasterio
 from geopy.geocoders import Nominatim
 
-def get_street_name(latitude, longitude):
+def get_location(latitude, longitude):
     geolocator = Nominatim(user_agent="DisasterWatch")
     location = geolocator.reverse((latitude, longitude), 
                                   language="en")
@@ -12,20 +12,75 @@ def get_street_name(latitude, longitude):
     # address = [''] * (9 - len(components)) + ['' if component is None else component for component in components] 
     return location.raw
 
+def print_dictionary(dictionary):
+    for key, value in dictionary.items():
+        print(f"{key}: {value}")
+    print()
 
+
+def get_country_province(city_name):
+    geolocator = Nominatim(user_agent="DisasterWatch")
+    location = geolocator.geocode(city_name, exactly_one=True)
+    if location:
+        return {
+            'country': location.raw.get('address', {}).get('country'),
+            'state': location.raw.get('address', {}).get('state'),
+            'city': location.raw.get('address', {}).get('city')
+        }
+    else:
+        return {
+            'country': 'Unknown',
+            'state': 'Unknown',
+            'city': city_name
+        }
+
+def extract_address_components(address):
+    extracted_components = {}
+    if 'country' in address:
+        extracted_components['country'] = address['country']
+    if 'state' in address:
+        extracted_components['state'] = address['state']
+    if 'city' in address:
+        extracted_components['city'] = address['city']
+    else: 
+        extracted_components['city'] = ""
+    if 'town' in address:
+        extracted_components['town'] = address['town']
+    suburb_municipality = ''
+    if 'suburb' in address:
+        suburb_municipality += address['suburb']
+    if 'municipality' in address:
+        if suburb_municipality:
+            suburb_municipality += ', ' + address['municipality']
+        else:
+            suburb_municipality += address['municipality']
+    if suburb_municipality:
+        extracted_components['suburb_municipality'] = suburb_municipality
+    if 'neighbourhood' in address:
+        extracted_components['neighbourhood'] = address['neighbourhood']
+    if 'road' in address:
+        extracted_components['road'] = address['road']
+    for key in address:
+        if key not in extracted_components and not "ISO" in key and key!="country_code" and key!="postcode" and key!="city_district":
+            extracted_components["name"] =  key.capitalize() + ": " + address[key]
+
+    return extracted_components
 
 # print(get_street_name(34.032412964910364, -118.83242962970759))
 # karachi-patel hospital
-# def print_dictionary(dictionary):
-#     for key, value in dictionary.items():
-#         print(f"{key}: {value}")
-# patelhospital = get_street_name(24.93555926321077, 67.09717674474203)
-# print_dictionary(patelhospital['address'])
-# hajilemogoth = get_street_name(24.934930604953006, 67.09454227030362)
-# print_dictionary(hajilemogoth['address'])
-# centaurus = get_street_name(33.70789764984663, 73.04975970848382)
-# print_dictionary(centaurus['address'])
 
+# patelhospital = get_street_name(24.93555926321077, 67.09717674474203)
+# print_dictionary(extract_address_components(patelhospital['address']))
+# hajilemogoth = get_street_name(24.934930604953006, 67.09454227030362)
+# print_dictionary(extract_address_components(hajilemogoth['address']))
+# centaurus = get_street_name(33.70789764984663, 73.04975970848382)
+# print_dictionary(extract_address_components(centaurus['address']))
+
+# woosley_address = get_street_name(34.032412964910364, -118.83242962970759)
+# print_dictionary(extract_address_components(woosley_address['address']))
+
+# school = get_street_name(24.944825175109454, 67.05061532893578)
+# print_dictionary(extract_address_components(school['address']))
 # print(get_street_name(33.65623583955007, 72.99861595930268))
 # print(get_street_name(33.532791117455794, 73.16296485833928))
 # print(get_street_name(33.532489425413125, 73.16314399994715))
@@ -55,25 +110,25 @@ def mask_to_polygons(mask, transform, rdp=True):
         contour_points = np.squeeze(contour)
         epsilon = 0.01 * cv2.arcLength(contour_points, True)
         approx = np.squeeze(cv2.approxPolyDP(contour_points, epsilon, True)).tolist()
-        polygon=[]
+        coordinates=[]
         for x,y in approx:
             approx_lat, approx_long = pixels_to_coordinates(transform, (x, y))   
             correct_lat, correct_long = approx_lat+lat_offset, approx_long+long_offset
-            polygon.append((correct_lat, correct_long))
+            coordinates.append((correct_lat, correct_long))
         
         # Calculate the center of the polygon
-        center_lat = sum(point[0] for point in polygon) / len(polygon)
-        center_long = sum(point[1] for point in polygon) / len(polygon)
+        center_lat = sum(point[0] for point in coordinates) / len(coordinates)
+        center_long = sum(point[1] for point in coordinates) / len(coordinates)
 
         # Get the street name using the center coordinates
-        address = get_street_name(center_lat, center_long)["address"]
+        address = extract_address_components(get_location(center_lat, center_long)["address"])
 
         # Save the polygon data along with the location details
         polygons_in_mask.append({
-            'polygon': polygon,
+            'coordinates': coordinates,
             'center_lat': center_lat,
             'center_long': center_long,
-            'street_name': address
+            'address': address
         })
     return polygons_in_mask
 

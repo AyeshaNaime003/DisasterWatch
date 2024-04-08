@@ -11,3 +11,28 @@
     min-height: 512px;
     width: 100%;
 }
+.equal-width {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.equal-width th, .equal-width td {
+    border: 1px solid #000;
+    padding: 8px; /* Adjust padding as needed */
+    text-align: center; /* Adjust text alignment as needed */
+}
+.equal-width .red {
+    background-color: #ffcccc; /* Light red */
+}
+
+.equal-width .orange {
+    background-color: #ffddb3; /* Light orange */
+}
+
+.equal-width .yellow {
+    background-color: #ffffcc; /* Light yellow */
+}
+
+.equal-width .green {
+    background-color: #ccffcc; /* Light green */
+}

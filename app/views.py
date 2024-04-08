@@ -118,6 +118,8 @@ def map(request):
     
     date = json_data.get("date")   
     city = json_data["city"]   
+    state = json_data["state"]   
+    country = json_data["country"]   
     disaster_type = json_data["disaster_type"]   
     disaster_description = json_data["disaster_description"]   
     comments = json_data["comments"]   
@@ -130,6 +132,8 @@ def map(request):
     context = {
         'date': date,
         'city': city,
+        'state': state,
+        'country': country,
         'disaster_type': disaster_type,
         'disaster_description': disaster_description,
         'comments': comments,
@@ -141,6 +145,7 @@ def map(request):
             'middle_long': middle_long,
         }
     }
+    # print(context)
     return render(request, 'app/map.html', context={'context': context})
 
 
@@ -244,7 +249,9 @@ def inferenceform(request):
         # Convert the dictionary to JSON format
         json_data = json.dumps({
             "date": date,
-            "city":city,
+            "city":polygons_in_mask[0]['address']['city'],
+            "state":polygons_in_mask[0]['address']['state'],
+            "country":polygons_in_mask[0]['address']['country'],
             "disaster_type":disaster_type, 
             "disaster_description":disaster_description, 
             "comments":comments,
@@ -256,9 +263,11 @@ def inferenceform(request):
             # Create and save an instance of JsonFileModel
             json_model_instance = JsonFileModel.objects.create(user=request.user, json_file=json_data)
             json_model_instance.save()
+            print("JsonFileModel model created")
             messages.success(request, "JsonFileModel model created")
             return redirect("map")
         except:
+            print("Unable to save inference")
             messages.error(request, "Unable to save inference")
             return redirect("inferenceform")
     else:

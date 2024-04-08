@@ -20,11 +20,9 @@
                     {% endif %}
             </div>
             <div id="cityinfo" class="my-2 d-flex rounded py-2 px-1">
-                <h1>islamabad</h1>
-                <h1>temp</h1>
-                <h1>humidiy</h1>
-                <h1>temp</h1>
-                <h1>temp</h1>
+                <h1>{{ context.country }}</h1>
+                <h1>{{ context.state }}</h1>
+                <h1>{{ context.city }}</h1>
             </div>
             <div class="row">
                 <div class="col-12 col-md-6">
@@ -39,48 +37,20 @@
                     </div>
                 </div>
                 <div class="col-12 col-md-6">
-                    <div id="table">
-                        <table>
-                            <tr>
-                                <th>hiiii</th>
-                                <th>hiiii</th>
-                                <th>hiiii</th>
-                                <th>hiiii</th>
-                                <th>hiiii</th>
-                            </tr>
-                            <tr>
-                                <th>hiiii</th>
-                                <th>hiiii</th>
-                                <th>hiiii</th>
-                                <th>hiiii</th>
-                                <th>hiiii</th>
-                            </tr>
-                            <tr>
-                                <th>hiiii</th>
-                                <th>hiiii</th>
-                                <th>hiiii</th>
-                                <th>hiiii</th>
-                                <th>hiiii</th>
-                            </tr>
-                            <tr>
-                                <th>hiiii</th>
-                                <th>hiiii</th>
-                                <th>hiiii</th>
-                                <th>hiiii</th>
-                                <th>hiiii</th>
-                            </tr>
-                            <tr>
-                                <th>hiiii</th>
-                                <th>hiiii</th>
-                                <th>hiiii</th>
-                                <th>hiiii</th>
-                                <th>hiiii</th>
-                            </tr>
-                        </table>
+                        <div id="table" class="equal-width" cellspacing="0" cellpadding="8" >
+                            <table>
+                                <tr>
+                                    <th>Building</th>
+                                    <th>Neighbourhood</th>
+                                    <th>Road</th>
+                                    <th>Suburb</th>
+                                    <th>Town</th>
+                                </tr>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
     </div>
 </div>
 
@@ -92,30 +62,48 @@
     var polygonData = context.polygon_data;
     var lat = context.important_coordinates.middle_lat;
     var long = context.important_coordinates.middle_long;
-    // console.log(lat, long);
+    console.log(lat, long);
     // console.log(polygonData);
     var map = L.map('map').setView([lat, long], 18);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
     // red, orange, yellow, green
     var allPolygons = [];
     for (var color in polygonData) {
-        polygons = []
+        colorPolygons = []
         if (polygonData.hasOwnProperty(color)) {
             var colorPolygonData = polygonData[color];
             for (var i = 0; i < colorPolygonData.length; i++) {
-                coordinates = colorPolygonData[i]["polygon"]
-                address = colorPolygonData[i]["street_name"]
+                coordinates = colorPolygonData[i]["coordinates"]
+                var address = colorPolygonData[i]["address"];
+                var popupContent = `<div>${displayAddressComponents(address)}</div>`;
                 var polygon = L.polygon(coordinates, {
                     fillColor: color,
                     color: color,
                     fillOpacity: 0.5
                 }).addTo(map);
-                polygon.bindPopup(address);
+                polygon.bindPopup(popupContent);
+                colorPolygons.push(polygon);
+
+
+                var tableRow = document.createElement('tr');
+                tableRow.classList.add(color);
+            tableRow.innerHTML = `
+                <td>${address.name}</td>
+                <td>${address.neighbourhood}</td>
+                <td>${address.road}</td>
+                <td>${address.suburb}</td>
+                <td>${address.town}</td>
+            `;
+            document.getElementById('table').appendChild(tableRow);
             }
         }
-        allPolygons.push(polygons)
+        allPolygons.push(colorPolygons)
     }
     function togglePolygon(color) {
+        var rows = document.querySelectorAll('.'+color);
+    rows.forEach(function (row) {
+        row.style.display = row.style.display === 'none' ? '' : 'none'; // Toggle visibility
+    });
         switch (color) {
             case 'red':
                 togglePolygonsVisibility(allPolygons[0]);
@@ -133,14 +121,31 @@
                 break;
         }
     }
+
+
     // Function to toggle visibility of polygons in an array
     function togglePolygonsVisibility(polygonsArray) {
         polygonsArray.forEach(function (polygon) {
+            
             var currentOpacity = polygon.options.fillOpacity || 0;
             polygon.setStyle({ fillOpacity: currentOpacity ? 0 : 0.3 });
             polygon.setStyle({ opacity: currentOpacity ? 0 : 1 });
         });
     }
+
+
+    function displayAddressComponents(address) {
+    let components = [];
+    const keys = ['town', 'suburb_municipality', 'neighbourhood', 'road'];
+    
+    for (const key of keys) {
+        if (key in address) {
+            components.push(address[key]);
+        }
+    }
+
+    return components.join(', ');
+}
 
 </script>
 
