@@ -1,4 +1,4 @@
-.dw-nav{
+#dw-navbar{
     background-color: whitesmoke;
     flex-direction: row;
     justify-content: center;
@@ -6,19 +6,20 @@
     position: relative;
     border-radius: 5px;
 }
-.dw-av div ul{
+#dw-av div ul{
     margin: auto;
 }
-
+/* BIG SCREENS */
 @media (min-width: 768px) {
-    .dw-nav{
+    #dw-navbar{
         display: flex;
-          flex-direction: column;
+        flex-direction: column;
+        min-height: 100vh;
       }
-      .dw-nav div .logo{
+      #dw-navbar div .logo{
           margin-bottom: 70%;
       }
-      .dw-nav div{
+      #dw-navbar div{
           position: fixed;
           top: 50%;
           transform: translate(0, -50%);

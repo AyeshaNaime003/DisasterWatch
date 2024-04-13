@@ -202,7 +202,6 @@ def inferenceform(request):
         # get data from form
         pre_image = request.FILES['pre_image']
         post_image = request.FILES['post_image']
-        city = request.POST['city']  
         date = request.POST['date']
         disaster_type = request.POST['disaster_type']
         disaster_description = request.POST['disaster_description']
@@ -247,9 +246,10 @@ def inferenceform(request):
             print(f"{color}: {len(polygons_in_mask)}")
             polygons_data[color]=polygons_in_mask
         # Convert the dictionary to JSON format
+       
         json_data = json.dumps({
             "date": date,
-            "city":polygons_in_mask[0]['address']['city'],
+            "city": polygons_in_mask[0]['address']['city'] if polygons_in_mask[0]['address']['city'] == request.POST['city'] else polygons_in_mask[0]['address']['town'],
             "state":polygons_in_mask[0]['address']['state'],
             "country":polygons_in_mask[0]['address']['country'],
             "disaster_type":disaster_type, 

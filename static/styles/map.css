@@ -7,7 +7,7 @@
     /* border-radius: 10px; */
 }
 #map{
-    height: 100%;
+    /* height: 100%; */
     min-height: 512px;
     width: 100%;
 }
@@ -16,23 +16,19 @@
     border-collapse: collapse;
 }
 
-.equal-width th, .equal-width td {
-    border: 1px solid #000;
+#table .col {
+    border: 0.5px solid var(--light-black);
     padding: 8px; /* Adjust padding as needed */
-    text-align: center; /* Adjust text alignment as needed */
 }
-.equal-width .red {
-    background-color: #ffcccc; /* Light red */
+#table .red {
+    background-color: #ffcccc; 
 }
-
-.equal-width .orange {
-    background-color: #ffddb3; /* Light orange */
+#table .orange {
+    background-color: #ffddb3;
 }
-
-.equal-width .yellow {
-    background-color: #ffffcc; /* Light yellow */
+#table .yellow {
+    background-color: #ffffcc; 
 }
-
-.equal-width .green {
-    background-color: #ccffcc; /* Light green */
+#table .green {
+    background-color: #ccffcc;
 }

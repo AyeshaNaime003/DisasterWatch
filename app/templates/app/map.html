@@ -1,58 +1,71 @@
+<!-- MAP -->
 {% extends 'index.html' %}
 {% load static %}
-{% block title %}Home{% endblock title %}
+{% block title %}Map{% endblock title %}
 {% block body %}
+<!-- CSS -->
 <link href="{% static '/styles/map.css' %}" rel="stylesheet" />
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-
-<div id="map-container" class="container-fluid">
-    <div id="row" class="row">
+<!-- HTML -->
+<div id="map-page" class="container-fluid">
+    <div class="row">
+        <!-- NAVBAR -->
         {% include 'app/navbar2.html' %}
-        <div class="col-md-11 home-container">
-            <div class="container error-container">
-                {% if messages %}
-                {% for message in messages %}
-                <p class="alert {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% endif %}"
-                    role="alert">
-                    {{ message }}
-                    {% endfor %}
-                    </ul>
-                    {% endif %}
-            </div>
-            <div id="cityinfo" class="my-2 d-flex rounded py-2 px-1">
-                <h1>{{ context.country }}</h1>
-                <h1>{{ context.state }}</h1>
-                <h1>{{ context.city }}</h1>
-            </div>
+        <div class="col-md-11">
+            <!-- ERROR CONTAINER -->
             <div class="row">
-                <div class="col-12 col-md-6">
+                <div class="container error-container">
+                    {% if messages %}
+                    {% for message in messages %}
+                    <p class="alert {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% endif %}"
+                        role="alert">
+                        {{ message }}
+                    </p>
+                    {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+            <!-- MAIN CONTENT -->
+            <div class="row">
+                <div class="col-md-8">
+                    <!-- city info -->
+                    <div id="cityinfo" class="my-2 rounded py-2 px-1">
+                        <h1>{{ context.country }}, {{ context.state }}</h1>
+                        <h1>{{ context.city }}</h1>
+                    </div>
+                    <!-- map -->
                     <div id="map"></div>
+                    <!-- toggler for map and table -->
                     <div id="toggler" class="my-2 py-2 px-1">
-                        <input type="checkbox" id="redToggle" checked onclick="togglePolygon('red')"> Destroyed
-                        <input type="checkbox" id="orangeToggle" checked onclick="togglePolygon('orange')"> Majorly
+                        <input type="checkbox" id="redToggle" checked onclick="toggle('red')"> Destroyed
+                        <input type="checkbox" id="orangeToggle" checked onclick="toggle('orange')"> Majorly
                         Damaged
-                        <input type="checkbox" id="yellowToggle" checked onclick="togglePolygon('yellow')"> Minorly
+                        <input type="checkbox" id="yellowToggle" checked onclick="toggle('yellow')"> Minorly
                         Damaged
-                        <input type="checkbox" id="greenToggle" checked onclick="togglePolygon('green')"> Undamaged
+                        <input type="checkbox" id="greenToggle" checked onclick="toggle('green')"> Undamaged
                     </div>
                 </div>
-                <div class="col-12 col-md-6">
-                        <div id="table" class="equal-width" cellspacing="0" cellpadding="8" >
-                            <table>
-                                <tr>
-                                    <th>Building</th>
-                                    <th>Neighbourhood</th>
-                                    <th>Road</th>
-                                    <th>Suburb</th>
-                                    <th>Town</th>
-                                </tr>
-                            </table>
+                <!-- table -->
+                <div class="col-md-4">
+                    <div id="table" cellpadding="10" cellspacing="5">
+                        <div class="table">
+                            <div class="row">
+                                <div class="col col-3">Building</div>
+                                <div class="col col-3">Neighbourhood</div>
+                                <div class="col col-2">Road</div>
+                                <div class="col col-2">Suburb</div>
+                                <div class="col col-2">Town</div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
+
+        </div>
     </div>
 </div>
+
+
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
@@ -68,42 +81,45 @@
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
     // red, orange, yellow, green
     var allPolygons = [];
+    var allTableRows = [];
     for (var color in polygonData) {
         colorPolygons = []
         if (polygonData.hasOwnProperty(color)) {
             var colorPolygonData = polygonData[color];
             for (var i = 0; i < colorPolygonData.length; i++) {
-                coordinates = colorPolygonData[i]["coordinates"]
+                var coordinates = colorPolygonData[i]["coordinates"]
                 var address = colorPolygonData[i]["address"];
-                var popupContent = `<div>${displayAddressComponents(address)}</div>`;
+                // create polygon using coordinates and bind address to it
                 var polygon = L.polygon(coordinates, {
                     fillColor: color,
                     color: color,
                     fillOpacity: 0.5
                 }).addTo(map);
-                polygon.bindPopup(popupContent);
+                polygon.bindPopup(`<div>${displayAddressComponents(address)}</div>`);
                 colorPolygons.push(polygon);
+                // addig addresses to the table
+                var tableRow = `<div class="row ${color}">
+                    <div class="col col-3">${address.name}</div>
+                    <div class="col col-3">${address.neighbourhood}</div>
+                    <div class="col col-2">${address.road}</div>
+                    <div class="col col-2">${address.suburb}</div>
+                    <div class="col col-2">${address.town}</div>
+                </div>`;
+                $('#table').append(tableRow);
 
-
-                var tableRow = document.createElement('tr');
-                tableRow.classList.add(color);
-            tableRow.innerHTML = `
-                <td>${address.name}</td>
-                <td>${address.neighbourhood}</td>
-                <td>${address.road}</td>
-                <td>${address.suburb}</td>
-                <td>${address.town}</td>
-            `;
-            document.getElementById('table').appendChild(tableRow);
             }
         }
         allPolygons.push(colorPolygons)
     }
-    function togglePolygon(color) {
-        var rows = document.querySelectorAll('.'+color);
-    rows.forEach(function (row) {
-        row.style.display = row.style.display === 'none' ? '' : 'none'; // Toggle visibility
-    });
+    
+    
+    
+    
+    function toggle(color) {
+        var rows = document.querySelectorAll('.' + color);
+        rows.forEach(function (row) {
+            row.style.display = row.style.display === 'none' ? '' : 'none'; // Toggle visibility
+        });
         switch (color) {
             case 'red':
                 togglePolygonsVisibility(allPolygons[0]);
@@ -121,12 +137,9 @@
                 break;
         }
     }
-
-
-    // Function to toggle visibility of polygons in an array
     function togglePolygonsVisibility(polygonsArray) {
         polygonsArray.forEach(function (polygon) {
-            
+
             var currentOpacity = polygon.options.fillOpacity || 0;
             polygon.setStyle({ fillOpacity: currentOpacity ? 0 : 0.3 });
             polygon.setStyle({ opacity: currentOpacity ? 0 : 1 });
@@ -135,17 +148,17 @@
 
 
     function displayAddressComponents(address) {
-    let components = [];
-    const keys = ['town', 'suburb_municipality', 'neighbourhood', 'road'];
-    
-    for (const key of keys) {
-        if (key in address) {
-            components.push(address[key]);
-        }
-    }
+        let components = [];
+        const keys = ['name', 'neighbourhood', 'road', 'suburb_municipality', "town"];
 
-    return components.join(', ');
-}
+        for (const key of keys) {
+            if (key in address) {
+                components.push(address[key]);
+            }
+        }
+
+        return components.join(', ');
+    }
 
 </script>
 
