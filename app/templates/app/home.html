@@ -1,66 +1,69 @@
-  {% extends 'index.html' %}
-  {% load static %}
-  {% block title %}Home{% endblock title %}
-  {% block body %}
-  <link href="{% static '/styles/home2.css' %}" rel="stylesheet" />
+{% extends 'index.html' %}
+{% load static %}
+{% block title %}Home{% endblock title %}
+{% block body %}
+<link href="{% static '/styles/home2.css' %}" rel="stylesheet" />
 
-  <div class="container-fluid">
-    <div class="row main-row">
-      {% include 'app/navbar2.html' %}
-        <div class="col-md-11 home-container">
-        <div class="container error-container">
-          {% if messages %}
-          {% for message in messages %}
-          <p class="alert {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% endif %}"
-            role="alert">
-            {{ message }}
-            {% endfor %}
-            </ul>
-            {% endif %}
-        </div>
-        <!-- ABOUT US -->
-        <div class="aboutus">
-          <div class="my-3 p-2">
-            <h1 class="display-4 fw-normal fst-italic">DisasterWatch</h1>
-            <p class="lead my-3">An AI-Driven Web Service for Disaster Damage Assessment
-            </p>
-          </div>
-        </div>
-        <!-- NEWS -->
-        <div class="news my-3 p-2">
-          <h3 class="m-3">Recent Disaster Related News:</h3>
-          {% if reports %}
-          <div class="row m-1 mb-2">
-            {% for report in reports %}
-            <div class="co-12 col-md-4 col-xl-2 mb-2">
-              <div class="p-1 h-100 border overflow-hidden">
-                <!-- <a href="{{ report.fields.href }}" class=" icon-link gap-1 icon-link-hover stretched-link"> -->
-                {{ report.fields.title }}
-                <!-- </a> -->
-              </div>
-            </div>
-            {% endfor %}
-          </div>
-          {% else %}
-          <p>No earthquake reports available.</p>
+<div id="homepage" class="container-fluid">
+  <div class="row main-row">
+    <!-- NAVBAR -->
+    {% include 'app/navbar2.html' %}
+    <!-- MAIN CONTENT -->
+    <div class="col-md-11 home-container">
+        <!-- error -->
+      <div class="container error-container">
+        {% if messages %}
+        {% for message in messages %}
+        <p class="alert {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% endif %}"
+          role="alert">
+          {{ message }}
+          {% endfor %}
+          </ul>
           {% endif %}
+      </div>
+      <!-- ABOUT US -->
+      <div class="aboutus">
+        <div class="mb-2 p-2">
+          <h1 class="display-4 fw-normal fst-italic">DisasterWatch</h1>
+          <p class="lead my-3">An AI-Driven Web Service for Disaster Damage Assessment
+          </p>
         </div>
-        <!-- TAKE TO FORM -->
-        <div class="taketoform my-3 py-3 px-4">
-          <div class="d-flex flex-column align-items-start">
-            <h2 class="fw-bold  mt-2">Experience DisasterWatch's Cutting-Edge AI Model</h2>
-            <p class="text-body-secondary mt-2">
-              Dive into the innovative world of DisasterWatch's AI-driven model, offering real-time disaster prediction
-              and analysis. Navigate through interactive maps and dashboards to gain valuable insights, empowering you to
-              make informed decisions and take proactive measures. Join us in our mission to create a safer, more
-              resilient world.
-            </p>
-            <a href="{% url 'inferenceform' %}" class="btn btn-primary">Run model Inference</a>
+      </div>
+      <!-- NEWS -->
+      <div class="news my-3 p-2">
+        <h3 class="m-3">Recent Disaster Related News:</h3>
+        {% if reports %}
+        <div class="row m-1 mb-2">
+          {% for report in reports %}
+          <div class="co-12 col-md-4 col-xl-2 mb-2">
+            <div class="p-1 h-100 border overflow-hidden">
+              <!-- <a href="{{ report.fields.href }}" class=" icon-link gap-1 icon-link-hover stretched-link"> -->
+              {{ report.fields.title }}
+              <!-- </a> -->
+            </div>
           </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <p>No earthquake reports available.</p>
+        {% endif %}
+      </div>
+      <!-- TAKE TO FORM -->
+      <div class="taketoform my-3 py-3 px-4">
+        <div class="d-flex flex-column align-items-start">
+          <h2 class="fw-bold  mt-2">Experience DisasterWatch's Cutting-Edge AI Model</h2>
+          <p class="text-body-secondary mt-2">
+            Dive into the innovative world of DisasterWatch's AI-driven model, offering real-time disaster prediction
+            and analysis. Navigate through interactive maps and dashboards to gain valuable insights, empowering you to
+            make informed decisions and take proactive measures. Join us in our mission to create a safer, more
+            resilient world.
+          </p>
+          <a href="{% url 'inferenceform' %}" class="btn btn-primary">Run model Inference</a>
         </div>
       </div>
     </div>
   </div>
+</div>
 
 
-  {% endblock body %}
+{% endblock body %}

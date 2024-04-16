@@ -27,3 +27,10 @@ h2, h3{
 .bg-lovely-blue-deeper{
     background-color: var(--lovely-blue-deeper);
 }
+.bg-whitesmoke{
+    background-color: whitesmoke
+}
+.main-row{
+    background-color: var(--lovely-blue-lighter);
+    padding: 1%;
+}   

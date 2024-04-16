@@ -1,18 +1,24 @@
 {% extends 'index.html' %}
+
 {% load static %}
+
 {% block title %}Inference Form{% endblock title %}
+
 {% block body %}
 <link rel="stylesheet" href="{% static '/styles/home2.css' %}">
 <link rel="stylesheet" href="{% static '/styles/inference_form.css' %}">
 
 
 
-<div class="container-fluid">
+<div id="inferencepage" class="container-fluid">
     <div class="row main-row">
-      {% include 'app/navbar2.html' %}
-        <div class="col-md-11 home-container">
+        <!-- NAVBAR -->
+        {% include 'app/navbar2.html' %}
+        <!-- MAIN CONTENT -->
+        <div class="col-md-11">
+
             
-<div class="inferenceform m-2 p-2">
+<div class="inferenceform mx-2 p-2">
     <form method="POST" enctype="multipart/form-data">
         {% csrf_token %}
         <div class="row my-1">
