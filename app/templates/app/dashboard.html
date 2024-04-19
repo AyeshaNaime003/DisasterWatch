@@ -149,8 +149,17 @@
                             </div>
                             <div class="row my-2">
                                 <div class="col p-2 rounded mx-1 bg-whitesmoke">
-                                    <h2>Map</h2>
+                                    <div>
+                                        <h2>Map</h2>
+                                        <a href="{% url 'map' %}">Go to Interactive Map</a>
+                                    </div>
                                     <div id="heatmap" style="height: 400px;"></div>
+                                    <div id="toggler" class="my-2 py-2 px-1">
+                                        <input type="checkbox" id="redToggle" checked onclick="toggle('red')"> Destroyed
+                                        <input type="checkbox" id="orangeToggle" checked onclick="toggle('orange')"> Majorly Damaged
+                                        <input type="checkbox" id="yellowToggle" checked onclick="toggle('yellow')"> Minorly Damaged
+                                        <input type="checkbox" id="greenToggle" checked onclick="toggle('green')"> Undamaged
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -160,33 +169,58 @@
         </div>
 
 
-<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script> -->
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-<script src="{% static 'Leaflet.heat-gh-pages/dist/leaflet-heat.js' %}"></script>
+        <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script> -->
+        <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+        <script src="{% static 'Leaflet.heat-gh-pages/dist/leaflet-heat.js' %}"></script>
 
-<script>
-    var context = {{ context| safe }};
-    var polygonData = context.polygon_data;
-    var lat = context.map_middle_lat;
-    var long = context.map_middle_long;
-    var map = L.map('heatmap').setView([lat, long], 18);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
-    var heatmapData = [];
-        for (var color in polygonData) {
-            if (polygonData.hasOwnProperty(color)) {
-                var colorPolygonData = polygonData[color];
-                for (var i = 0; i < colorPolygonData.length; i++) {
-                    var coordinates = colorPolygonData[i]["coordinates"];
-                    console.log(coordinates)
-                    heatmapData.push(coordinates); 
+        <script>
+            var context = {{ context| safe }};
+            var polygonData = context.polygon_data;
+            var lat = context.map_middle_lat;
+            var long = context.map_middle_long;
+            var map = L.map('heatmap').setView([lat, long], 15);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+            var heatLayers = {};
+            for (var color in polygonData) {
+                var heatmapData = [];
+                if (polygonData.hasOwnProperty(color)) {
+                    var colorPolygonData = polygonData[color];
+                    for (var i = 0; i < colorPolygonData.length; i++) {
+                        heatmapData.push([colorPolygonData[i]["center_lat"], colorPolygonData[i]["center_long"], 1]);
+                    }
+                    console.log(heatmapData)
+                    var heatMap = L.heatLayer(heatmapData, {
+                        radius: 20,
+                        blur: 12,
+                        maxZoom: 18,
+                        gradient: {
+                            1: color
+                        }
+                    }).addTo(map);
+                    heatLayers[color] = heatMap;
                 }
+                
             }
+    function toggle(color) {
+        if (heatLayers[color]) {
+            heatLayers[color].remove(); // Remove heatmap layer if exists
+            delete heatLayers[color]; // Remove reference from object
+        } else {
+            var heatmapData = []; // Recreate heatmap data for the color
+            var colorPolygonData = polygonData[color];
+            for (var i = 0; i < colorPolygonData.length; i++) {
+                heatmapData.push([colorPolygonData[i]["center_lat"], colorPolygonData[i]["center_long"], 1]);
+            }
+            var heatMap = L.heatLayer(heatmapData, {
+                radius: 20,
+                blur: 12,
+                maxZoom: 18,
+                gradient: {
+                    1: color
+                }
+            }).addTo(map);
+            heatLayers[color] = heatMap; // Store new heatmap layer in object
         }
-
-    var heatMap = L.heatLayer(heatmapData, {
-        radius: 20,
-        blur: 10,
-        maxZoom: 18
-    }).addTo(map);
-</script>
-            {% endblock body %}
+    }
+        </script>
+{% endblock body %}
