@@ -34,7 +34,10 @@
                         <h1>{{ context.city }}</h1>
                     </div>
                     <!-- map -->
-                    <div id="map"></div>
+                    <div id="map-container">
+                        <div id="map"></div>
+                        
+                    </div>
                     <!-- toggler for map and table -->
                     <div id="toggler" class="my-2 py-2 px-1">
                         <input type="checkbox" id="redToggle" checked onclick="toggle('red')"> Destroyed
@@ -72,13 +75,47 @@
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script>
     var context = {{ context| safe }};
-    var polygonData = context.polygon_data;
-    var lat = context.map_middle_lat;
-    var long = context.map_middle_long;
-    console.log(lat, long);
-    // console.log(polygonData);
-    var map = L.map('map').setView([lat, long], 18);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+    // map and tiles
+    var map = L.map('map').setView([context.map_middle_lat, context.map_middle_long], 18);
+
+
+var baseMaps = {
+    "Street Map": L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}),
+    "Satellite Map": L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        maxZoom: 19,
+        attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+    }),
+};  
+L.control.layers(baseMaps).addTo(map);
+
+// Handle toggler actions
+document.querySelectorAll('input[name="map-toggle"]').forEach(function(input) {
+    input.addEventListener('change', function() {
+        var selectedValue = this.value;
+        switch(selectedValue) {
+            case 'street':
+                streetMapLayer.addTo(map);
+                satelliteMapLayer.remove();
+                terrainMapLayer.remove();
+                break;
+            case 'satellite':
+                satelliteMapLayer.addTo(map);
+                streetMapLayer.remove();
+                terrainMapLayer.remove();
+                break;
+            case 'terrain':
+                terrainMapLayer.addTo(map);
+                streetMapLayer.remove();
+                satelliteMapLayer.remove();
+                break;
+        }
+    });
+});
+
+var polygonData = context.polygon_data;
+    
     // red, orange, yellow, green
     var allPolygons = [];
     var allTableRows = [];

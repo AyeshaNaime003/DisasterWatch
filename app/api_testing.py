@@ -21,17 +21,17 @@ print(desired_time, unix_to_humanreadable(desired_time))
 
 
 # Construct the API request URL with the specified time
-url = f"http://api.openweathermap.org/data/2.5/weather?q={city_name}&dt={current_time}&appid={api_key}"
-# url = f"http://api.openweathermap.org/data/2.5/weather?q={city_name}&appid={api_key}"
+# url = f"http://api.openweathermap.org/data/2.5/weather?q={city_name}&dt={current_time}&appid={api_key}"
+# # url = f"http://api.openweathermap.org/data/2.5/weather?q={city_name}&appid={api_key}"
 
-response = requests.get(url)
-data = response.json()
+# response = requests.get(url)
+# data = response.json()
 
-print(f"City: {data['name']}")
-print(f"Temperature: {(data['main']['temp'] - 273.15):.2f} C")
-print(f"Humidity: {data['main']['humidity']}%")
-print(f"Weather: {data['weather'][0]['description']}")
-print(f"Weather: {data}")
+# print(f"City: {data['name']}")
+# print(f"Temperature: {(data['main']['temp'] - 273.15):.2f} C")
+# print(f"Humidity: {data['main']['humidity']}%")
+# print(f"Weather: {data['weather'][0]['description']}")
+# print(f"Weather: {data}")
 
 
 # POPULATION
@@ -87,11 +87,11 @@ def get_population(country_name):
         print(f"Error: {e}")
         return None
 
-# Call the function to get the population of Pakistan
-country_name = 'Pakistan'
-population = get_population(country_name)
+# # Call the function to get the population of Pakistan
+# country_name = 'Pakistan'
+# population = get_population(country_name)
 
-if population is not None:
-    print(f"Population of {country_name}: {population}")
-else:
-    print(f"Population data not found for {country_name}")
+# if population is not None:
+#     print(f"Population of {country_name}: {population}")
+# else:
+#     print(f"Population data not found for {country_name}")
