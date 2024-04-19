@@ -33,7 +33,7 @@ sys.path.append(model_dir)
 
 from server.settings import *
 from model.models import SeResNext50_Unet_MultiScale
-from model.data_preprocessing import tif_to_img, one_hot_encoding_mask, mask_to_polygons, polygons_to_masks, get_tif_transform, pixels_to_coordinates
+from model.data_preprocessing import tif_to_img, one_hot_encoding_mask, mask_to_polygons, get_tif_transform, pixels_to_coordinates
 # from .get_lat_long import get_important_coordinates
 
 # from .folium_maps import html_code
@@ -125,10 +125,10 @@ def map(request):
     comments = json_data["comments"]   
     pre_path = json_data["pre_path"]   
     post_path = json_data["post_path"]   
+    map_middle_lat = json_data["map_middle_lat"]   
+    map_middle_long = json_data["map_middle_long"]   
     polygon_data = json_data["polygon_data"]   
         
-    transform = get_tif_transform(pre_path)
-    middle_lat, middle_long = pixels_to_coordinates(transform, (612,612))
     context = {
         'date': date,
         'city': city,
@@ -138,12 +138,10 @@ def map(request):
         'disaster_description': disaster_description,
         'comments': comments,
         'pre_path': pre_path,
-        'post_path': post_path,
         'polygon_data': polygon_data,
-        'important_coordinates': {
-            'middle_lat': middle_lat,
-            'middle_long': middle_long,
-        }
+        'map_middle_lat': map_middle_lat,
+        'map_middle_long': map_middle_long,
+        'post_path': post_path,
     }
     # print(context)
     return render(request, 'app/map.html', context={'context': context})
@@ -197,7 +195,8 @@ def help(request):
 
 @login_required(login_url="login/")
 def inferenceform(request):
-    # if True:
+    if request.method == 'POST' and request.POST["comments"]=="EMPTY":
+            return redirect("dashboard")
     if request.method == 'POST' and request.FILES['pre_image'] and request.FILES['post_image']:
         # get data from form
         pre_image = request.FILES['pre_image']
@@ -241,15 +240,16 @@ def inferenceform(request):
         for i, mask in enumerate(dummy_masks):
             color=classes[i]
             _, mask = cv2.threshold(mask.astype('uint8'), 0, 255, cv2.THRESH_BINARY)
-            # print(f"{color} mask {mask.shape} {mask.dtype} {mask.max()}")
             polygons_in_mask = mask_to_polygons(mask, tranform, rdp=False)
-            # print(polygons_in_mask[:5])
             print(f"{color}: {len(polygons_in_mask)}")
             polygons_data[color]=polygons_in_mask
+        
         # Convert the dictionary to JSON format
         print(request.POST['city'])
         print( polygons_in_mask[0]['address']['city'])
         print( polygons_in_mask[0]['address']['town'])
+        transform = get_tif_transform(pre_path)
+        map_middle_lat, map_middle_long = pixels_to_coordinates(transform, (612,612))
         json_data = json.dumps({
             "date": date,
             "city": polygons_in_mask[0]['address']['city'] if polygons_in_mask[0]['address']['city'] == request.POST['city'] else polygons_in_mask[0]['address']['town'],
@@ -258,9 +258,11 @@ def inferenceform(request):
             "disaster_type":disaster_type, 
             "disaster_description":disaster_description, 
             "comments":comments,
-            "polygon_data": polygons_data, 
+            'map_middle_lat': map_middle_lat,
+            'map_middle_long': map_middle_long,
             "pre_path":pre_path, 
-            "post_path":post_path, 
+            "post_path":post_path,
+            "polygon_data": polygons_data, 
         })
         try:
             # Create and save an instance of JsonFileModel
@@ -268,7 +270,7 @@ def inferenceform(request):
             json_model_instance.save()
             print("JsonFileModel model created")
             messages.success(request, "JsonFileModel model created")
-            return redirect("map")
+            return redirect("dashboard")
         except:
             print("Unable to save inference")
             messages.error(request, "Unable to save inference")

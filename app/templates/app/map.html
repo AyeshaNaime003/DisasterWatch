@@ -73,8 +73,8 @@
 <script>
     var context = {{ context| safe }};
     var polygonData = context.polygon_data;
-    var lat = context.important_coordinates.middle_lat;
-    var long = context.important_coordinates.middle_long;
+    var lat = context.map_middle_lat;
+    var long = context.map_middle_long;
     console.log(lat, long);
     // console.log(polygonData);
     var map = L.map('map').setView([lat, long], 18);

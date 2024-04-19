@@ -147,3 +147,10 @@ LEAFLET_CONFIG = {
         'minZoom': 13,
     },
 }
+
+
+# # Set session expire at browser close
+# SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
+# # Optionally, you can set the session cookie age to 0 to expire it immediately when the browser is closed
+# SESSION_COOKIE_AGE = 0
