@@ -32,19 +32,10 @@ sys.path.append(model_dir)
 # print(f"paths to check for module: {sys.path}")
 
 from server.settings import *
-from model.models import SeResNext50_Unet_MultiScale
-from model.data_preprocessing import tif_to_img, one_hot_encoding_mask, mask_to_polygons, get_tif_transform, pixels_to_coordinates
-# from .get_lat_long import get_important_coordinates
+from .model.data_preprocessing import tif_to_img, one_hot_encoding_mask, mask_to_polygons, get_tif_transform, pixels_to_coordinates
 
-# from .folium_maps import html_code
-# # from .plotly_maps import html_code
-# from .map_segmentation import html_code
-# from .plotly_maps import dash_app
 
 os.environ['TORCH_HOME'] = model_dir
-
-
-from geopy.geocoders import Nominatim
 
 def get_address(request):
     if request.method == 'GET':
@@ -109,10 +100,14 @@ def logoutPage(request):
 
 
 @login_required(login_url="login/")
+def adminPanel(request):
+     return render(request, "app/adminPanel.html")
+
+
+@login_required(login_url="login/")
 def map(request): 
     # get data from database
     json_file_model = JsonFileModel.objects.filter(user=request.user).last()
-    # print("JSON FILE MODEL")
     # print(model_to_dict(json_file_model))
     json_data = json.loads(json_file_model.json_file)
     
@@ -138,23 +133,50 @@ def map(request):
         'disaster_description': disaster_description,
         'comments': comments,
         'pre_path': pre_path,
+        'post_path': post_path,
         'polygon_data': polygon_data,
         'map_middle_lat': map_middle_lat,
         'map_middle_long': map_middle_long,
-        'post_path': post_path,
     }
     # print(context)
     return render(request, 'app/map.html', context={'context': context})
 
 
-@login_required(login_url="login/")
-def adminPanel(request):
-     return render(request, "app/adminPanel.html")
-
 
 @login_required(login_url="login/")
 def dashboard(request):
-    return render(request, "app/dashboard.html")
+    json_file_model = JsonFileModel.objects.filter(user=request.user).last()
+    json_data = json.loads(json_file_model.json_file)
+    
+    date = json_data.get("date")   
+    city = json_data["city"]   
+    state = json_data["state"]   
+    country = json_data["country"]   
+    disaster_type = json_data["disaster_type"]   
+    disaster_description = json_data["disaster_description"]   
+    comments = json_data["comments"]   
+    pre_path = json_data["pre_path"]   
+    post_path = json_data["post_path"]   
+    map_middle_lat = json_data["map_middle_lat"]   
+    map_middle_long = json_data["map_middle_long"]   
+    polygon_data = json_data["polygon_data"]   
+        
+    context = {
+        'date': date,
+        'city': city,
+        'state': state,
+        'country': country,
+        'disaster_type': disaster_type,
+        'disaster_description': disaster_description,
+        'comments': comments,
+        'pre_path': pre_path,
+        'post_path': post_path,
+        'polygon_data': polygon_data,
+        'map_middle_lat': map_middle_lat,
+        'map_middle_long': map_middle_long,
+    }
+    return render(request, 'app/dashboard.html', context={'context': context})
+
 
 @login_required(login_url="login/")
 def profile(request):

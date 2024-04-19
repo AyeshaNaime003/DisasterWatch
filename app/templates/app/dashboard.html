@@ -33,12 +33,12 @@
                 <div class="row ">
                     <!-- CITY INFO  -->
                     <div id="cityinfo" class="bg-whitesmoke p-2 rounded">
-                        <div class="row">
+                        <div class="row align-items-center">
                             <div class="col m-2">
-                                <h1 class="d-inline">Islamabad</h1>
+                                <h1 class="d-inline">{{ context.city}}, {{ context.state}}, {{ context.country}}</h1>
                             </div>
                             <div class="col m-2">
-                                <h5 class="d-inlne text-end">{date}</h5>
+                                <h5 class="text-end">{{ context.date }}</h5>
                             </div>
 
                         </div>
@@ -150,7 +150,7 @@
                             <div class="row my-2">
                                 <div class="col p-2 rounded mx-1 bg-whitesmoke">
                                     <h2>Map</h2>
-                                    <div id="map" style="height: 400px;"></div>
+                                    <div id="heatmap" style="height: 400px;"></div>
                                 </div>
                             </div>
                         </div>
@@ -159,42 +159,34 @@
             </div>
         </div>
 
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
-        <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-        <script src="{% static 'Leaflet.heat-gh-pages/dist/leaflet-heat.js' %}"></script>
+<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script> -->
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="{% static 'Leaflet.heat-gh-pages/dist/leaflet-heat.js' %}"></script>
 
+<script>
+    var context = {{ context| safe }};
+    var polygonData = context.polygon_data;
+    var lat = context.map_middle_lat;
+    var long = context.map_middle_long;
+    var map = L.map('heatmap').setView([lat, long], 18);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+    var heatmapData = [];
+        for (var color in polygonData) {
+            if (polygonData.hasOwnProperty(color)) {
+                var colorPolygonData = polygonData[color];
+                for (var i = 0; i < colorPolygonData.length; i++) {
+                    var coordinates = colorPolygonData[i]["coordinates"];
+                    console.log(coordinates)
+                    heatmapData.push(coordinates); 
+                }
+            }
+        }
 
-        <script>
-           var map = L.map('map').setView([37.7749, -122.4194], 16);
-
-// Add the OpenStreetMap tile layer
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(map);
-var data = [
-            [37.7749, -122.4194, 0.5],
-            [37.7849, -122.4194, 1],
-            [37.7949, -122.4194, 0.5],
-            [37.7749, -122.4294, 1],
-            [37.7849, -122.4294, 0.5],
-            [37.7949, -122.4294, 1]
-        ];
-
-        var heatMap = L.heatLayer(data, {
-            radius: 40,
-            blur: 10,
-            gradient: {
-                '0': 'Navy', '0.25': 'Navy',
-                '0.26': 'Green',
-                '0.5': 'Green',
-                '0.51': 'Yellow',
-                '0.75': 'Yellow',
-                '0.76': 'Red',
-                '1': 'Red'
-            },
-            maxZoom: 13
-        }).addTo(map);
+    var heatMap = L.heatLayer(heatmapData, {
+        radius: 20,
+        blur: 10,
+        maxZoom: 18
+    }).addTo(map);
 </script>
             {% endblock body %}
