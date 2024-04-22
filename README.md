@@ -31,7 +31,6 @@ link to template file using {load static} and <link href="{% static '/styles/log
 
 login: get to go to the page, post to sent form data to view, using django's builtin functions, authenticate the valid user and then login(create session id)
 
-news api: reliefweb, no ai key, just use get url to get news related to certain topics, rn only doing earthquakes, latest first
 
 map api: 
  2) plotly: real time, satellite style using mapbox token, draw polygons, hover in the midpoint

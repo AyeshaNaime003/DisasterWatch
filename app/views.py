@@ -18,6 +18,10 @@ import cv2
 import json
 import matplotlib.pyplot as plt
 from datetime import datetime
+from geopy.geocoders import Nominatim
+from geopy.exc import GeocoderUnavailable
+
+PIP_DEFAULT_TIMEOUT=100
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.dirname(current_dir)
@@ -39,14 +43,20 @@ os.environ['TORCH_HOME'] = model_dir
 
 def get_address(request):
     if request.method == 'GET':
-        lat = request.GET.get('lat')
-        lon = request.GET.get('lon')
+        try:
+            lat = request.GET.get('lat')
+            lon = request.GET.get('lon')
+            
+            geolocator = Nominatim(user_agent="my_geocoder")
+            location = geolocator.reverse((lat, lon), exactly_one=True)
+            print("1")
+            return JsonResponse({'address': location.address})
         
-        geolocator = Nominatim(user_agent="my_geocoder")
-        location = geolocator.reverse((lat, lon), exactly_one=True)
+        except GeocoderUnavailable:
+            # Handle the exception
+            messages.error(request, "Address retrieval failed. Please try again later.")
+            return redirect("inferenceform")
         
-        return JsonResponse({'address': location.address})
-
     return JsonResponse({'error': 'Invalid request'})
 
 def loginPage(request):
@@ -181,16 +191,15 @@ def dashboard(request):
 @login_required(login_url="login/")
 def profile(request):
     user = request.user
-    print(user.email, user.first_name, user.last_name, user.contact, user.profile_picture.url)
+    print(user.email, user.first_name, user.last_name, user.contact, user.profile_picture.url if user.profile_picture else '')
     if request.method == 'POST':
-         # Get the data from the form
+        # Get the data from the form
         first_name = request.POST.get('first_name')
         last_name = request.POST.get('last_name')
         email = request.POST.get('email')
         contact_number = request.POST.get('contact-number')
         bio = request.POST.get('bio')
         profile_picture = request.FILES.get('profile_picture')
-        
 
         # Update user attributes
         user.first_name = first_name
@@ -198,16 +207,23 @@ def profile(request):
         user.email = email
         user.contact = contact_number
         user.bio = bio
+
+        # Check if profile picture exists
         if profile_picture:
             user.profile_picture.delete()
             user.profile_picture = profile_picture
             print("picture saved")
+        else:
+            # Set default profile picture if it doesn't exist
+            default_profile_pic = '/static/assets/images/default_profile_pic.jpg'
+            user.profile_picture = default_profile_pic
+
         # Save the changes
         user.save()
         messages.success(request, 'Profile updated successfully!')
         return redirect('profile')
     else:
-        return render(request, "app/profile.html", context={'user': user,})
+        return render(request, "app/profile.html", context={'user': user})
 
 
 @login_required(login_url="login/")
@@ -257,7 +273,7 @@ def inferenceform(request):
         print(f"Dummy mask after hot encoding  {dummy_masks.shape}, {dummy_masks.dtype}")
         tranform = get_tif_transform(pre_path)
         classes=["red","orange","yellow","green"]
-        print("1")
+        
         # format the inference for database
         polygons_data={}
         for i, mask in enumerate(dummy_masks):

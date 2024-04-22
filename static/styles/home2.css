@@ -54,3 +54,15 @@ section.errorpage h2 i {
     background-color: #d4edda;
     color: #155724;
 }
+
+.carousel-item {
+    min-height: max-content;
+}
+
+.card-body {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: small;
+    height: 200px;
+}
+
