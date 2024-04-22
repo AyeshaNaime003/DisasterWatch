@@ -154,3 +154,5 @@ LEAFLET_CONFIG = {
 
 # # Optionally, you can set the session cookie age to 0 to expire it immediately when the browser is closed
 # SESSION_COOKIE_AGE = 0
+
+GEOCODER_TIMEOUT = 10  # Increase the timeout value (in seconds)

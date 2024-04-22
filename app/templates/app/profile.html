@@ -2,125 +2,128 @@
 {% load static %}
 {% block title %}Profile{% endblock title %}
 {% block body %}
+<link rel="stylesheet" href="{% static '/styles/profile.css' %}">
 <link rel="stylesheet" href="{% static '/styles/home2.css' %}">
+
+
 <div id="profilepage" class="container-fluid">
   <div class="row main-row">
-    <!-- SIDEBAR -->
-  {% include 'app/navbar2.html' %}
-  <!-- RIGHT PANEL -->
-  <div class="col-md-11">
-    <div class="right-container">
-      <div class="container py-5">
-        <div class="container error-container">
-          {% if messages %}
-          {% for message in messages %}
-          <p class="alert {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% endif %}"
-            role="alert">
-            {{ message }}
-            {% endfor %}
-            </ul>
-            {% endif %}
-        </div>
-       <div class="container form-container">
-        <form action="{% url 'update-profile' %}" method="POST" enctype="multipart/form-data">
-          {% csrf_token %}
-          <div class="row">
-            <div class="col-lg-4">
-              <div class="card mb-4">
-                <div class="card-body text-center">
-                  <div class="profile-picture-container">
-                    <div class="profile-picture-container">
-                      <img id="profile-picture" src="{{ user.profile_picture.url }}" class="d-block w-100"
-                        alt="Profile Picture">
-                      <input type="file" id="profile-picture-input" name="profile_picture" style="display: none;" accept="image/*" >
-                    </div>
+      <!-- SIDEBAR -->
+      {% include 'app/navbar2.html' %}
+      <!-- RIGHT PANEL -->
+      <div class="col-md-11">
+          <div class="right-container">
+              <div class="container py-5">
+                  <div class="container error-container">
+                      {% if messages %}
+                          {% for message in messages %}
+                              <p class="alert {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% endif %}"
+                                  role="alert">
+                                  {{ message }}
+                              </p>
+                          {% endfor %}
+                      {% endif %}
                   </div>
-  
-                  <h5 class="my-3">{{ user.username }}</h5>
-  
-                  <textarea class="form-control" name="bio">{{ user.bio }}</textarea>
-                </div>
+                  <div class="container form-container">
+                      <form action="{% url 'update-profile' %}" method="POST" enctype="multipart/form-data">
+                          {% csrf_token %}
+                          <div class="row">
+                              <div class="col-lg-4">
+                                  <div class="card mb-4">
+                                      <div class="card-body text-center">
+                                          <div class="profile-picture-container">
+                                              {% if user.profile_picture %}
+                                                  <img id="profile-picture" src="{{ user.profile_picture.url }}"
+                                                      class="d-block w-100" alt="Profile Picture">
+                                              {% else %}
+                                                  <img id="profile-picture"
+                                                      src="{% static 'assets/images/default_profile_pic.jpg' %}"
+                                                      class="d-block w-100" alt="Default Profile Picture">
+                                              {% endif %}
+                                              <input type="file" id="profile-picture-input" name="profile_picture"
+                                                  style="display: none;" accept="image/*">
+                                          </div>
+                                      </div>
+                                  </div>
+
+                                  <h5 class="my-3">{{ user.username }}</h5>
+
+                                  <textarea class="form-control mb-3" name="bio">{{ user.bio }}</textarea>
+                              </div>
+                              <div class="col-lg-8">
+                                  <div class="card mb-4">
+                                      <div class="card-body">
+
+                                          <div class="form-group row">
+                                              <label class="col-sm-3 col-form-label">Full Name:</label>
+                                              <div class="col-sm-9">
+                                                  <input type="text" class="form-control" name="first_name"
+                                                      value="{{ user.first_name }}">
+                                              </div>
+                                          </div>
+                                          <hr>
+                                          <div class="form-group row">
+                                              <label class="col-sm-3 col-form-label">Last Name:</label>
+                                              <div class="col-sm-9">
+                                                  <input type="text" class="form-control" name="last_name"
+                                                      value="{{ user.last_name }}">
+                                              </div>
+                                          </div>
+                                          <hr>
+                                          <div class="form-group row">
+                                              <label class="col-sm-3 col-form-label">Email:</label>
+                                              <div class="col-sm-9">
+                                                  <input type="text" class="form-control" name="email"
+                                                      value="{{ user.email }}">
+                                              </div>
+                                          </div>
+                                          <hr>
+                                          <div class="form-group row">
+                                              <label class="col-sm-3 col-form-label">Contact Number:</label>
+                                              <div class="col-sm-9">
+                                                  <input type="text" class="form-control" name="contact-number"
+                                                      value="{{ user.contact }}">
+                                              </div>
+                                          </div>
+                                          <hr>
+                                          <!-- Repeat the same for other fields -->
+                                          <div class="row">
+                                              <div class="col-sm-12">
+                                                  <button type="submit" class="btn btn-primary">Update</button>
+                                              </div>
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                      </form>
+                  </div>
               </div>
-            </div>
-            <div class="col-lg-8">
-              <div class="card mb-4">
-                <div class="card-body">
-  
-                  <div class="row">
-                    <div class="col-sm-3">
-                      <p class="mb-0">Full Name:</p>
-                    </div>
-                    <div class="col-sm-9">
-                      <input type="text" class="form-control" name="first_name" value="{{ user.first_name }}">
-                    </div>
-                  </div>
-                  <hr>
-                  <div class="row">
-                    <div class="col-sm-3">
-                      <p class="mb-0">Last Name:</p>
-                    </div>
-                    <div class="col-sm-9">
-                      <input type="text" class="form-control" name="last_name" value="{{ user.last_name }}">
-                    </div>
-                  </div>
-                  <hr>
-                  <div class="row">
-                    <div class="col-sm-3">
-                      <p class="mb-0">Email:</p>
-                    </div>
-                    <div class="col-sm-9">
-                      <input type="text" class="form-control" name="email" value="{{ user.email }}">
-                    </div>
-                  </div>
-                  <hr>
-                  <div class="row">
-                    <div class="col-sm-3">
-                      <p class="mb-0">Contact Number:</p>
-                    </div>
-                    <div class="col-sm-9">
-                      <input type="text" class="form-control" name="contact-number" value="{{ user.contact }}">
-                    </div>
-                  </div>
-                  <hr>
-                  <!-- Repeat the same for other fields -->
-                  <div class="row">
-                    <div class="col-sm-12">
-                      <button type="submit" class="btn btn-primary">Update</button>
-                    </div>
-                  </div>
-              </div>
-              </div>
-            </div>
           </div>
-        </form>
       </div>
-    </div>
-    </div>
   </div>
-  </div>
+</div>
 
 <script>
   // JavaScript
   document.addEventListener('DOMContentLoaded', function () {
-    const profilePicture = document.getElementById('profile-picture');
-    const profilePictureInput = document.getElementById('profile-picture-input');
-    profilePicture.addEventListener('click', function () {
-      profilePictureInput.click();
-    });
+      const profilePicture = document.getElementById('profile-picture');
+      const profilePictureInput = document.getElementById('profile-picture-input');
+      profilePicture.addEventListener('click', function () {
+          profilePictureInput.click();
+      });
 
-    profilePictureInput.addEventListener('change', function (event) {
-      const file = event.target.files[0];
-      const reader = new FileReader();
+      profilePictureInput.addEventListener('change', function (event) {
+          const file = event.target.files[0];
+          const reader = new FileReader();
 
-      reader.onload = function (e) {
-        profilePicture.src = e.target.result;
-      };
+          reader.onload = function (e) {
+              profilePicture.src = e.target.result;
+          };
 
-      reader.readAsDataURL(file);
-    });
+          reader.readAsDataURL(file);
+      });
   });
-
-
 </script>
 
 
