@@ -7,9 +7,9 @@ def get_location(latitude, longitude):
     geolocator = Nominatim(user_agent="DisasterWatch")
     location = geolocator.reverse((latitude, longitude), 
                                   language="en")
-    # address = location.address if location else "Unknown"
-    # components = [component.strip() for component in address.split(',')]
-    # address = [''] * (9 - len(components)) + ['' if component is None else component for component in components] 
+    address = location.address if location else "Unknown"
+    components = [component.strip() for component in address.split(',')]
+    address = [''] * (9 - len(components)) + ['' if component is None else component for component in components] 
     return location.raw
 
 def print_dictionary(dictionary):
