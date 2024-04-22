@@ -219,10 +219,10 @@ def help(request):
 def inferenceform(request):
     if request.method == 'POST' and request.POST["comments"]=="EMPTY":
             return redirect("dashboard")
-    if request.method == 'POST' and request.FILES['pre_image'] and request.FILES['post_image']:
+    if request.method == 'POST' and request.FILES.get('pre_image') != None and request.FILES.get('post_image') != None:
         # get data from form
-        pre_image = request.FILES['pre_image']
-        post_image = request.FILES['post_image']
+        pre_image = request.FILES.get('pre_image')
+        post_image = request.FILES.get('post_image')
         city = request.POST['city']
         date = request.POST['date']
         disaster_type = request.POST['disaster_type']
@@ -257,6 +257,7 @@ def inferenceform(request):
         print(f"Dummy mask after hot encoding  {dummy_masks.shape}, {dummy_masks.dtype}")
         tranform = get_tif_transform(pre_path)
         classes=["red","orange","yellow","green"]
+        print("1")
         # format the inference for database
         polygons_data={}
         for i, mask in enumerate(dummy_masks):
@@ -265,7 +266,6 @@ def inferenceform(request):
             polygons_in_mask = mask_to_polygons(mask, tranform, rdp=False)
             print(f"{color}: {len(polygons_in_mask)}")
             polygons_data[color]=polygons_in_mask
-        
         # Convert the dictionary to JSON format
         print(request.POST['city'])
         print( polygons_in_mask[0]['address']['city'])

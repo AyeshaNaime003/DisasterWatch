@@ -47,7 +47,7 @@ page wont load until all the addressses are retrived
 To run this project, you need to install GDAL. Follow the steps below:
 
 ### 1. Download GDAL Wheel File
-
+NEW LINK:https://github.com/cgohlke/geospatial-wheels/?tab=readme-ov-file EW LINK BELOW
 - Visit [Python Extension Packages for Windows - Christoph Gohlke](https://www.lfd.uci.edu/~gohlke/pythonlibs/).
 - Search for GDAL and download the appropriate wheel file based on your Python version and system architecture. For example, for Python 3.9 on a 64-bit system, download `GDAL-3.4.3-cp39-cp39-win_amd64.whl`.
 

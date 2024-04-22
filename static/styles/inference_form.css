@@ -1,0 +1,94 @@
+/* Image Input Fields */
+.image-input {
+    border: 2px dashed #ced4da;
+    border-radius: 5px;
+    position: relative;
+    height:40%;
+    cursor:pointer;
+    margin-left: 20px;
+    background-color: rgb(245, 245, 245);
+}
+
+
+.image-input input[type="file"] {
+    display: none;
+}
+
+.image-input label {
+    position: absolute;
+    top: 50%;
+    /* font-weight:normal; */
+    left: 50%;
+    transform: translate(-50%, -50%);
+    cursor: pointer;
+    text-align: center;
+}
+
+.image-input label i {
+    display: block;
+    margin: 0 auto;
+    font-size: auto; /* Adjust size as needed */
+    margin-bottom: 10px; /* Adjust spacing as needed */
+}
+
+.col-md-6 p {
+    margin:20px;
+    font-weight: bold;
+    margin-bottom:0px;
+}
+
+/* Add styles for dragover effect */
+.dragover {
+    border: 2px dashed #007bff; /* Change color as needed */
+}
+
+/* Button */
+.btn-primary {
+    width: 100%;
+}
+
+/* Lovely Blue Deeper Color */
+.bg-lovely-blue-deeper {
+    background-color: #205a96;
+    border-color: #205a96;
+}
+
+.bg-lovely-blue-deeper:hover {
+    background-color: #14326d;
+    border-color: #14326d;
+}
+
+/* Inference Form */
+.inferenceform {
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    /* padding: 10px; */
+    width: 100%; 
+    margin-left: auto;
+    margin-right: 0px;
+}
+
+.inferenceform label {
+    font-weight: bold;
+    color: #343a40;
+}
+
+.inferenceform input[type="text"],
+.inferenceform input[type="date"],
+.inferenceform select,
+.inferenceform textarea {
+    width: 98%;
+    /* padding: 10px; */
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+    box-sizing: border-box;
+    padding-left:20px;
+}
+
+.inferenceform select {
+    height: auto;
+}
+
+.inferenceform textarea {
+    resize: none;
+}
