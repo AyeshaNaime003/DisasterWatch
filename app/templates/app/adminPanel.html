@@ -7,9 +7,6 @@
 {% block body %}
 
 <!-- CUSTOM CSS -->
-<link href="{% static '/styles/dashboard.css' %}" rel="stylesheet" />
-<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-<script src="{% static '/javascript/jquery-3.7.1.js' %}"></script>
 
 <!-- HTML -->
 <div id="dashboard-page" class="container-fluid">
@@ -20,21 +17,33 @@
         <div class="col-md-11">
             <div class="container-fluid">
                 <div class="row">
+                    <div class="container error-container">
+                        {% if messages %}
+                        {% for message in messages %}
+                        <p class="alert {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% endif %}"
+                          role="alert">
+                          {{ message }}
+                          {% endfor %}
+                          </ul>
+                          {% endif %}
+                      </div>
+                </div>
+                <div class="row">
                     <div class="col-md-6">
                         <h2>Add User</h2>
-                        <form id="addUserForm"  action="{% url 'add-user' %}" method="POST">
+                        <form id="addUserForm" action="{% url 'admin-panel' %}" method="POST">
                             {% csrf_token %}
                             <div class="form-group">
                                 <label for="username">Username</label>
-                                <input type="text" class="form-control" id="username" name="username" required>
+                                <input type="text" class="form-control"  name="username" required>
                             </div>
                             <div class="form-group">
                                 <label for="email">Email</label>
-                                <input type="email" class="form-control" id="email" name="email" required>
+                                <input type="email" class="form-control" name="email" required>
                             </div>
                             <div class="form-group">
                                 <label for="password">Password</label>
-                                <input type="password" class="form-control" id="password" name="password" required>
+                                <input type="password" class="form-control" name="password" required>
                             </div>
                             <button type="submit" class="btn btn-primary">Add</button>
                         </form>
@@ -44,69 +53,97 @@
                             {% for user in users %}
                             <li onclick="selectUser('{{ user.id }}')">
                                 <span>{{ user.username }}</span>
-                                <!-- Add edit and delete buttons here if needed -->
                             </li>
                             {% endfor %}
                         </ul>
                     </div>
                     <div class="col-md-6">
-                        <div class="col-md-6">
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <h2>User Details</h2>
-                                    <form id="userDetailsForm">
-                                        {% if selected_user %}
-                                        <input type="hidden" id="userId" name="userId" value="{{ selected_user.id }}">
-                                        <div class="form-group">
-                                            <label for="username">Username</label>
-                                            <input type="text" class="form-control" id="username" name="username" value="{{ selected_user.username }}" readonly>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="email">Email</label>
-                                            <input type="email" class="form-control" id="email" name="email" value="{{ selected_user.email }}" readonly>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="contact">Contact</label>
-                                            <input type="text" class="form-control" id="contact" name="contact" value="{{ selected_user.contact }}" readonly>
-                                        </div>
-                                        <!-- Add more user details as needed -->
-                                        <button type="button" id="editUserBtn" class="btn btn-primary">Edit</button>
-                                        <button type="button" id="deleteUserBtn" class="btn btn-danger">Delete</button>
-                                        
-                                        {% endif %}
-                                    </form>
-                                    <hr>
-                                    <h3>Login History</h3>
-                                    <ul>
-                                        {% for login in selected_user.loginhistory_set.all %}
-                                        <li>{{ login.timestamp }} - {{ login.ip_address }}</li>
-                                        {% endfor %}
-                                    </ul>x  
-                                </div>
-                                <div class="col-md-12">
-                                    <h2>Inference History</h2>
-                                    <!-- Add code to display inference history -->
-                                </div>
+                        <div class="row">
+                            <h2>User Details</h2>
+                            <div id="userDetailsContainer" style="display: none;">
+                                <!-- Empty form initially -->
+                                <form id="userDetailsForm" method="POST">
+
+                                    {% csrf_token %}
+                                    <div class="form-group">
+                                        <label for="username">Username</label>
+                                        <input type="text" class="form-control" id="username" name="username" disabled >
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="email">Email</label>
+                                        <input type="email" class="form-control" id="email" name="email"  disabled>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="contact">Contact</label>
+                                        <input type="text" class="form-control" id="contact" name="contact"  disabled>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="is_admin">Is Admin</label>
+                                        <input type="checkbox" id="is_admin" name="is_admin" >
+                                    </div>
+                                    <!-- Add more user details as needed -->
+                                    <button type="submit" id="editUserBtn" class="btn btn-primary">Edit</button>
+                                    <button type="button" id="deleteUserBtn" class="btn btn-danger">Delete</button>
+                                </form>
                             </div>
+
+
+
+                            <!-- html from user_details.html -->
+                            <hr>
+                            <h3>Login History</h3>
+                            <ul>
+                                {% for login in selected_user.loginhistory_set.all %}
+                                <li>{{ login.timestamp }} - {{ login.ip_address }}</li>
+                                {% endfor %}
+                            </ul>x
+                        </div>
+                        <div class="row">
+                            <h2>Inference History</h2>
+                            <!-- Add code to display inference history -->
                         </div>
                     </div>
                 </div>
             </div>
         </div>
         <script>
-            function selectUser(userId) {
-                // var userId = $(element).data('user-id');
+            
+
+
+    function selectUser(userId) {
                 $.ajax({
                     url: '/get-user-details/' + userId + '/',  // Endpoint to fetch user details
                     type: 'GET',
                     success: function(response) {
-                $('#userDetailsForm').html(response);  // Display user details HTML
-            },
-                    error: function(xhr, status, error) {
+
+            $('#userId').val(response.id);
+            $('#username').val(response.username);
+            $('#email').val(response.email);
+            $('#contact').val(response.contact);
+            $('#is_admin').prop('checked', response.is_admin);
+            console.log("form updated");
+        $('#userDetailsContainer').css('display', 'block');
+        var form = document.getElementById('userDetailsForm');
+    form.action = "{% url 'edit-user' user_id=0 %}".replace('0', response.id);
+        },
+                    error: function (xhr, status, error) {
                         console.error(xhr.responseText);
                     }
                 });
             }
+          
+
+    // Edit button click event
+    $('#editUserBtn').click(function() {
+        // Handle edit functionality here
+    });
+
+    // Delete button click event
+    $('#deleteUserBtn').click(function() {
+        // Handle delete functionality here
+    });
+
+
         </script>
 
-{% endblock body %}
+        {% endblock body %}

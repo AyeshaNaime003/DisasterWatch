@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.decorators import login_required
+from django.shortcuts import redirect, get_object_or_404
 from django.contrib import messages
 from django.http import HttpResponse
 from django.forms.models import model_to_dict
@@ -111,22 +112,17 @@ def logoutPage(request):
     return redirect("login")
 
 def get_user_details(request, user_id):
-    print("getting user details in view fucntion")
-    user = CustomUser.objects.filter(id=user_id).first()
-    if user:
-        user_details_html = render_to_string('app/adminPanel.html', {'selected_user': user})
-        return HttpResponse(user_details_html)
-    else:
-        return HttpResponse(status=404)
+    user = get_object_or_404(CustomUser, id=user_id)    
+    return JsonResponse({
+        'id': user.id,
+        'username': user.username,
+        'email': user.email,
+        'contact': user.contact,
+        'is_admin': user.is_admin,
+    })
 
 @login_required(login_url="login/")
 def adminPanel(request):
-    users = CustomUser.objects.all()
-    selected_user = None
-    return render(request, "app/adminPanel.html", {'users': users})
-
-@login_required(login_url="login/")
-def add_user(request):
     if request.method == 'POST':
         username = request.POST.get('username')
         email = request.POST.get('email')
@@ -137,23 +133,21 @@ def add_user(request):
             messages.success(request, f"User '{username}' added successfully!")
         except Exception as e:
             messages.error(request, f"Failed to add user: {e}")
-    return redirect('admin-panel')
+    users = CustomUser.objects.all()
+    return render(request, "app/adminPanel.html", {'users': users})
+
 
 @login_required(login_url="login/")
 def edit_user(request, user_id):
+    print("In edit function")
+    user = get_object_or_404(CustomUser, id=user_id)
     if request.method == 'POST':
-        user = CustomUser.objects.filter(id=user_id).first()
-        if user:
-            username = request.POST.get('username')
-            email = request.POST.get('email')
-            contact = request.POST.get('contact')
-            user.username = username
-            user.email = email
-            user.contact = contact
-            user.save()
-            messages.success(request, f"User '{username}' updated successfully!")
-        else:
-            messages.error(request, "User not found!")
+        is_admin = request.POST.get('is_admin') == 'on'  
+        user.is_admin = is_admin
+        user.save()
+        print("Role updated")
+        messages.success(request, f"User '{user.username}' updated successfully!")
+        return redirect('admin-panel')
     return redirect('admin-panel')
 
 @login_required(login_url="login/")
