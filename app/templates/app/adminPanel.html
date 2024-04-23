@@ -66,6 +66,8 @@
 
                                     {% csrf_token %}
                                     <div class="form-group">
+                                        <input type="number" hidden class="form-control" id="userId" name="id" disabled >
+                                        
                                         <label for="username">Username</label>
                                         <input type="text" class="form-control" id="username" name="username" disabled >
                                     </div>
@@ -82,7 +84,7 @@
                                         <input type="checkbox" id="is_admin" name="is_admin" >
                                     </div>
                                     <!-- Add more user details as needed -->
-                                    <button type="submit" id="editUserBtn" class="btn btn-primary">Edit</button>
+                                    <button type="button" id="editUserBtn" class="btn btn-primary">Edit</button>
                                     <button type="button" id="deleteUserBtn" class="btn btn-danger">Delete</button>
                                 </form>
                             </div>
@@ -134,15 +136,44 @@
           
 
     // Edit button click event
-    $('#editUserBtn').click(function() {
-        // Handle edit functionality here
+       $('#editUserBtn').click(function() {
+        var formData = $('#userDetailsForm').serialize();
+        $.ajax({
+            url: '/edit-user/' + $('#userId').val() + '/', // Form action URL
+            type: 'POST',
+            data:   formData, // Form data to be submitted
+            success: function(response) {
+                // Handle success response
+                console.log(response);
+            },
+            error: function(xhr, status, error) {
+                // Handle error response
+                console.error(xhr.responseText);
+            }
+        });
     });
 
     // Delete button click event
     $('#deleteUserBtn').click(function() {
-        // Handle delete functionality here
-    });
+    var userId = $('#userId').val();
+    var csrfToken = $('input[name="csrfmiddlewaretoken"]').val(); // Get the CSRF token value
 
+    $.ajax({
+        url: '/delete-user/' + userId + '/', // URL for deleting the user
+        type: 'POST', // Use POST method for deletion
+        headers: {
+            'X-CSRFToken': csrfToken // Include the CSRF token in the headers
+        },
+        success: function(response) {
+            // Handle success response
+            console.log(response);
+        },
+        error: function(xhr, status, error) {
+            // Handle error response
+            console.error(xhr.responseText);
+        }
+    });
+});
 
         </script>
 
