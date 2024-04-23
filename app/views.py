@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.decorators import login_required
+from django.shortcuts import redirect, get_object_or_404
 from django.contrib import messages
 from django.http import HttpResponse
 from django.forms.models import model_to_dict
@@ -20,6 +21,8 @@ import matplotlib.pyplot as plt
 from datetime import datetime
 from geopy.geocoders import Nominatim
 from geopy.exc import GeocoderUnavailable
+from .forms import CustomUserForm
+from django.template.loader import render_to_string
 
 PIP_DEFAULT_TIMEOUT=100
 
@@ -108,11 +111,55 @@ def logoutPage(request):
     logout(request)
     return redirect("login")
 
+def get_user_details(request, user_id):
+    user = get_object_or_404(CustomUser, id=user_id)    
+    return JsonResponse({
+        'id': user.id,
+        'username': user.username,
+        'email': user.email,
+        'contact': user.contact,
+        'is_admin': user.is_admin,
+    })
 
 @login_required(login_url="login/")
 def adminPanel(request):
-     return render(request, "app/adminPanel.html")
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        try:
+            user = CustomUser.objects.create_user(username=username, email=email, password=password)
+            print("User created succcessfully")
+            messages.success(request, f"User '{username}' added successfully!")
+        except Exception as e:
+            messages.error(request, f"Failed to add user: {e}")
+    users = CustomUser.objects.all()
+    return render(request, "app/adminPanel.html", {'users': users})
 
+
+@login_required(login_url="login/")
+def edit_user(request, user_id):
+    print("In edit function")
+    user = get_object_or_404(CustomUser, id=user_id)
+    if request.method == 'POST':
+        is_admin = request.POST.get('is_admin') == 'on'  
+        user.is_admin = is_admin
+        user.save()
+        print("Role updated")
+        messages.success(request, f"User '{user.username}' updated successfully!")
+        return redirect('admin-panel')
+    return redirect('admin-panel')
+
+@login_required(login_url="login/")
+def delete_user(request, user_id):
+    user = CustomUser.objects.filter(id=user_id).first()
+    if user:
+        username = user.username
+        user.delete()
+        messages.success(request, f"User '{username}' deleted successfully!")
+    else:
+        messages.error(request, "User not found!")
+    return redirect('admin-panel')
 
 @login_required(login_url="login/")
 def map(request): 

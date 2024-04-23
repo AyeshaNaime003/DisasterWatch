@@ -11,10 +11,9 @@ class CustomUser(AbstractUser):
     # additional fields for user
     location = models.TextField(null=True, blank=True)
     contact = models.TextField(max_length=14, null=True, blank=True)
-    # status - admin or not 
     is_admin = models.BooleanField(default=False)
     bio = models.TextField(max_length=500, blank=True)
-    profile_picture = models.ImageField(upload_to='profile_pics/', null=True, blank=True)
+    profile_picture = models.ImageField(upload_to='profile_pics/', default='profile_pics/default_profile_pic.jpg')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     def _str_(self):

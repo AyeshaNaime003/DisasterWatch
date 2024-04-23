@@ -12,7 +12,6 @@ urlpatterns = [
     path('login/', views.loginPage, name="login"),
     path('logout/', views.logoutPage, name="logout"),
     path('map/', views.map, name="map"),
-    path('admin-panel/', views.adminPanel, name="admin-panel"),
     path('dashboard/', views.dashboard, name="dashboard"),
     path('profile/', views.profile, name="profile"),
     path('update-profile/', views.profile, name="update-profile"),
@@ -20,6 +19,11 @@ urlpatterns = [
     path('inferenceform/', views.inferenceform, name="inferenceform"),
     # path('<path:not_found>', TemplateView.as_view(template_name='app/404.html'), name='not_found'),
     path('get-address/', views.get_address, name='get_address'),
+    # admin panel
+     path('admin-panel/', views.adminPanel, name="admin-panel"),
+    path('edit-user/<int:user_id>/', views.edit_user, name="edit-user"),
+    path('delete-user/<int:user_id>/', views.delete_user, name="delete-user"),
+    path('get-user-details/<int:user_id>/', views.get_user_details, name='get-user-details'),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
