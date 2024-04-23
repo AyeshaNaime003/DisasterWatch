@@ -2,8 +2,8 @@ document.addEventListener("DOMContentLoaded", function() {
     // Function to fetch disaster-related news
     function fetchDisasterNews() {
         const apiKey = 'pub_4247484e68d5e15c897c668c0414a291ea88a'; // Replace 'YOUR_API_KEY' with your actual API key from newsdata.io
-        const url = `https://newsdata.io/api/1/news?apikey=pub_4247484e68d5e15c897c668c0414a291ea88a&qInTitle=earthquake OR flood OR disaster`;
-
+        const url = `https://newsdata.io/api/1/news?apikey=pub_4247484e68d5e15c897c668c0414a291ea88a&qInTitle=earthquake OR flood OR disaster&country=pk&language=en`;
+        // console.log("NEWS FETCHED")
         fetch(url)
         .then(response => {
             if (!response.ok) {
