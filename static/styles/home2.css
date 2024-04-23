@@ -1,6 +1,6 @@
 /* Home Container */
 .home-container div {
-    background-color: whitesmoke;
+    background-color: white;
     border-radius: 10px;
 }
 
@@ -66,3 +66,8 @@ section.errorpage h2 i {
     height: 200px;
 }
 
+.readMore {
+    background-color: white;
+    border-color: var(--lovely-blue-deeper);
+    color: var(--lovely-blue-deeper);
+}

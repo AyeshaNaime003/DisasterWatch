@@ -53,11 +53,12 @@ document.addEventListener("DOMContentLoaded", function() {
                         description.style.fontSize = 'small';
 
                         const source = document.createElement('a');
-                        source.href = article.sourceUrl;
-                        source.classList.add('btn', 'btn-primary', 'mt-auto');
+                        source.href = article.source_url;
+                        source.classList.add('btn', 'readMore', 'mt-auto');
                         source.style.width = 'max-content';
                         source.style.height = 'max-content'
                         source.style.alignSelf = 'center'
+                        source.style.fontSize = 'small'
                         source.textContent = 'Read More';
 
                         cardBody.appendChild(title);

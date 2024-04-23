@@ -4,91 +4,109 @@
 {% block body %}
 <link rel="stylesheet" href="{% static '/styles/profile.css' %}">
 
+
 <div id="profilepage" class="container-fluid">
-    <div class="row main-row">
-        <!-- SIDEBAR -->
-        {% include 'app/navbar2.html' %}
-        <!-- RIGHT PANEL -->
-        <div class="col-md-11">
-            <div class="right-container">
-                <div class="container-xl px-4 mt-4" >
-                    <div class="row">
-                        <div class="col-xl-4">
-                            <!-- Profile picture card-->
-                            <div class="card mb-4 mb-xl-0">
-                            <div class="card-header">Profile Picture</div>
-                                <div class="card-body text-center">
-                                    <!-- Profile picture image-->
-                                    <div class="profile-picture-container">
-                                        <img class="img-account-profile rounded-circle mb-2" src="{{ user.profile_picture.url }}" alt="Profile Picture">
+  <div class="row main-row">
+      <!-- SIDEBAR -->
+      {% include 'app/navbar2.html' %}
+      <!-- RIGHT PANEL -->
+      <div class="col-md-11">
+          <div class="right-container">
+              {% comment %} <div class="container py-5" style= 'padding:0px;'> {% endcomment %}
+                  <div class="container error-container">
+                      {% if messages %}
+                          {% for message in messages %}
+                              <p class="alert {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% endif %}"
+                                  role="alert">
+                                  {{ message }}
+                              </p>
+                          {% endfor %}
+                      {% endif %}
+                  </div>
+                  <div class="container form-container">
+                      <form action="{% url 'update-profile' %}" method="POST" enctype="multipart/form-data">
+                          {% csrf_token %}
+                          <div class="row">
+                                <div class="col-xl-4">
+                                    <div class="card mb-4 mb-xl-0">
+                                        <div class="card-header">Profile Picture</div>
+                                        <div class="card-body text-center">
+                                            <div class="profile-picture-container">
+                                                {% if user.profile_picture %}
+                                                <img id="profile-picture" src="{{ user.profile_picture.url }}" class='profileImage'
+                                                  alt="Profile Picture">
+                                                {% else %}
+                                                <img id="profile-picture" src="{% static 'profile_picture/default_profile_pic.jpg' %}"
+                                                  class='profileImage' alt="Default Profile Picture">
+                                                {% endif %}
+                                                <input type="file" id="profile-picture-input" name="profile_picture"
+                                                  style="display: none;" accept="image/*">
+                                                <!-- Profile picture help block-->
+                                            </div>
+                                            <div class="small font-italic text-muted mb-4" style="margin-top:10px">JPG or PNG no larger than 5 MB</div>
+                                        </div>
                                     </div>
-                                    <!-- Profile picture help block-->
-                                    <div class="small font-italic text-muted mb-4">JPG or PNG no larger than 5 MB</div>
-                                    <!-- Profile picture upload button-->
-                                    <button class="btn btn-primary" type="button">Upload new image</button>
                                 </div>
-                            </div>
-                            
-                        </div>
-                        <div class="col-xl-8">
-                            <!-- Account details card-->
-                            <div class="card mb-4">
-                                <div class="card-header">Account Details</div>
-                                <div class="card-body">
-                                    <form action="{% url 'update-profile' %}" method="POST">
-                                        {% csrf_token %}
-                                        <!-- Form Group (username)-->
-                                        <div class="mb-3">
-                                            <label class="small mb-1" for="inputUsername">Username</label>
-                                            <input class="form-control" id="inputUsername" type="text" name="username" value="{{ user.username }}">
+                                <div class="col-xl-8">
+                                    <!-- Account details card-->
+                                    <div class="card mb-4">
+                                        <div class="card-header">Account Details</div>
+                                        <div class="card-body">
+                                            <form action="{% url 'update-profile' %}" method="POST">
+                                                {% csrf_token %}
+                                                <!-- Form Group (username)-->
+                                                <div class="mb-3">
+                                                    <label class="small mb-1" for="inputUsername">Username</label>
+                                                    <input class="form-control" id="inputUsername" type="text" name="username" value="{{ user.username }}">
+                                                </div>
+                                                <!-- Form Row-->
+                                                <div class="row gx-3 mb-3">
+                                                    <!-- Form Group (first name)-->
+                                                    <div class="col-md-6">
+                                                        <label class="small mb-1" for="inputFirstName">First name</label>
+                                                        <input class="form-control" id="inputFirstName" type="text" name="first_name" value="{{ user.first_name }}">
+                                                    </div>
+                                                    <!-- Form Group (last name)-->
+                                                    <div class="col-md-6">
+                                                        <label class="small mb-1" for="inputLastName">Last name</label>
+                                                        <input class="form-control" id="inputLastName" type="text" name="last_name" value="{{ user.last_name }}">
+                                                    </div>
+                                                </div>
+                                                <!-- Form Row        -->
+                                                <div class="mb-3">
+                                                    <!-- Form Group (location)-->
+                                                    {% comment %} <div class="col-md-6"> {% endcomment %}
+                                                        <label class="small mb-1" for="inputLocation">Location</label>
+                                                        <input class="form-control" id="inputLocation" type="text" name="location" value="{{ user.location }}">
+                                                    {% comment %} </div> {% endcomment %}
+                                                </div>
+                                                <!-- Form Group (email address)-->
+                                                <div class="mb-3">
+                                                    <label class="small mb-1" for="inputEmailAddress">Email address</label>
+                                                    <input class="form-control" id="inputEmailAddress" type="email" name="email" value="{{ user.email }}">
+                                                </div>
+                                                <!-- Form Row-->
+                                                <div class="row gx-3 mb-3">
+                                                    <!-- Form Group (phone number)-->
+                                                    <div class="col-md-6">
+                                                        <label class="small mb-1" for="inputPhone">Phone number</label>
+                                                        <input class="form-control" id="inputPhone" type="tel" name="contact-number" value="{{ user.contact }}">
+                                                    </div>
+                                                    
+                                                    <!-- Form Group (role)-->
+                                                    <div class="mb-3">
+                                                        <label class="small mb-1">Role</label>
+                                                        <input class="form-control" id="inputRole" type="text" value="{% if user.is_admin %}Admin{% else %}Employee{% endif %}" readonly>
+                                                    </div>
+                                                    
+                                                </div>
+                                                <!-- Save changes button-->
+                                                <div class="text-center">
+                                                    <button class="btn btn-primary" type="submit">Save changes</button>
+                                                </div>
+                                            </form>
                                         </div>
-                                        <!-- Form Row-->
-                                        <div class="row gx-3 mb-3">
-                                            <!-- Form Group (first name)-->
-                                            <div class="col-md-6">
-                                                <label class="small mb-1" for="inputFirstName">First name</label>
-                                                <input class="form-control" id="inputFirstName" type="text" name="first_name" value="{{ user.first_name }}">
-                                            </div>
-                                            <!-- Form Group (last name)-->
-                                            <div class="col-md-6">
-                                                <label class="small mb-1" for="inputLastName">Last name</label>
-                                                <input class="form-control" id="inputLastName" type="text" name="last_name" value="{{ user.last_name }}">
-                                            </div>
-                                        </div>
-                                        <!-- Form Row        -->
-                                        <div class="row gx-3 mb-3">
-                                            <!-- Form Group (organization name)-->
-                                            <div class="col-md-6">
-                                                <label class="small mb-1" for="inputOrgName">Organization name</label>
-                                                <input class="form-control" id="inputOrgName" type="text" name="organization_name" value="{{ user.organization_name }}">
-                                            </div>
-                                            <!-- Form Group (location)-->
-                                            <div class="col-md-6">
-                                                <label class="small mb-1" for="inputLocation">Location</label>
-                                                <input class="form-control" id="inputLocation" type="text" name="location" value="{{ user.location }}">
-                                            </div>
-                                        </div>
-                                        <!-- Form Group (email address)-->
-                                        <div class="mb-3">
-                                            <label class="small mb-1" for="inputEmailAddress">Email address</label>
-                                            <input class="form-control" id="inputEmailAddress" type="email" name="email" value="{{ user.email }}">
-                                        </div>
-                                        <!-- Form Row-->
-                                        <div class="row gx-3 mb-3">
-                                            <!-- Form Group (phone number)-->
-                                            <div class="col-md-6">
-                                                <label class="small mb-1" for="inputPhone">Phone number</label>
-                                                <input class="form-control" id="inputPhone" type="tel" name="phone_number" value="{{ user.phone_number }}">
-                                            </div>
-                                            <!-- Form Group (birthday)-->
-                                            <div class="col-md-6">
-                                                <label class="small mb-1" for="inputBirthday">Birthday</label>
-                                                <input class="form-control" id="inputBirthday" type="text" name="birthday" value="{{ user.birthday }}">
-                                            </div>
-                                        </div>
-                                        <!-- Save changes button-->
-                                        <button class="btn btn-primary" type="submit">Save changes</button>
-                                    </form>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -96,33 +114,33 @@
                 </div>
             </div>
         </div>
-    </div>
-</div>
 
 <script>
-    // JavaScript
-    document.addEventListener('DOMContentLoaded', function () {
-        const profilePicture = document.getElementById('profile-picture');
-        const profilePictureInput = document.getElementById('profile-picture-input');
-        profilePicture.addEventListener('click', function () {
-            profilePictureInput.click();
-        });
-
-        profilePictureInput.addEventListener('change', function (event) {
-            const file = event.target.files[0];
-            const reader = new FileReader();
-
-            reader.onload = function (e) {
-                profilePicture.src = e.target.result;
-            };
-
-            reader.readAsDataURL(file);
-        });
-
+  // JavaScript
+  document.addEventListener('DOMContentLoaded', function () {
+    const profilePicture = document.getElementById('profile-picture');
+    const profilePictureInput = document.getElementById('profile-picture-input');
+    profilePicture.addEventListener('click', function () {
+        profilePictureInput.click();
     });
+
+    profilePictureInput.addEventListener('change', function (event) {
+        const file = event.target.files[0];
+        const reader = new FileReader();
+
+        reader.onload = function (e) {
+            profilePicture.src = e.target.result;
+        };
+
+        reader.readAsDataURL(file);
+    });
+
+  });
 </script>
 
 <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js'></script>
 <script src='https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js'></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.js'></script>
+
 
 {% endblock body %}

@@ -198,7 +198,7 @@ def profile(request):
         last_name = request.POST.get('last_name')
         email = request.POST.get('email')
         contact_number = request.POST.get('contact-number')
-        bio = request.POST.get('bio')
+        location = request.POST.get('location')
         profile_picture = request.FILES.get('profile_picture')
 
         # Update user attributes
@@ -206,7 +206,7 @@ def profile(request):
         user.last_name = last_name
         user.email = email
         user.contact = contact_number
-        user.bio = bio
+        user.location = location
 
         # Check if profile picture exists
         if profile_picture:
@@ -215,7 +215,7 @@ def profile(request):
             print("picture saved")
         else:
             # Set default profile picture if it doesn't exist
-            default_profile_pic = '/static/assets/images/default_profile_pic.jpg'
+            default_profile_pic = 'media/profile_pics/default_profile_pic.jpg'
             user.profile_picture = default_profile_pic
 
         # Save the changes
