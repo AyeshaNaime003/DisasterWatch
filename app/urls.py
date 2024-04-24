@@ -20,7 +20,8 @@ urlpatterns = [
     # path('<path:not_found>', TemplateView.as_view(template_name='app/404.html'), name='not_found'),
     path('get-address/', views.get_address, name='get_address'),
     # admin panel
-     path('admin-panel/', views.adminPanel, name="admin-panel"),
+    path('admin-panel/', views.adminPanel, name="admin-panel"),
+    path('add-user/', views.addUser, name="add-user"),
     path('edit-user/<int:user_id>/', views.edit_user, name="edit-user"),
     path('delete-user/<int:user_id>/', views.delete_user, name="delete-user"),
     path('get-user-details/<int:user_id>/', views.get_user_details, name='get-user-details'),

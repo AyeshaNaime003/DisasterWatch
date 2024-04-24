@@ -22,6 +22,9 @@
                                 <div class='row'>
                                     <div class='text-start col-md-6'><h5 >All Users</h5></div>
                                     <div class='text-end col-md-6'><p >Click on any row to select user</p></div>
+                                    <div class='text-end col-md-6'><a href="{% url 'add-user' %}"><button class="btn btn-outline-primary">Add User</button></a>
+                                    
+                                    </div>
                                 </div>
                                 <table class="table table-bordered table-hover">
                                     <thead>
@@ -50,35 +53,7 @@
 
                         <div class="card mb-4">
                             <div class="card-body">
-                                <h5>Add User</h5>
-                                <form id="addUserForm" action="{% url 'admin-panel' %}" method="POST">
-                                    {% csrf_token %}
-                                    <div class="row gx-3 ">
-                                        <div class="col-md-6">
-                                            <label for="firstName">First Name</label>
-                                            <input type="firstName" class="form-control" name="firstName" required>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label for="lastName">Last Name</label>
-                                            <input type="lastName" class="form-control" name="lastName" required>
-                                        </div>
-                                    </div>
-                                    <div class=" form-group">
-                                            <label for="email">Email</label>
-                                            <input type="email" class="form-control" name="email" required>
-                                    </div>
-                                    <div class="row gx-3 ">
-                                        <div class="col-md-6">
-                                            <label for="username">Username</label>
-                                            <input type="text" class="form-control" name="username" required>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label for="password">Password</label>
-                                            <input type="password" class="form-control" name="password" required>
-                                        </div>
-                                    </div>
-                                    <button type="submit" class="btn btn-primary">Add</button>
-                                </form>
+                                hehe
                             </div>
                         </div>
                     </div>
@@ -208,6 +183,7 @@
             success: function(response) {
                 // Handle success response
                 console.log(response);
+                location.reload();
             },
             error: function(xhr, status, error) {
                 // Handle error response

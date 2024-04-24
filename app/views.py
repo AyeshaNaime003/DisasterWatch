@@ -123,22 +123,30 @@ def get_user_details(request, user_id):
 
 @login_required(login_url="login/")
 def adminPanel(request):
-    if request.method == 'POST':
-        username = request.POST.get('username')
-        email = request.POST.get('email')
-        password = request.POST.get('password')
-        fName = request.POST.get('firstName')
-        lName = request.POST.get('lastName')
-        try:
-            user = CustomUser.objects.create_user(username=username, email=email, password=password, first_name=fName, last_name=lName)
-            print("User created succcessfully")
-            messages.success(request, f"User '{username}' added successfully!")
-        except Exception as e:
-            messages.error(request, f"Failed to add user: {e}")
     users = CustomUser.objects.all()
     return render(request, "app/adminPanel.html", {'users': users})
 
-
+@login_required(login_url="login/")
+def addUser(request):
+    if request.method == 'POST':
+        print("form submitted")
+        username = request.POST.get('username')
+        email = request.POST.get('email')
+        contact = request.POST.get('contact')
+        password = request.POST.get('password')
+        fName = request.POST.get('firstName')
+        lName = request.POST.get('lastName')
+        is_admin = request.POST.get('is_admin') == 'on'  
+        try:
+            user = CustomUser.objects.create_user(username=username, email=email, password=password, first_name=fName, last_name=lName, contact=contact, is_admin=is_admin)
+            messages.success(request, f"User '{username}' added successfully!")
+        except Exception as e:
+            messages.error(request, f"Failed to add user: {e}")
+        finally:
+            return redirect('admin-panel')
+    else:
+        return render(request, 'app/addUser.html')
+    
 @login_required(login_url="login/")
 def edit_user(request, user_id):
     print("In edit function")

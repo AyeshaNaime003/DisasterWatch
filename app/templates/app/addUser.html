@@ -1,0 +1,50 @@
+{% extends 'index.html' %}
+
+{% load static %}
+
+{% block title %}Add User{% endblock title %}
+
+{% block body %}
+<div class="container">
+    <h5>Add User</h5>
+    <form id="addUserForm" action="{% url 'add-user' %}" method="POST">
+        {% csrf_token %}
+        <div class="row gx-3 ">
+            <div class="col-md-6">
+                <label for="firstName">First Name</label>
+                <input type="firstName" class="form-control" name="firstName" required>
+            </div>
+            <div class="col-md-6">
+                <label for="lastName">Last Name</label>
+                <input type="lastName" class="form-control" name="lastName" required>
+            </div>
+        </div>
+        <div class=" form-group">
+            <label for="email">Email</label>
+            <input type="email" class="form-control" name="email" required>
+        </div>
+        <div class="row gx-3 ">
+            <div class="col-md-6">
+                <label for="username">Username</label>
+                <input type="text" class="form-control" name="username" required>
+            </div>
+            <div class="col-md-6">
+                <label for="password">Password</label>
+                <input type="password" class="form-control" name="password" required>
+            </div>
+        </div>
+        <div class="row gx-3 ">
+            <div class="col-md-6">
+                <label for="contact">Contact Number:</label>
+                <input type="text" class="form-control" name="contact" required>
+            </div>
+            <div class="col-md-6">
+                <input type="checkbox" id="is_admin" name="is_admin">
+<label for="is_admin">Is Admin</label>
+
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Add</button>
+    </form>
+</div>
+{% endblock %}
