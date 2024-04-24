@@ -22,10 +22,10 @@
                     <div id="cityinfo" class="bg-whitesmoke p-2 rounded">
                         <div class="row align-items-center">
                             <div class="col m-2">
-                                <h1 class="d-inline">{{ context.city}}, {{ context.state}}, {{ context.country}}</h1>
+                                <h1 class="d-inline">{{ context.disaster_city}}, {{ context.disaster_state}}, {{ context.disaster_country}}</h1>
                             </div>
                             <div class="col m-2">
-                                <h5 class="text-end">{{ context.date }}</h5>
+                                <h5 class="text-end">{{ context.disaster_date }}</h5>
                             </div>
 
                         </div>
@@ -156,15 +156,26 @@
         </div>
 
 
-        <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script> -->
+
+
         <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
         <script src="{% static 'Leaflet.heat-gh-pages/dist/leaflet-heat.js' %}"></script>
 
         <script>
-            var context = {{ context| safe }};
-            var polygonData = context.polygon_data;
-            var lat = context.map_middle_lat;
-            var long = context.map_middle_long;
+            var context = {{ context | safe }};
+            var date = context.disaster_date;
+            var city = context.disaster_city;
+            var state = context.disaster_state;
+            var country = context.disaster_country;
+            var disasterType = context.disaster_type;
+            var disasterDescription = context.disaster_description;
+            var comments = context.disaster_comments;
+            var prePath = context.pre_tif_path;
+            var postPath = context.post_tif_path;
+            var polygonData = context.results;
+            console.log(polygonData)
+            var lat = context.tif_middle_latitude;
+            var long = context.tif_middle_longitude;
             var map = L.map('heatmap').setView([lat, long], 15);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
             var heatLayers = {};

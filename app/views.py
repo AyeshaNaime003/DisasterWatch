@@ -6,7 +6,7 @@ from django.shortcuts import redirect, get_object_or_404
 from django.contrib import messages
 from django.http import HttpResponse
 from django.forms.models import model_to_dict
-from .models import CustomUser, JsonFileModel
+from .models import CustomUser, JsonFileModel, InferenceModel
 from django.http import JsonResponse
 import json
 import requests
@@ -212,37 +212,58 @@ def map(request):
 
 @login_required(login_url="login/")
 def dashboard(request):
-    json_file_model = JsonFileModel.objects.filter(user=request.user).last()
-    json_data = json.loads(json_file_model.json_file)
+    # json_file_model = JsonFileModel.objects.filter(user=request.user).last()
+    # json_data = json.loads(json_file_model.json_file)
     
-    date = json_data.get("date")   
-    city = json_data["city"]   
-    state = json_data["state"]   
-    country = json_data["country"]   
-    disaster_type = json_data["disaster_type"]   
-    disaster_description = json_data["disaster_description"]   
-    comments = json_data["comments"]   
-    pre_path = json_data["pre_path"]   
-    post_path = json_data["post_path"]   
-    map_middle_lat = json_data["map_middle_lat"]   
-    map_middle_long = json_data["map_middle_long"]   
-    polygon_data = json_data["polygon_data"]   
+    # date = json_data.get("date")   
+    # city = json_data["city"]   
+    # state = json_data["state"]   
+    # country = json_data["country"]   
+    # disaster_type = json_data["disaster_type"]   
+    # disaster_description = json_data["disaster_description"]   
+    # comments = json_data["comments"]   
+    # pre_path = json_data["pre_path"]   
+    # post_path = json_data["post_path"]   
+    # map_middle_lat = json_data["map_middle_lat"]   
+    # map_middle_long = json_data["map_middle_long"]   
+    # polygon_data = json_data["polygon_data"]   
         
-    context = {
-        'date': date,
-        'city': city,
-        'state': state,
-        'country': country,
-        'disaster_type': disaster_type,
-        'disaster_description': disaster_description,
-        'comments': comments,
-        'pre_path': pre_path,
-        'post_path': post_path,
-        'polygon_data': polygon_data,
-        'map_middle_lat': map_middle_lat,
-        'map_middle_long': map_middle_long,
-    }
-    return render(request, 'app/dashboard.html', context={'context': context})
+    # context = {
+    #     'date': date,
+    #     'city': city,
+    #     'state': state,
+    #     'country': country,
+    #     'disaster_type': disaster_type,
+    #     'disaster_description': disaster_description,
+    #     'comments': comments,
+    #     'pre_path': pre_path,
+    #     'post_path': post_path,
+    #     'polygon_data': polygon_data,
+    #     'map_middle_lat': map_middle_lat,
+    #     'map_middle_long': map_middle_long,
+    # }
+    # return render(request, 'app/dashboard.html', context={'context': context})
+    inference_model = InferenceModel.objects.filter(user=request.user).last()
+    
+    # context = {
+    #     'id': inference_model.id if inference_model else None,
+    #     'user': inference_model.user if inference_model else None,
+    #     'disaster_date': inference_model.disaster_date if inference_model else None,
+    #     'disaster_city': inference_model.disaster_city if inference_model else None,
+    #     'disaster_state': inference_model.disaster_state if inference_model else None,
+    #     'disaster_country': inference_model.disaster_country if inference_model else None,
+    #     'disaster_type': inference_model.disaster_type if inference_model else None,
+    #     'disaster_description': inference_model.disaster_description if inference_model else None,
+    #     'disaster_comments': inference_model.disaster_comments if inference_model else None,
+    #     'tif_middle_latitude': inference_model.tif_middle_latitude if inference_model else None,
+    #     'tif_middle_longitude': inference_model.tif_middle_longitude if inference_model else None,
+    #     'pre_tif_path': inference_model.pre_tif_path if inference_model else None,
+    #     'post_tif_path': inference_model.post_tif_path if inference_model else None,
+    #     'results': inference_model.results if inference_model else None,
+    #     'created_at': inference_model.created_at if inference_model else None,
+    #     'updated_at': inference_model.updated_at if inference_model else None
+    # }
+    return render(request, 'app/dashboard.html', {"context":inference_model})
 
 
 @login_required(login_url="login/")
@@ -286,90 +307,159 @@ def help(request):
     return render(request, "app/help.html")
 
 
+# # @login_required(login_url="login/")
+# def inferenceform(request):
+#     if request.method == 'POST' and request.POST["comments"]=="EMPTY":
+#             return redirect("dashboard")
+#     if request.method == 'POST' and request.FILES.get('pre_image') != None and request.FILES.get('post_image') != None:
+#         # get data from form 
+#         pre_image = request.FILES.get('pre_image')
+#         post_image = request.FILES.get('post_image')
+#         city = request.POST['city']
+#         date = request.POST['date']
+#         disaster_type = request.POST['disaster_type']
+#         disaster_description = request.POST['disaster_description']
+#         comments = request.POST['comments']
+
+#         # save the tiff files temporarily in media root
+#         file_name = f"{date}_{city}_{disaster_type}"
+#         pre_path = os.path.join(MEDIA_ROOT, 'tiff', file_name+"_pre.tif")
+#         post_path = os.path.join(MEDIA_ROOT, 'tiff', file_name+"_post.tif")
+#         with open(pre_path, 'wb') as f: 
+#             for chunk in pre_image.chunks():
+#                 f.write(chunk)
+#         with open(post_path, 'wb') as f:
+#             for chunk in post_image.chunks():
+#                 f.write(chunk)
+#         print("pre and post tifs saved")
+        
+#         # convert the tiff files to RGB images to run for inference
+#         pre_tif, post_tif = gdal.Open(pre_path), gdal.Open(post_path)
+#         pre_image, post_image = torch.from_numpy(tif_to_img(pre_tif)), torch.from_numpy(tif_to_img(post_tif))
+#         pre_post = torch.cat((pre_image, post_image), dim=2).permute(2,0,1).unsqueeze(0).to(torch.float)
+#         print(f"Tifs converted to concatenated images of {pre_post.shape}, {pre_post.dtype}")
+#         # INFERENCE------------------------------------------------------------------
+#         # model = SeResNext50_Unet_MultiScale()
+#         # output = model(pre_post)
+       
+#         # DUMMY DATA----------------------------------------------------------------------
+#         dummy_mask = cv2.imread("woolsey-fire_00000715_post_disaster.png") 
+#         print(f"Dummy mask shape an type {dummy_mask.shape}, {dummy_mask.dtype}")
+#         dummy_masks = one_hot_encoding_mask(dummy_mask)
+#         print(f"Dummy mask after hot encoding  {dummy_masks.shape}, {dummy_masks.dtype}")
+#         tranform = get_tif_transform(pre_path)
+#         classes=["red","orange","yellow","green"]
+        
+#         # format the inference for database
+#         polygons_data={}
+#         for i, mask in enumerate(dummy_masks):
+#             color=classes[i]
+#             _, mask = cv2.threshold(mask.astype('uint8'), 0, 255, cv2.THRESH_BINARY)
+#             polygons_in_mask = mask_to_polygons(mask, tranform, rdp=False)
+#             print(f"{color}: {len(polygons_in_mask)}")
+#             polygons_data[color]=polygons_in_mask
+#         # Convert the dictionary to JSON format
+#         print(request.POST['city'])
+#         print( polygons_in_mask[0]['address']['city'])
+#         print( polygons_in_mask[0]['address']['town'])
+#         transform = get_tif_transform(pre_path)
+#         map_middle_lat, map_middle_long = pixels_to_coordinates(transform, (612,612))
+#         json_data = json.dumps({
+#             "date": date,
+#             "city": polygons_in_mask[0]['address']['city'] if polygons_in_mask[0]['address']['city'] == request.POST['city'] else polygons_in_mask[0]['address']['town'],
+#             "state":polygons_in_mask[0]['address']['state'],
+#             "country":polygons_in_mask[0]['address']['country'],
+#             "disaster_type":disaster_type, 
+#             "disaster_description":disaster_description, 
+#             "comments":comments,
+#             'map_middle_lat': map_middle_lat,
+#             'map_middle_long': map_middle_long,
+#             "pre_path":pre_path, 
+#             "post_path":post_path,
+#             "polygon_data": polygons_data, 
+#         })
+#         try:
+#             # Create and save an instance of JsonFileModel
+#             json_model_instance = JsonFileModel.objects.create(user=request.user, json_file=json_data)
+#             json_model_instance.save()
+#             print("JsonFileModel model created")
+#             messages.success(request, "JsonFileModel model created")
+#             return redirect("dashboard")
+#         except:
+#             print("Unable to save inference")
+#             messages.error(request, "Unable to save inference")
+#             return redirect("inferenceform")
+#     else:
+#         return render(request, "app/inferenceform.html")
+        
 @login_required(login_url="login/")
 def inferenceform(request):
-    if request.method == 'POST' and request.POST["comments"]=="EMPTY":
-            return redirect("dashboard")
-    if request.method == 'POST' and request.FILES.get('pre_image') != None and request.FILES.get('post_image') != None:
-        # get data from form 
-        pre_image = request.FILES.get('pre_image')
-        post_image = request.FILES.get('post_image')
-        city = request.POST['city']
-        date = request.POST['date']
+    if request.method == 'POST' and request.FILES.get('pre_image') and request.FILES.get('post_image'):
+        # Get data from form
+        pre_image = request.FILES['pre_image']
+        post_image = request.FILES['post_image']
+        disaster_city = request.POST['city']
+        disaster_date = request.POST['date']
         disaster_type = request.POST['disaster_type']
         disaster_description = request.POST['disaster_description']
-        comments = request.POST['comments']
-
-        # save the tiff files temporarily in media root
-        file_name = f"{date}_{city}_{disaster_type}"
+        disaster_comments = request.POST['comments']
+        # Save the tiff files temporarily in media root
+        file_name = f"{disaster_date}_{disaster_city}_{disaster_type}"
         pre_path = os.path.join(MEDIA_ROOT, 'tiff', file_name+"_pre.tif")
         post_path = os.path.join(MEDIA_ROOT, 'tiff', file_name+"_post.tif")
-        with open(pre_path, 'wb') as f: 
+        with open(pre_path, 'wb') as f:
             for chunk in pre_image.chunks():
                 f.write(chunk)
         with open(post_path, 'wb') as f:
             for chunk in post_image.chunks():
                 f.write(chunk)
-        print("pre and post tifs saved")
-        
-        # convert the tiff files to RGB images to run for inference
+        print("Pre and post tifs saved")
+        # Convert the tiff files to RGB images to run for inference
         pre_tif, post_tif = gdal.Open(pre_path), gdal.Open(post_path)
         pre_image, post_image = torch.from_numpy(tif_to_img(pre_tif)), torch.from_numpy(tif_to_img(post_tif))
         pre_post = torch.cat((pre_image, post_image), dim=2).permute(2,0,1).unsqueeze(0).to(torch.float)
         print(f"Tifs converted to concatenated images of {pre_post.shape}, {pre_post.dtype}")
-        # INFERENCE------------------------------------------------------------------
-        # model = SeResNext50_Unet_MultiScale()
-        # output = model(pre_post)
-       
-        # DUMMY DATA----------------------------------------------------------------------
-        dummy_mask = cv2.imread("woolsey-fire_00000715_post_disaster.png") 
-        print(f"Dummy mask shape an type {dummy_mask.shape}, {dummy_mask.dtype}")
+        # Dummy data (for testing purposes)
+        dummy_mask = cv2.imread("woolsey-fire_00000715_post_disaster.png")
+        print(f"Dummy mask shape and type {dummy_mask.shape}, {dummy_mask.dtype}")
         dummy_masks = one_hot_encoding_mask(dummy_mask)
-        print(f"Dummy mask after hot encoding  {dummy_masks.shape}, {dummy_masks.dtype}")
-        tranform = get_tif_transform(pre_path)
-        classes=["red","orange","yellow","green"]
-        
-        # format the inference for database
-        polygons_data={}
-        for i, mask in enumerate(dummy_masks):
-            color=classes[i]
-            _, mask = cv2.threshold(mask.astype('uint8'), 0, 255, cv2.THRESH_BINARY)
-            polygons_in_mask = mask_to_polygons(mask, tranform, rdp=False)
-            print(f"{color}: {len(polygons_in_mask)}")
-            polygons_data[color]=polygons_in_mask
-        # Convert the dictionary to JSON format
-        print(request.POST['city'])
-        print( polygons_in_mask[0]['address']['city'])
-        print( polygons_in_mask[0]['address']['town'])
+        print(f"Dummy mask after hot encoding {dummy_masks.shape}, {dummy_masks.dtype}")
         transform = get_tif_transform(pre_path)
-        map_middle_lat, map_middle_long = pixels_to_coordinates(transform, (612,612))
-        json_data = json.dumps({
-            "date": date,
-            "city": polygons_in_mask[0]['address']['city'] if polygons_in_mask[0]['address']['city'] == request.POST['city'] else polygons_in_mask[0]['address']['town'],
-            "state":polygons_in_mask[0]['address']['state'],
-            "country":polygons_in_mask[0]['address']['country'],
-            "disaster_type":disaster_type, 
-            "disaster_description":disaster_description, 
-            "comments":comments,
-            'map_middle_lat': map_middle_lat,
-            'map_middle_long': map_middle_long,
-            "pre_path":pre_path, 
-            "post_path":post_path,
-            "polygon_data": polygons_data, 
-        })
+        classes = ["red", "orange", "yellow", "green"]
+         # Format the inference data for the database
+        results = {}
+        for i, mask in enumerate(dummy_masks):
+            color = classes[i]
+            _, mask = cv2.threshold(mask.astype('uint8'), 0, 255, cv2.THRESH_BINARY)
+            polygons_in_mask = mask_to_polygons(mask, transform, rdp=False)
+            print(f"{color}: {len(polygons_in_mask)}")
+            results[color] = polygons_in_mask
+        # Convert the dictionary to JSON format
+        tif_middle_latitude, tif_middle_longitude = pixels_to_coordinates(transform, (612, 612))
         try:
-            # Create and save an instance of JsonFileModel
-            json_model_instance = JsonFileModel.objects.create(user=request.user, json_file=json_data)
-            json_model_instance.save()
-            print("JsonFileModel model created")
-            messages.success(request, "JsonFileModel model created")
+            # Create and save an instance of InferenceModel
+            inference_model_instance = InferenceModel.objects.create(
+                user=request.user,
+                disaster_date=disaster_date,
+                disaster_city=polygons_in_mask[0]['address']['city'] if polygons_in_mask[0]['address']['city'] == request.POST['city'] else polygons_in_mask[0]['address']['town'],
+                disaster_state=polygons_in_mask[0]['address']['state'],
+                disaster_country=polygons_in_mask[0]['address']['country'],
+                disaster_type=disaster_type,
+                disaster_description=disaster_description,
+                disaster_comments=disaster_comments,
+                tif_middle_latitude=tif_middle_latitude,
+                tif_middle_longitude=tif_middle_longitude,
+                pre_tif_path=pre_path,
+                post_tif_path=post_path,
+                results=results,
+            )
+            inference_model_instance.save()
+            print("InferenceModel model created")
+            messages.success(request, "InferenceModel model created")
             return redirect("dashboard")
-        except:
-            print("Unable to save inference")
+        except Exception as e:
+            print(f"Unable to save inference: {e}")
             messages.error(request, "Unable to save inference")
             return redirect("inferenceform")
     else:
         return render(request, "app/inferenceform.html")
-        
-
-
