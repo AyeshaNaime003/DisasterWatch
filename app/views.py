@@ -247,10 +247,13 @@ def dashboard(request):
 
 @login_required(login_url="login/")
 def profile(request):
+    # get current user
     user = request.user
     print(user.email, user.first_name, user.last_name, user.contact, user.profile_picture.url if user.profile_picture else '')
+    user_inferences = JsonFileModel.objects.filter(user=user)
+    # print(user_inferences)
+    # make chnages to the fields of current user using the form
     if request.method == 'POST':
-        # Get the data from the form
         first_name = request.POST.get('first_name')
         last_name = request.POST.get('last_name')
         email = request.POST.get('email')
@@ -258,7 +261,6 @@ def profile(request):
         location = request.POST.get('location')
         profile_picture = request.FILES.get('profile_picture')
 
-        # Update user attributes
         user.first_name = first_name
         user.last_name = last_name
         user.email = email
@@ -270,17 +272,13 @@ def profile(request):
             user.profile_picture.delete()
             user.profile_picture = profile_picture
             print("picture saved")
-        else:
-            # Set default profile picture if it doesn't exist
-            default_profile_pic = 'media/profile_pics/default_profile_pic.jpg'
-            user.profile_picture = default_profile_pic
 
         # Save the changes
         user.save()
         messages.success(request, 'Profile updated successfully!')
         return redirect('profile')
     else:
-        return render(request, "app/profile.html", context={'user': user})
+        return render(request, "app/profile.html", context={'user': user, "user_inferences":user_inferences})
 
 
 @login_required(login_url="login/")

@@ -28,3 +28,4 @@ class JsonFileModel(models.Model):
 
     def _str_(self):
         return f"JsonFileModel - {self.id} (User: {self.user.username})"
+    
