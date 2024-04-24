@@ -1,0 +1,11 @@
+.getAns {
+    padding-top:100px;
+}
+
+.card{
+    background-color: rgb(229, 242, 255);
+}
+
+.card:hover {
+    background-color: rgb(211, 228, 246);
+}

@@ -1,15 +1,15 @@
 {% extends 'index.html' %}
-
 {% load static %}
-
 {% block title %}Dashboard{% endblock title %}
-
 {% block body %}
 
 <!-- CUSTOM CSS -->
 <link href="{% static '/styles/dashboard.css' %}" rel="stylesheet" />
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+
 <!-- HTML -->
+
 <div id="dashboard-page" class="container-fluid">
     <div class="row main-row">
         <!-- NAVBAR TAKING 1/12TH -->
@@ -17,19 +17,6 @@
         <!-- MAIN CONTENT TAKING 1/12TH -->
         <div class="col-md-11">
             <div class="container-fluid m-1">
-                <!-- ERROR CONTAINER -->
-                <div class="row ">
-                    <div class="container error-container">
-                        {% if messages %}
-                        {% for message in messages %}
-                        <p class="alert {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% endif %}"
-                            role="alert">
-                            {{ message }}
-                        </p>
-                        {% endfor %}
-                        {% endif %}
-                    </div>
-                </div>
                 <div class="row ">
                     <!-- CITY INFO  -->
                     <div id="cityinfo" class="bg-whitesmoke p-2 rounded">
@@ -223,4 +210,25 @@
         }
     }
         </script>
+
+<!-- Error messages -->
+{% if messages %}
+{% for message in messages %}
+    <div id="alert-container" class="position-fixed top-0 start-50 translate-middle-x mt-4" style="z-index: 1050">
+        <div class="alert {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% endif %}"
+            role="alert">
+            {{ message }}
+        </div>
+    </div>
+{% endfor %}
+<script>
+    // Automatically remove alert after 5 seconds
+    $(document).ready(function () {
+        setTimeout(function () {
+            $('#alert-container').fadeOut();
+        }, 2000);
+    });
+</script>
+{% endif %}
+
 {% endblock body %}

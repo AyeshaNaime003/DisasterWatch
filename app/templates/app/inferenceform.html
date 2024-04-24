@@ -1,67 +1,50 @@
 {% extends 'index.html' %}
-
 {% load static %}
-
 {% block title %}Inference Form{% endblock title %}
-
 {% block body %}
 <link rel="stylesheet" href="{% static '/styles/home2.css' %}">
 <link rel="stylesheet" href="{% static '/styles/inference_form.css' %}">
 <script src="{% static '/javascript/inference_form.js' %}"></script>
 
-
 <div id="inferencepage" class="container-fluid">
-    <div class="row main-row" style = "background-color: rgb(210, 210, 210)">
+    <div class="row main-row" style="background-color: rgb(210, 210, 210)">
         <!-- NAVBAR -->
         {% include 'app/navbar2.html' %}
         <!-- MAIN CONTENT -->
-        <div class="col-md-11" style = "padding:20px">
-            <!-- error -->
-            <div class="container error-container">
-                {% if messages %}
-                {% for message in messages %}
-                <p class="alert {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% endif %}"
-                role="alert">
-                {{ message }}
-                {% endfor %}
-                </ul>
-                {% endif %}
-            </div>
-            
+        <div class="col-md-11" style="padding: 20px">
             <div class="inferenceform mx-2 p-2">
-                <form method="POST" enctype="multipart/form-data">
+                <form id="inference_form" method="POST" enctype="multipart/form-data">
                     {% csrf_token %}
                     <div class="row my-1">
                         <!-- First Column: Image Input Fields -->
-                        <div class="col-md-6" >
+                        <div class="col-md-6">
                             <p>Pre-Disaster Image:</p>
                             <div class="image-input mb-3" id="pre_image_drop_area">
                                 <label for="pre_image">
                                     <i class="fas fa-upload" style="font-weight:normal"> Drop or drag a file here or <br><b>Click to browse</b></br></i> </label>
-                                    <input type="file" class="form-control-file" id="pre_image" name="pre_image" accept=".tif">
+                                <input type="file" class="form-control-file" id="pre_image" name="pre_image" accept=".tif" required>
                             </div>
                             <p>Post-Disaster Image:</p>
                             <div class="image-input" id="post_image_drop_area">
                                 <label for="post_image">
                                     <i class="fas fa-upload" style="font-weight:normal"> Drop or drag a file here or 
                                         <br><b>Click to browse</b></br></i></label>
-                                    <input type="file" class="form-control-file" id="post_image" name="post_image" accept=".tif">
+                                <input type="file" class="form-control-file" id="post_image" name="post_image" accept=".tif" required>
                             </div>
                         </div>
-
                         <!-- Second Column: Other Input Fields -->
                         <div class="col-md-6">
-                            <div class="my-4" style= "margin-top:0%">
+                            <div class="my-4" style="margin-top: 0%">
                                 <label for="city">City:</label>
-                                <input type="text" class="form-control" id="city" name="city">
+                                <input type="text" class="form-control" id="city" name="city" required>
                             </div>
                             <div class="my-4">
                                 <label for="date">Date of Satellite Imagery:</label>
-                                <input type="date" class="form-control" id="date" name="date">
+                                <input type="date" class="form-control" id="date" name="date" required>
                             </div>
                             <div class="my-4">
                                 <label for="disaster_type">Type of Disaster:</label>
-                                <select class="form-control" id="disaster_type" name="disaster_type">
+                                <select class="form-control" id="disaster_type" name="disaster_type" required>
                                     <option value="earthquake">Earthquake</option>
                                     <option value="flood">Flood</option>
                                     <option value="fire">Fire</option>
@@ -84,7 +67,20 @@
         </div>
     </div>
 </div>
-
-  
-  {% endblock body %}
-
+<!-- Error messages -->
+{% if errors %}
+<div id="alert-container" class="position-fixed top-0 start-50 translate-middle-x mt-4" style="z-index: 1050; display: block;">
+    <div class="alert alert-danger" role="alert">
+        Please fill out all required fields.
+    </div>
+</div>
+<script>
+    // Automatically remove alert after 5 seconds
+    $(document).ready(function () {
+        setTimeout(function () {
+            $('#alert-container').fadeOut();
+        }, 5000);
+    });
+</script>
+{% endif %}
+{% endblock body %}

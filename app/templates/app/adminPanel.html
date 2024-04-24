@@ -1,147 +1,189 @@
 {% extends 'index.html' %}
-
 {% load static %}
 
 {% block title %}Admin Panel{% endblock title %}
 
 {% block body %}
 
-<!-- CUSTOM CSS -->
+<link rel="stylesheet" href="{% static '/styles/profile.css' %}">
+<link rel="stylesheet" href="{% static '/styles/adminPanel.css' %}">
 
-<!-- HTML -->
 <div id="dashboard-page" class="container-fluid">
     <div class="row main-row">
         <!-- NAVBAR TAKING 1/12TH -->
         {% include 'app/navbar2.html' %}
         <!-- MAIN CONTENT TAKING 1/12TH -->
         <div class="col-md-11">
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="container error-container">
-                        {% if messages %}
-                        {% for message in messages %}
-                        <p class="alert {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% endif %}"
-                          role="alert">
-                          {{ message }}
-                          {% endfor %}
-                          </ul>
-                          {% endif %}
-                      </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6">
-                        <h2>Add User</h2>
-                        <form id="addUserForm" action="{% url 'admin-panel' %}" method="POST">
-                            {% csrf_token %}
-                            <div class="form-group">
-                                <label for="username">Username</label>
-                                <input type="text" class="form-control"  name="username" required>
+            {% comment %} <div class="container-fluid"> {% endcomment %}
+                <div class="row gx-3">
+                    <div class="col-lg-8 ">
+                        <div class="card mb-3" style="height: 355px; overflow-y: auto;">
+                            <div class="card-body">
+                                <div class='row'>
+                                    <div class='text-start col-md-6'><h5 >All Users</h5></div>
+                                    <div class='text-end col-md-6'><p >Click on any row to select user</p></div>
+                                </div>
+                                <table class="table table-bordered table-hover">
+                                    <thead>
+                                        <tr class = 'table-light'>
+                                            <th>Username</th>
+                                            <th>First Name</th>
+                                            <th>Last Name</th>
+                                            <th>Email</th>
+                                            <th>Phone</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for user in users %}
+                                        <tr onclick="selectUser('{{ user.id }}')">
+                                            <td>{{ user.username }}</td>
+                                            <td>{{ user.first_name }}</td>
+                                            <td>{{ user.last_name }}</td>
+                                            <td>{{ user.email }}</td>
+                                            <td>{{ user.contact }}</td> {# Assuming phone is in the profile model #}
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
                             </div>
-                            <div class="form-group">
-                                <label for="email">Email</label>
-                                <input type="email" class="form-control" name="email" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="password">Password</label>
-                                <input type="password" class="form-control" name="password" required>
-                            </div>
-                            <button type="submit" class="btn btn-primary">Add</button>
-                        </form>
-                        <hr>
-                        <h2>All Users</h2>
-                        <ul id="userList">
-                            {% for user in users %}
-                            <li onclick="selectUser('{{ user.id }}')">
-                                <span>{{ user.username }}</span>
-                            </li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="row">
-                            <h2>User Details</h2>
-                            <div id="userDetailsContainer" style="display: none;">
-                                <!-- Empty form initially -->
-                                <form id="userDetailsForm" method="POST">
+                        </div>
 
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h5>Add User</h5>
+                                <form id="addUserForm" action="{% url 'admin-panel' %}" method="POST">
                                     {% csrf_token %}
-                                    <div class="form-group">
-                                        <input type="number" hidden class="form-control" id="userId" name="id" disabled >
-                                        
-                                        <label for="username">Username</label>
-                                        <input type="text" class="form-control" id="username" name="username" disabled >
+                                    <div class="row gx-3 ">
+                                        <div class="col-md-6">
+                                            <label for="firstName">First Name</label>
+                                            <input type="firstName" class="form-control" name="firstName" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="lastName">Last Name</label>
+                                            <input type="lastName" class="form-control" name="lastName" required>
+                                        </div>
                                     </div>
-                                    <div class="form-group">
-                                        <label for="email">Email</label>
-                                        <input type="email" class="form-control" id="email" name="email"  disabled>
+                                    <div class=" form-group">
+                                            <label for="email">Email</label>
+                                            <input type="email" class="form-control" name="email" required>
                                     </div>
-                                    <div class="form-group">
-                                        <label for="contact">Contact</label>
-                                        <input type="text" class="form-control" id="contact" name="contact"  disabled>
+                                    <div class="row gx-3 ">
+                                        <div class="col-md-6">
+                                            <label for="username">Username</label>
+                                            <input type="text" class="form-control" name="username" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="password">Password</label>
+                                            <input type="password" class="form-control" name="password" required>
+                                        </div>
                                     </div>
-                                    <div class="form-group">
-                                        <label for="is_admin">Is Admin</label>
-                                        <input type="checkbox" id="is_admin" name="is_admin" >
-                                    </div>
-                                    <!-- Add more user details as needed -->
-                                    <button type="button" id="editUserBtn" class="btn btn-primary">Edit</button>
-                                    <button type="button" id="deleteUserBtn" class="btn btn-danger">Delete</button>
+                                    <button type="submit" class="btn btn-primary">Add</button>
                                 </form>
                             </div>
-
-
-
-                            <!-- html from user_details.html -->
-                            <hr>
-                            <h3>Login History</h3>
-                            <ul>
-                                {% for login in selected_user.loginhistory_set.all %}
-                                <li>{{ login.timestamp }} - {{ login.ip_address }}</li>
-                                {% endfor %}
-                            </ul>x
                         </div>
-                        <div class="row">
-                            <h2>Inference History</h2>
-                            <!-- Add code to display inference history -->
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="card mb-4" card-cap-padding-y=0px;>
+                            <div class="card-body">
+                                <h5>User Details</h5>
+                                <div id="userDetailsContainer" style="display: none;">
+                                    <form id="userDetailsForm" method="POST">
+                                        {% csrf_token %}
+                                        <div class="form-group">
+                                            <input type="number" hidden class="form-control" id="userId" name="id"
+                                                disabled>
+
+                                            <label for="username">Username</label>
+                                            <input type="text" class="form-control" id="username" name="username"
+                                                disabled>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="email">Email</label>
+                                            <input type="email" class="form-control" id="email" name="email" disabled>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="contact">Contact</label>
+                                            <input type="text" class="form-control" id="contact" name="contact"
+                                                disabled>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="is_admin">Is Admin</label>
+                                            <input type="checkbox" id="is_admin" name="is_admin">
+                                        </div>
+                                        <button type="button" id="editUserBtn" class="btn btn-primary">Edit</button>
+                                        <button type="button" id="deleteUserBtn" class="btn btn-danger">Delete</button>
+                                    </form>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <h5>Login History</h5>
+                                <ul>
+                                    {% for login in selected_user.loginhistory_set.all %}
+                                    <li>{{ login.timestamp }} - {{ login.ip_address }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            <div class="card-body">
+                                <h5>Inference History</h5>
+                                <!-- Add code to display inference history -->
+                            </div>
                         </div>
                     </div>
                 </div>
+            {% comment %} </div> {% endcomment %}
+        </div>
+    </div>
+</div>
+
+<!-- Error messages -->
+{% if messages %}
+    {% for message in messages %}
+        <div id="alert-container" class="position-fixed top-0 start-50 translate-middle-x mt-4" style="z-index: 1050">
+            <div class="alert {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% endif %}"
+                role="alert">
+                {{ message }}
             </div>
         </div>
-        <script>
-            
+    {% endfor %}
+    <script>
+        // Automatically remove alert after 5 seconds
+        $(document).ready(function () {
+            setTimeout(function () {
+                $('#alert-container').fadeOut();
+            }, 2000);
+        });
+    </script>
+{% endif %}
 
 
+<script>
     function selectUser(userId) {
-                $.ajax({
-                    url: '/get-user-details/' + userId + '/',  // Endpoint to fetch user details
-                    type: 'GET',
-                    success: function(response) {
-
-            $('#userId').val(response.id);
-            $('#username').val(response.username);
-            $('#email').val(response.email);
-            $('#contact').val(response.contact);
-            $('#is_admin').prop('checked', response.is_admin);
-            console.log("form updated");
-        $('#userDetailsContainer').css('display', 'block');
-        var form = document.getElementById('userDetailsForm');
-    form.action = "{% url 'edit-user' user_id=0 %}".replace('0', response.id);
-        },
-                    error: function (xhr, status, error) {
-                        console.error(xhr.responseText);
-                    }
-                });
+        $.ajax({
+            url: '/get-user-details/' + userId + '/', // Endpoint to fetch user details
+            type: 'GET',
+            success: function(response) {
+                $('#userId').val(response.id);
+                $('#username').val(response.username);
+                $('#email').val(response.email);
+                $('#contact').val(response.contact);
+                $('#is_admin').prop('checked', response.is_admin);
+                console.log("form updated");
+                $('#userDetailsContainer').css('display', 'block');
+                var form = document.getElementById('userDetailsForm');
+                form.action = "{% url 'edit-user' user_id=0 %}".replace('0', response.id);
+            },
+            error: function(xhr, status, error) {
+                console.error(xhr.responseText);
             }
-          
+        });
+    }
 
-    // Edit button click event
-       $('#editUserBtn').click(function() {
+    $('#editUserBtn').click(function() {
         var formData = $('#userDetailsForm').serialize();
         $.ajax({
             url: '/edit-user/' + $('#userId').val() + '/', // Form action URL
             type: 'POST',
-            data:   formData, // Form data to be submitted
+            data: formData, // Form data to be submitted
             success: function(response) {
                 // Handle success response
                 console.log(response);
@@ -153,28 +195,26 @@
         });
     });
 
-    // Delete button click event
     $('#deleteUserBtn').click(function() {
-    var userId = $('#userId').val();
-    var csrfToken = $('input[name="csrfmiddlewaretoken"]').val(); // Get the CSRF token value
+        var userId = $('#userId').val();
+        var csrfToken = $('input[name="csrfmiddlewaretoken"]').val(); // Get the CSRF token value
 
-    $.ajax({
-        url: '/delete-user/' + userId + '/', // URL for deleting the user
-        type: 'POST', // Use POST method for deletion
-        headers: {
-            'X-CSRFToken': csrfToken // Include the CSRF token in the headers
-        },
-        success: function(response) {
-            // Handle success response
-            console.log(response);
-        },
-        error: function(xhr, status, error) {
-            // Handle error response
-            console.error(xhr.responseText);
-        }
+        $.ajax({
+            url: '/delete-user/' + userId + '/', // URL for deleting the user
+            type: 'POST', // Use POST method for deletion
+            headers: {
+                'X-CSRFToken': csrfToken // Include the CSRF token in the headers
+            },
+            success: function(response) {
+                // Handle success response
+                console.log(response);
+            },
+            error: function(xhr, status, error) {
+                // Handle error response
+                console.error(xhr.responseText);
+            }
+        });
     });
-});
+</script>
 
-        </script>
-
-        {% endblock body %}
+{% endblock body %}

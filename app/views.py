@@ -127,8 +127,10 @@ def adminPanel(request):
         username = request.POST.get('username')
         email = request.POST.get('email')
         password = request.POST.get('password')
+        fName = request.POST.get('firstName')
+        lName = request.POST.get('lastName')
         try:
-            user = CustomUser.objects.create_user(username=username, email=email, password=password)
+            user = CustomUser.objects.create_user(username=username, email=email, password=password, first_name=fName, last_name=lName)
             print("User created succcessfully")
             messages.success(request, f"User '{username}' added successfully!")
         except Exception as e:
@@ -283,7 +285,7 @@ def inferenceform(request):
     if request.method == 'POST' and request.POST["comments"]=="EMPTY":
             return redirect("dashboard")
     if request.method == 'POST' and request.FILES.get('pre_image') != None and request.FILES.get('post_image') != None:
-        # get data from form
+        # get data from form 
         pre_image = request.FILES.get('pre_image')
         post_image = request.FILES.get('post_image')
         city = request.POST['city']

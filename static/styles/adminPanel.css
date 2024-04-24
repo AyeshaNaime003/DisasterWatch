@@ -1,0 +1,12 @@
+.text-end p {
+    font-size: small;
+    color: grey; 
+}
+
+.card {
+display: flex;
+}
+
+.btn {
+    margin-top:10px;
+}
