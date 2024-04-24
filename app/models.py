@@ -18,7 +18,7 @@ class CustomUser(AbstractUser):
     updated_at = models.DateTimeField(auto_now=True)
     def _str_(self):
         return self.username
-    
+        
 class JsonFileModel(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     json_file = models.JSONField()

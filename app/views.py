@@ -126,15 +126,18 @@ def adminPanel(request):
     if request.method == 'POST':
         username = request.POST.get('username')
         email = request.POST.get('email')
+        contact = request.POST.get('contact')
         password = request.POST.get('password')
         try:
-            user = CustomUser.objects.create_user(username=username, email=email, password=password)
+            user = CustomUser.objects.create_user(username=username, email=email, contact=contact, password=password)
             print("User created succcessfully")
             messages.success(request, f"User '{username}' added successfully!")
+            return redirect('admin-panel')
         except Exception as e:
             messages.error(request, f"Failed to add user: {e}")
-    users = CustomUser.objects.all()
-    return render(request, "app/adminPanel.html", {'users': users})
+    else:
+        users = CustomUser.objects.all()
+        return render(request, "app/adminPanel.html", {'users': users})
 
 
 @login_required(login_url="login/")
