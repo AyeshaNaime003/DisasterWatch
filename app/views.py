@@ -186,8 +186,6 @@ def map(request):
         'results': json.loads(inference_model.results) if inference_model else None,
     }})
 
-
-
 @login_required(login_url="login/")
 def dashboard(request):
     inference_model = InferenceModel.objects.filter(user=request.user).last()
@@ -203,14 +201,13 @@ def dashboard(request):
         'results': json.loads(inference_model.results) if inference_model else None,
     }})
 
-
 @login_required(login_url="login/")
 def profile(request):
     # get current user
     user = request.user
     print(user.email, user.first_name, user.last_name, user.contact, user.profile_picture.url if user.profile_picture else '')
-    user_inferences = JsonFileModel.objects.filter(user=user)
-    # print(user_inferences)
+    user_inferences = InferenceModel.objects.filter(user=user)
+    print(user_inferences)
     # make chnages to the fields of current user using the form
     if request.method == 'POST':
         first_name = request.POST.get('first_name')
