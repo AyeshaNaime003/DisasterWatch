@@ -12,31 +12,21 @@
         <!-- NAVBAR -->
         {% include 'app/navbar2.html' %}
         <div class="col-md-11">
-            <!-- ERROR CONTAINER -->
-            <div class="row">
-                <div class="container error-container">
-                    {% if messages %}
-                    {% for message in messages %}
-                    <p class="alert {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% endif %}"
-                        role="alert">
-                        {{ message }}
-                    </p>
-                    {% endfor %}
-                    {% endif %}
-                </div>
-            </div>
+    
             <!-- MAIN CONTENT -->
             <div class="row">
                 <div class="col-md-8">
                     <!-- city info -->
                     <div id="cityinfo" class="my-2 rounded py-2 px-1">
-                        <h1>{{ context.country }}, {{ context.state }}</h1>
-                        <h1>{{ context.city }}</h1>
+                        <h1>{{ context.disaster_country }}, {{ context.disaster_state }}</h1>
+                        <h1>{{ context.disaster_city }}</h1>
+                        <p> Disaster Type: {{ context.disaster_type }}</p>
+                        <p> Disaster Description: {{ context.disaster_description }}</p>
                     </div>
                     <!-- map -->
                     <div id="map-container">
                         <div id="map"></div>
-                        
+
                     </div>
                     <!-- toggler for map and table -->
                     <div id="toggler" class="my-2 py-2 px-1">
@@ -68,61 +58,55 @@
     </div>
 </div>
 
+<!-- Error messages -->
+{% if messages %}
+    {% for message in messages %}
+        <div id="alert-container" class="position-fixed top-0 start-50 translate-middle-x mt-4" style="z-index: 1050">
+            <div class="alert {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% endif %}"
+                role="alert">
+                {{ message }}
+            </div>
+        </div>
+    {% endfor %}
+    <script>
+        // Automatically remove alert after 5 seconds
+        $(document).ready(function () {
+            setTimeout(function () {
+                $('#alert-container').fadeOut();
+            }, 2000);
+        });
+    </script>
+{% endif %}
 
-
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script>
     var context = {{ context| safe }};
+    var results = context.results;
+    var lat = context.tif_middle_latitude;
+    var long = context.tif_middle_longitude;
     // map and tiles
-    var map = L.map('map').setView([context.map_middle_lat, context.map_middle_long], 18);
-
-
-var baseMaps = {
-    "Street Map": L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19,
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}),
-    "Satellite Map": L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    var map = L.map('map').setView([lat, long], 18);
+    var streetView = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    });
+    streetView.addTo(map);
+    var satelliteView = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
         maxZoom: 19,
         attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
-    }),
-};  
-L.control.layers(baseMaps).addTo(map);
-
-// Handle toggler actions
-document.querySelectorAll('input[name="map-toggle"]').forEach(function(input) {
-    input.addEventListener('change', function() {
-        var selectedValue = this.value;
-        switch(selectedValue) {
-            case 'street':
-                streetMapLayer.addTo(map);
-                satelliteMapLayer.remove();
-                terrainMapLayer.remove();
-                break;
-            case 'satellite':
-                satelliteMapLayer.addTo(map);
-                streetMapLayer.remove();
-                terrainMapLayer.remove();
-                break;
-            case 'terrain':
-                terrainMapLayer.addTo(map);
-                streetMapLayer.remove();
-                satelliteMapLayer.remove();
-                break;
-        }
     });
-});
-
-var polygonData = context.polygon_data;
-    
-    // red, orange, yellow, green
+    var baseMaps = {
+        "Street Map": streetView,
+        "Satellite Map": satelliteView
+    };
+    L.control.layers(baseMaps).addTo(map);
+    // drawing polygons on map and adding addresses to the table
     var allPolygons = [];
-    var allTableRows = [];
-    for (var color in polygonData) {
+    for (var color in results) {
         colorPolygons = []
-        if (polygonData.hasOwnProperty(color)) {
-            var colorPolygonData = polygonData[color];
+        if (results.hasOwnProperty(color)) {
+            var colorPolygonData = results[color];
             for (var i = 0; i < colorPolygonData.length; i++) {
                 var coordinates = colorPolygonData[i]["coordinates"]
                 var address = colorPolygonData[i]["address"];
@@ -135,28 +119,25 @@ var polygonData = context.polygon_data;
                 polygon.bindPopup(`<div>${displayAddressComponents(address)}</div>`);
                 colorPolygons.push(polygon);
                 // addig addresses to the table
-                var tableRow = `<div class="row ${color}">
+                $('#table').append(`<div class="row ${color}">
                     <div class="col col-3">${address.name}</div>
                     <div class="col col-3">${address.neighbourhood}</div>
                     <div class="col col-2">${address.road}</div>
                     <div class="col col-2">${address.suburb}</div>
                     <div class="col col-2">${address.town}</div>
-                </div>`;
-                $('#table').append(tableRow);
-
+                </div>`);
             }
         }
         allPolygons.push(colorPolygons)
     }
-    
-    
-    
-    
+    // classes toggler
     function toggle(color) {
+        // table
         var rows = document.querySelectorAll('.' + color);
         rows.forEach(function (row) {
             row.style.display = row.style.display === 'none' ? '' : 'none'; // Toggle visibility
         });
+        // map
         switch (color) {
             case 'red':
                 togglePolygonsVisibility(allPolygons[0]);
@@ -182,8 +163,7 @@ var polygonData = context.polygon_data;
             polygon.setStyle({ opacity: currentOpacity ? 0 : 1 });
         });
     }
-
-
+    // helper functions
     function displayAddressComponents(address) {
         let components = [];
         const keys = ['name', 'neighbourhood', 'road', 'suburb_municipality', "town"];
@@ -196,7 +176,5 @@ var polygonData = context.polygon_data;
 
         return components.join(', ');
     }
-
 </script>
-
 {% endblock body %}

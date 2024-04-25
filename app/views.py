@@ -173,100 +173,35 @@ def delete_user(request, user_id):
 
 @login_required(login_url="login/")
 def map(request): 
-    # get data from database
-    json_file_model = JsonFileModel.objects.filter(user=request.user).last()
-    # print(model_to_dict(json_file_model))
-    json_data = json.loads(json_file_model.json_file)
-    
-    date = json_data.get("date")   
-    city = json_data["city"]   
-    state = json_data["state"]   
-    country = json_data["country"]   
-    disaster_type = json_data["disaster_type"]   
-    disaster_description = json_data["disaster_description"]   
-    comments = json_data["comments"]   
-    pre_path = json_data["pre_path"]   
-    post_path = json_data["post_path"]   
-    map_middle_lat = json_data["map_middle_lat"]   
-    map_middle_long = json_data["map_middle_long"]   
-    polygon_data = json_data["polygon_data"]   
-        
-    context = {
-        'date': date,
-        'city': city,
-        'state': state,
-        'country': country,
-        'disaster_type': disaster_type,
-        'disaster_description': disaster_description,
-        'comments': comments,
-        'pre_path': pre_path,
-        'post_path': post_path,
-        'polygon_data': polygon_data,
-        'map_middle_lat': map_middle_lat,
-        'map_middle_long': map_middle_long,
-    }
-    # print(context)
-    return render(request, 'app/map.html', context={'context': context})
-
-
-
-@login_required(login_url="login/")
-def dashboard(request):
-    json_file_model = JsonFileModel.objects.filter(user=request.user).last()
-    json_data = json.loads(json_file_model.json_file)
-    
-    date = json_data.get("date")   
-    city = json_data["city"]   
-    state = json_data["state"]   
-    country = json_data["country"]   
-    disaster_type = json_data["disaster_type"]   
-    disaster_description = json_data["disaster_description"]   
-    comments = json_data["comments"]   
-    pre_path = json_data["pre_path"]   
-    post_path = json_data["post_path"]   
-    map_middle_lat = json_data["map_middle_lat"]   
-    map_middle_long = json_data["map_middle_long"]   
-    polygon_data = json_data["polygon_data"]   
-        
-    context = {
-        'date': date,
-        'city': city,
-        'state': state,
-        'country': country,
-        'disaster_type': disaster_type,
-        'disaster_description': disaster_description,
-        'comments': comments,
-        'pre_path': pre_path,
-        'post_path': post_path,
-        'polygon_data': polygon_data,
-        'map_middle_lat': map_middle_lat,
-        'map_middle_long': map_middle_long,
-    }
-    print(f"json file {context}")
-    print("\n\n\n")
-
     inference_model = InferenceModel.objects.filter(user=request.user).last()
-    
-    context = {
-        'id': inference_model.id if inference_model else None,
-        'user': inference_model.user.username if inference_model else None,
-        'disaster_date': inference_model.disaster_date.strftime('%Y-%m-%dT%H:%M:%S.%fZ') if inference_model and inference_model.disaster_date else None,
+    return render(request, 'app/map.html', {"context":{
+        'disaster_date': inference_model.disaster_date.strftime('%Y-%m-%d') if inference_model and inference_model.disaster_date else None,
         'disaster_city': inference_model.disaster_city if inference_model else None,
         'disaster_state': inference_model.disaster_state if inference_model else None,
         'disaster_country': inference_model.disaster_country if inference_model else None,
         'disaster_type': inference_model.disaster_type if inference_model else None,
         'disaster_description': inference_model.disaster_description if inference_model else None,
-        'disaster_comments': inference_model.disaster_comments if inference_model else None,
         'tif_middle_latitude': inference_model.tif_middle_latitude if inference_model else None,
         'tif_middle_longitude': inference_model.tif_middle_longitude if inference_model else None,
-        'pre_tif_path': inference_model.pre_tif_path if inference_model else None,
-        'post_tif_path': inference_model.post_tif_path if inference_model else None,
         'results': json.loads(inference_model.results) if inference_model else None,
-        'created_at': inference_model.disaster_date.strftime('%Y-%m-%dT%H:%M:%S.%fZ') if inference_model and inference_model.created_at else None,
-    }
-    print(f"inference model {context}")
+    }})
 
-    return render(request, 'app/dashboard.html', {"context":context})
+
+
+@login_required(login_url="login/")
+def dashboard(request):
+    inference_model = InferenceModel.objects.filter(user=request.user).last()
+    return render(request, 'app/dashboard.html', {"context":{
+        'disaster_date': inference_model.disaster_date.strftime('%Y-%m-%d') if inference_model and inference_model.disaster_date else None,
+        'disaster_city': inference_model.disaster_city if inference_model else None,
+        'disaster_state': inference_model.disaster_state if inference_model else None,
+        'disaster_country': inference_model.disaster_country if inference_model else None,
+        'disaster_type': inference_model.disaster_type if inference_model else None,
+        'disaster_description': inference_model.disaster_description if inference_model else None,
+        'tif_middle_latitude': inference_model.tif_middle_latitude if inference_model else None,
+        'tif_middle_longitude': inference_model.tif_middle_longitude if inference_model else None,
+        'results': json.loads(inference_model.results) if inference_model else None,
+    }})
 
 
 @login_required(login_url="login/")
