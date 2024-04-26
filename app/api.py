@@ -24,8 +24,9 @@ def get_weather(city_name, current_time):
         "city":city_name,
         "description":data["weather"][0]["description"],
         "temperature":data["main"]["temp"],
+        "wind":data["wind"]["speed"],
         "humidity":data["main"]["humidity"],
-        "rain": data["rain"]["1h"] if "rain" in data.keys()  else None,
+        "rain": data["rain"]["1h"] if "rain" in data.keys() else 0,
         "clouds":data["clouds"]["all"]
     }
 
