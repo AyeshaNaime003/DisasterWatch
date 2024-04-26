@@ -51,11 +51,7 @@
                             </div>
                         </div>
 
-                        <div class="card mb-4">
-                            <div class="card-body">
-                                hehe
-                            </div>
-                        </div>
+                       
                     </div>
                     <div class="col-lg-4">
                         <div class="card mb-4" card-cap-padding-y=0px;>
@@ -90,18 +86,14 @@
                                     </form>
                                 </div>
                             </div>
-                            <div class="card-body">
+                            <div id="loginHistory" class="card-body">
                                 <h5>Login History</h5>
-                                <ul>
-                                    {% for login in selected_user.loginhistory_set.all %}
-                                    <li>{{ login.timestamp }} - {{ login.ip_address }}</li>
-                                    {% endfor %}
-                                </ul>
+                                <div id="loginHistoryContainer">
+
+                                </div>
+            
                             </div>
-                            <div class="card-body">
-                                <h5>Inference History</h5>
-                                <!-- Add code to display inference history -->
-                            </div>
+                          
                         </div>
                     </div>
                 </div>
@@ -137,15 +129,22 @@
             url: '/get-user-details/' + userId + '/', // Endpoint to fetch user details
             type: 'GET',
             success: function(response) {
+                console.log(response)
                 $('#userId').val(response.id);
                 $('#username').val(response.username);
                 $('#email').val(response.email);
                 $('#contact').val(response.contact);
                 $('#is_admin').prop('checked', response.is_admin);
-                console.log("form updated");
                 $('#userDetailsContainer').css('display', 'block');
                 var form = document.getElementById('userDetailsForm');
-                form.action = "{% url 'edit-user' user_id=0 %}".replace('0', response.id);
+                // form.action = "{% url 'edit-user' user_id=0 %}".replace('0', response.id);
+                var loginHistoryHtml = '';
+            for (var i = 0; i < response.login_history.length; i++) {
+                var history = response.login_history[i];
+                loginHistoryHtml += `<div class="row"><div class="col">${history.login_time} ${history.logout_time ? history.logout_time : 'Still logged in'}</div></div>`;
+
+            }
+            $('#loginHistoryContainer').html(loginHistoryHtml);
             },
             error: function(xhr, status, error) {
                 console.error(xhr.responseText);

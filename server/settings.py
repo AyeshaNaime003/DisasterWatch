@@ -150,10 +150,9 @@ LEAFLET_CONFIG = {
 }
 
 
-# # Set session expire at browser close
-# SESSION_EXPIRE_AT_BROWSER_CLOSE = True
-
-# # Optionally, you can set the session cookie age to 0 to expire it immediately when the browser is closed
-# SESSION_COOKIE_AGE = 0
-
 GEOCODER_TIMEOUT = 10  # Increase the timeout value (in seconds)
+
+
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+SESSION_COOKIE_AGE = 3600
+SESSION_IDLE_TIMEOUT = 3000

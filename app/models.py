@@ -48,3 +48,12 @@ class InferenceModel(models.Model):
 
     def __str__(self):
         return f"InferenceModel - {self.id} (User: {self.user.username}, Created At: {self.created_at}, Disaster Type: {self.disaster_type}, City: {self.disaster_city}, Country: {self.disaster_country})"
+
+
+class LoginHistoryModel(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    login_time = models.DateTimeField(auto_now_add=True)
+    logout_time = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.user.username} - Login: {self.login_time}, Logout: {self.logout_time}"
