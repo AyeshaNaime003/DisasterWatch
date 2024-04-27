@@ -23,7 +23,7 @@
                         <div class="card">
                             <div class="row">
                                 <!-- CITY INFO  -->
-                                <div id="cityinfo" class="card-body rounded col-md-9">
+                                <div id="cityinfo" class="card-body col-md-9">
                                     <div class="row text-center">
                                         <div class="col">
                                             <h5>{{ context.disaster_city}}, {{ context.disaster_state}}, {{context.disaster_country}}</h3>
@@ -70,6 +70,7 @@
                                     </div>
                                 </div>
 
+                                <!-- GENERATE REPORT BUTTON -->
                                 <div class='card-body col-md-2 d-flex align-self-center'>
                                     <div class='px-5'><button class="btn btn-primary">Generate Report</button></div>
                                 </div>
@@ -80,18 +81,20 @@
                         <div class="row">
                             <div class="col-md-8">
                                 <div class="row my-2">
-                                    <div class="col custom-padding">
+                                    <div class="col-md-7 custom-padding">
                                         <div class="card border-info ">
                                             <div class='card-body'>
                                                 <div class="card-title"><h5 id="damageassessmentresults">Damage Assessment Results</h5></div>
-                                                <img src="https://images.twinkl.co.uk/tw1n/image/private/t_630/u/ux/barchart_ver_1.jpg"
+                                                <div id = 'damageBarChart'>
+                                                    <img src="https://images.twinkl.co.uk/tw1n/image/private/t_630/u/ux/barchart_ver_1.jpg"
                                                     class="w-100">
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                     
-                                    <div class="col custom-padding">
-                                        <div id="damagedistribution" class="card border-info ">
+                                    <div class="col-md-3 custom-padding">
+                                        <div id="damagedistribution" class="card border-info w-100">
                                             <div class='card-body'>
                                                 <div class="card-title"><h5 class="">Damage Distribution</h5></div>
                                                 <img src="https://images.twinkl.co.uk/tw1n/image/private/t_630/u/ux/barchart_ver_1.jpg"
