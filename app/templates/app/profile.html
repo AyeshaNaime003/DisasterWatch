@@ -136,20 +136,26 @@
                                                                 </thead>
                                                                 <tbody>
                                                                     <!-- Assuming 'data' is a list of dictionaries containing the information -->
+                                                                    
                                                                     {% for user_inference in user_inferences %}
-                                                                    <tr>
-                                                                        <td>{{ user_inference.created_at }}</td>
-                                                                        <td>{{ user_inference.disaster_date }}</td>
-                                                                        <td>{{ user_inference.disaster_type }}</td>
-                                                                        <td>{{ user_inference.disaster_city }}, 
-                                                                            {{user_inference.disaster_state }},
-                                                                            {{ user_inference.disaster_country }}
-                                                                        </td>
-                                                                        <td>{{ user_inference.disaster_description }}
-                                                                        </td>
-                                                                        <td>{{ user_inference.disaster_comments }}</td>
-                                                                    </tr>
+                                                                    
+                                                                        <tr>
+                                                                            <td>{{ user_inference.created_at }}</td>
+                                                                            <td>{{ user_inference.disaster_date }}</td>
+                                                                            <td>{{ user_inference.disaster_type }}</td>
+                                                                            <td>{{ user_inference.disaster_city }}, 
+                                                                                {{user_inference.disaster_state }},
+                                                                                {{ user_inference.disaster_country }}
+                                                                            </td>
+                                                                            <td>{{ user_inference.disaster_description }}
+                                                                            </td>
+                                                                            <td>{{ user_inference.disaster_comments }}</td>
+                                                                            <td>
+                                                                                <a href="{% url 'dashboard_with_id' inference_id=user_inference.id %}">View Details</a>
+                                                                            </td>
+                                                                        </tr>
                                                                     {% endfor %}
+                                                                </a>
                                                                 </tbody>
                                                             </table>
                                                         </div>

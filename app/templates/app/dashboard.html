@@ -165,7 +165,7 @@
                                 <div class="col p-2 rounded mx-1 bg-whitesmoke">
                                     <div>
                                         <h2>Map</h2>
-                                        <a href="{% url 'map' %}">Go to Interactive Map</a>
+                                        <a href="{% url 'map_with_id' inference_id=context.inference_id %}">Go to Interactive Map</a>
                                     </div>
                                     <div id="heatmap" style="height: 400px;"></div>
                                     <div id="toggler" class="my-2 py-2 px-1">
