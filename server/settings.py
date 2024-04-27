@@ -25,8 +25,10 @@ SECRET_KEY = "django-insecure-^t+x(redmfgp(zo^lf62&-!pyob@4z+2y+anogo$d-a9etza11
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
 ALLOWED_HOSTS = []
+
+# DEBUG = False
+# ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -50,7 +52,6 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     'django.middleware.csrf.CsrfViewMiddleware',
-    
 ]
 
 ROOT_URLCONF = "server.urls"
@@ -149,5 +150,5 @@ LEAFLET_CONFIG = {
     },
 }
 
-
-GEOCODER_TIMEOUT = 10  # Increase the timeout value (in seconds)
+# GEOCODER_TIMEOUT = 10  # Increase the timeout value (in seconds)
+SESSION_COOKIE_AGE = 60*60*2  # 2 hour timeout

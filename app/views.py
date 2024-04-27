@@ -26,8 +26,6 @@ from server.settings import *
 from .model.data_preprocessing import tif_to_img, one_hot_encoding_mask, mask_to_polygons, get_tif_transform, pixels_to_coordinates
 from .api import get_weather, get_population
 
-
-
 def get_address(request):
     if request.method == 'GET':
         try:
@@ -183,8 +181,8 @@ def dashboard(request):
         'tif_middle_latitude': inference_model.tif_middle_latitude if inference_model else None,
         'tif_middle_longitude': inference_model.tif_middle_longitude if inference_model else None,
         'results': json.loads(inference_model.results) if inference_model else None,
-        # 'weather':weather, 
-        'population':None, 
+        'weather':weather, 
+        'population': "None", 
     }})
 
 
