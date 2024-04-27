@@ -18,10 +18,6 @@ import cv2
 import json
 from geopy.geocoders import Nominatim
 from geopy.exc import GeocoderUnavailable
-
-PIP_DEFAULT_TIMEOUT=100
-
-
 from server.settings import *
 from .model.data_preprocessing import tif_to_img, one_hot_encoding_mask, mask_to_polygons, get_tif_transform, pixels_to_coordinates
 from .api import get_weather, get_population
@@ -43,7 +39,6 @@ def get_address(request):
             return redirect("inferenceform")
         
     return JsonResponse({'error': 'Invalid request'})
-
 def loginPage(request):
     if request.method=="POST":
         username = request.POST.get('username')
@@ -66,7 +61,6 @@ def loginPage(request):
     else:
         messages.error(request, None)
         return render(request, "app/login.html")
-
 @login_required(login_url="login/")
 def home(request):
     print(f"HII {request.user.username}, welcome to home page")
@@ -81,7 +75,6 @@ def home(request):
     else:
         messages.error(request, f"Failed to fetch data from API. Status code: {api_response.status_code}")
         return render(request, 'app/home.html')
-
 @login_required(login_url="login/")
 def logoutPage(request):
     login_history = LoginHistoryModel.objects.filter(user=request.user).order_by('-login_time').first()
@@ -92,7 +85,6 @@ def logoutPage(request):
     logout(request)
     print("logout")
     return redirect("login")
-
 def get_user_details(request, user_id):
     user = get_object_or_404(CustomUser, id=user_id)    
     loginHistory = LoginHistoryModel.objects.filter(user=user).values('login_time', 'logout_time')
@@ -111,12 +103,10 @@ def get_user_details(request, user_id):
         'is_admin': user.is_admin,
         'login_history':formatted_history
     })
-
 @login_required(login_url="login/")
 def adminPanel(request):
     users = CustomUser.objects.all()
     return render(request, "app/adminPanel.html", {'users': users})
-
 @login_required(login_url="login/")
 def addUser(request):
     if request.method == 'POST':
@@ -137,7 +127,6 @@ def addUser(request):
             return redirect('admin-panel')
     else:
         return render(request, 'app/addUser.html')
-    
 @login_required(login_url="login/")
 def edit_user(request, user_id):
     print("In edit function")
@@ -150,7 +139,6 @@ def edit_user(request, user_id):
         messages.success(request, f"User '{user.username}' updated successfully!")
         return redirect('admin-panel')
     return redirect('admin-panel')
-
 @login_required(login_url="login/")
 def delete_user(request, user_id):
     user = CustomUser.objects.filter(id=user_id).first()
@@ -161,7 +149,6 @@ def delete_user(request, user_id):
     else:
         messages.error(request, "User not found!")
     return redirect('admin-panel')
-
 @login_required(login_url="login/")
 def dashboard(request):
     inference_model = InferenceModel.objects.filter(user=request.user).last()
@@ -208,8 +195,6 @@ def dashboard(request):
         'damaged_count': sum(classes_count[1:]),
         'graph_data': classes_count if json_graph_data else class_none,
     }})
-
-
 @login_required(login_url="login/")
 def map(request): 
     inference_model = InferenceModel.objects.filter(user=request.user).last()
@@ -224,8 +209,6 @@ def map(request):
         'tif_middle_longitude': inference_model.tif_middle_longitude if inference_model else None,
         'results': json.loads(inference_model.results) if inference_model else None,
     }})
-
-
 @login_required(login_url="login/")
 def profile(request):
     # get current user
@@ -260,14 +243,97 @@ def profile(request):
         return redirect('profile')
     else:
         return render(request, "app/profile.html", context={'user': user, "user_inferences":user_inferences})
-
-
 @login_required(login_url="login/")
 def help(request):
     return render(request, "app/help.html")
+@login_required(login_url="login/")
+def inferenceform(request):
+    if request.method == 'POST' and request.FILES.get('pre_image') and request.FILES.get('post_image'):
+        # Get data from form
+        pre_image = request.FILES['pre_image']
+        post_image = request.FILES['post_image']
+        disaster_city = request.POST['city']
+        disaster_date = request.POST['date']
+        disaster_type = request.POST['disaster_type']
+        disaster_description = request.POST['disaster_description']
+        disaster_comments = request.POST['comments']
+        # Save the tiff files temporarily in media root
+        file_name = f"{disaster_date}_{disaster_city}_{disaster_type}"
+        pre_path = os.path.join(MEDIA_ROOT, 'tiff', file_name+"_pre.tif")
+        post_path = os.path.join(MEDIA_ROOT, 'tiff', file_name+"_post.tif")
+        with open(pre_path, 'wb') as f:
+            for chunk in pre_image.chunks():
+                f.write(chunk)
+        with open(post_path, 'wb') as f:
+            for chunk in post_image.chunks():
+                f.write(chunk)
+        print("Pre and post tifs saved")
+        # Convert the tiff files to RGB images to run for inference
+        pre_tif, post_tif = gdal.Open(pre_path), gdal.Open(post_path)
+        pre_image, post_image = torch.from_numpy(tif_to_img(pre_tif)), torch.from_numpy(tif_to_img(post_tif))
+        pre_post = torch.cat((pre_image, post_image), dim=2).permute(2,0,1).unsqueeze(0).to(torch.float)
+        print(f"Tifs converted to concatenated images of {pre_post.shape}, {pre_post.dtype}")
+        # Dummy data (for testing purposes)
+        dummy_mask = cv2.imread("woolsey-fire_00000715_post_disaster.png")
+        print(f"Dummy mask shape and type {dummy_mask.shape}, {dummy_mask.dtype}")
+        dummy_masks = one_hot_encoding_mask(dummy_mask)
+        print(f"Dummy mask after hot encoding {dummy_masks.shape}, {dummy_masks.dtype}")
+        transform = get_tif_transform(pre_path)
+        classes = ["red", "orange", "yellow", "green"]
+         # Format the inference data for the database
+        results = {}
+        for i, mask in enumerate(dummy_masks):
+            color = classes[i]
+            _, mask = cv2.threshold(mask.astype('uint8'), 0, 255, cv2.THRESH_BINARY)
+            polygons_in_mask = mask_to_polygons(mask, transform, rdp=False)
+            print(f"{color}: {len(polygons_in_mask)}")
+            results[color] = polygons_in_mask
+        # Convert the dictionary to JSON format
+        tif_middle_latitude, tif_middle_longitude = pixels_to_coordinates(transform, (612, 612))
+        try:
+            # Create and save an instance of InferenceModel
+            inference_model_instance = InferenceModel.objects.create(
+                user=request.user,
+                disaster_date=disaster_date,
+                disaster_city=polygons_in_mask[0]['address']['city'] if polygons_in_mask[0]['address']['city'] == request.POST['city'] else polygons_in_mask[0]['address']['town'],
+                disaster_state=polygons_in_mask[0]['address']['state'],
+                disaster_country=polygons_in_mask[0]['address']['country'],
+                disaster_type=disaster_type,
+                disaster_description=disaster_description,
+                disaster_comments=disaster_comments,
+                tif_middle_latitude=tif_middle_latitude,
+                tif_middle_longitude=tif_middle_longitude,
+                pre_tif_path=pre_path,
+                post_tif_path=post_path,
+                results=json.dumps(results),
+            )
+            inference_model_instance.save()
+            print("InferenceModel model created")
+            messages.success(request, "InferenceModel model created")
+            return redirect("dashboard")
+        except Exception as e:
+            print(f"Unable to save inference: {e}")
+            messages.error(request, "Unable to save inference")
+            return redirect("inferenceform")
+    else:
+        return render(request, "app/inferenceform.html")
+    
 
 
-# # @login_required(login_url="login/")
+
+
+
+
+
+
+
+
+
+
+
+
+
+    # # @login_required(login_url="login/")
 # def inferenceform(request):
 #     if request.method == 'POST' and request.POST["comments"]=="EMPTY":
 #             return redirect("dashboard")
@@ -351,75 +417,3 @@ def help(request):
 #             return redirect("inferenceform")
 #     else:
 #         return render(request, "app/inferenceform.html")
-        
-@login_required(login_url="login/")
-def inferenceform(request):
-    if request.method == 'POST' and request.FILES.get('pre_image') and request.FILES.get('post_image'):
-        # Get data from form
-        pre_image = request.FILES['pre_image']
-        post_image = request.FILES['post_image']
-        disaster_city = request.POST['city']
-        disaster_date = request.POST['date']
-        disaster_type = request.POST['disaster_type']
-        disaster_description = request.POST['disaster_description']
-        disaster_comments = request.POST['comments']
-        # Save the tiff files temporarily in media root
-        file_name = f"{disaster_date}_{disaster_city}_{disaster_type}"
-        pre_path = os.path.join(MEDIA_ROOT, 'tiff', file_name+"_pre.tif")
-        post_path = os.path.join(MEDIA_ROOT, 'tiff', file_name+"_post.tif")
-        with open(pre_path, 'wb') as f:
-            for chunk in pre_image.chunks():
-                f.write(chunk)
-        with open(post_path, 'wb') as f:
-            for chunk in post_image.chunks():
-                f.write(chunk)
-        print("Pre and post tifs saved")
-        # Convert the tiff files to RGB images to run for inference
-        pre_tif, post_tif = gdal.Open(pre_path), gdal.Open(post_path)
-        pre_image, post_image = torch.from_numpy(tif_to_img(pre_tif)), torch.from_numpy(tif_to_img(post_tif))
-        pre_post = torch.cat((pre_image, post_image), dim=2).permute(2,0,1).unsqueeze(0).to(torch.float)
-        print(f"Tifs converted to concatenated images of {pre_post.shape}, {pre_post.dtype}")
-        # Dummy data (for testing purposes)
-        dummy_mask = cv2.imread("woolsey-fire_00000715_post_disaster.png")
-        print(f"Dummy mask shape and type {dummy_mask.shape}, {dummy_mask.dtype}")
-        dummy_masks = one_hot_encoding_mask(dummy_mask)
-        print(f"Dummy mask after hot encoding {dummy_masks.shape}, {dummy_masks.dtype}")
-        transform = get_tif_transform(pre_path)
-        classes = ["red", "orange", "yellow", "green"]
-         # Format the inference data for the database
-        results = {}
-        for i, mask in enumerate(dummy_masks):
-            color = classes[i]
-            _, mask = cv2.threshold(mask.astype('uint8'), 0, 255, cv2.THRESH_BINARY)
-            polygons_in_mask = mask_to_polygons(mask, transform, rdp=False)
-            print(f"{color}: {len(polygons_in_mask)}")
-            results[color] = polygons_in_mask
-        # Convert the dictionary to JSON format
-        tif_middle_latitude, tif_middle_longitude = pixels_to_coordinates(transform, (612, 612))
-        try:
-            # Create and save an instance of InferenceModel
-            inference_model_instance = InferenceModel.objects.create(
-                user=request.user,
-                disaster_date=disaster_date,
-                disaster_city=polygons_in_mask[0]['address']['city'] if polygons_in_mask[0]['address']['city'] == request.POST['city'] else polygons_in_mask[0]['address']['town'],
-                disaster_state=polygons_in_mask[0]['address']['state'],
-                disaster_country=polygons_in_mask[0]['address']['country'],
-                disaster_type=disaster_type,
-                disaster_description=disaster_description,
-                disaster_comments=disaster_comments,
-                tif_middle_latitude=tif_middle_latitude,
-                tif_middle_longitude=tif_middle_longitude,
-                pre_tif_path=pre_path,
-                post_tif_path=post_path,
-                results=json.dumps(results),
-            )
-            inference_model_instance.save()
-            print("InferenceModel model created")
-            messages.success(request, "InferenceModel model created")
-            return redirect("dashboard")
-        except Exception as e:
-            print(f"Unable to save inference: {e}")
-            messages.error(request, "Unable to save inference")
-            return redirect("inferenceform")
-    else:
-        return render(request, "app/inferenceform.html")
