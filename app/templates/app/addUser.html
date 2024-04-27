@@ -17,7 +17,7 @@
             {% comment %} <div class="container-fluid"> {% endcomment %}
                 <div class="row gx-3">
                     <div class="col-lg-12">
-                        <div class="card mb-3" style="height: 95vh; overflow-y: auto;">
+                        <div class="card mb-3">
                             <div class="card-body">
                                 <div class="p-5 pb-0  pageTitle">
                                     ADD USER
@@ -27,45 +27,53 @@
                                 <div class='px-5 py-2'>
                                     <form id="addUserForm" action="{% url 'add-user' %}" method="POST">
                                         {% csrf_token %}
+                                        
+                                        <legend>Personal Details</legend>
                                         <div class="row gx-3 mb-3">
                                             <div class="col-md-6">
-                                                <label for="firstName">First Name</label>
+                                                <label for="firstName">First Name <b style='color:red'>*</b></label>
                                                 <input type="text" class="form-control blue-border" name="firstName" required>
                                             </div>
                                             <div class="col-md-6">
-                                                <label for="lastName">Last Name</label>
+                                                <label for="lastName">Last Name <b style='color:red'>*</b></label>
                                                 <input type="text" class="form-control blue-border" name="lastName" required>
                                             </div>
                                         </div>
-                                        <div class="form-group mb-3">
-                                            <label for="email">Email</label>
-                                            <input type="email" class="form-control blue-border" name="email" required>
-                                        </div>
                                         <div class="row gx-3 mb-3">
                                             <div class="col-md-6">
-                                                <label for="username">Username</label>
+                                                <label for="email">Email <b style='color:red'>*</b></label>
+                                                <input type="email" class="form-control blue-border" name="email" required>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="contact">Contact Number <b style='color:red'>*</b></label>
+                                                <input type="text" class="form-control blue-border" name="contact" required>
+                                            </div>
+                                        </div>
+
+                                        <legend>Official Details</legend>
+                                        <div class="row gx-3 mb-3">
+                                            <div class="col-md-6">
+                                                <label for="username">Username  <b style='color:red'>*</b></label>
                                                 <input type="text" class="form-control blue-border" name="username" required>
                                             </div>
                                             <div class="col-md-6">
-                                                <label for="password">Password</label>
+                                                <label for="password">Password <b style='color:red'>*</b></label>
                                                 <input type="password" class="form-control blue-border" name="password" required>
                                             </div>
                                         </div>
                                         <div class="row gx-3 mb-3">
+                                           
                                             <div class="col-md-6">
-                                                <label for="contact">Contact Number</label>
-                                                <input type="text" class="form-control blue-border" name="contact" required>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <label class="small mb-1">Role</label>
+                                                <label for='is_admin'>Role <b style='color:red'>*</b></label>
                                                 <select class="form-control blue-border" id="is_admin" name="is_admin" required>
                                                     <option value="earthquake">Employee</option>
                                                     <option value="flood">Admin</option>
                                                     <!-- Add more options as needed -->
                                                 </select>
                                             </div>
+                                            
                                         </div>
-                                        <div class='text-end'><button type="submit" class="btn btn-primary">Add User</button></div>
+                                        <div class='py-3 '><button type="submit" class="btn btn-primary">Add User</button></div>
                                     </form>
                                 </div>
                             </div>
@@ -100,11 +108,5 @@
 <script>
     // Add your JavaScript code here if needed
 </script>
-
-<style>
-    .blue-border {
-        border: 1px solid var(--lovely-blue);
-    }
-</style>
 
 {% endblock body %}

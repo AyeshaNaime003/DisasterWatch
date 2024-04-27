@@ -31,3 +31,13 @@ display: flex;
     color:gray;
 }
 
+.blue-border{
+    border:1px solid rgb(185, 185, 185);
+}
+
+#addUserForm {
+    /* background-color: rgb(238, 242, 245); */
+    border-radius: 10px;
+    padding-right: 20px;
+}
+

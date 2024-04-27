@@ -34,3 +34,10 @@ h2, h3{
     background-color: var(--lovely-blue-lighter);
     padding: 1%;
 }   
+
+.btn,
+.btn-primary {
+    padding-left: 20px;
+    padding-right: 20px;
+    
+}
