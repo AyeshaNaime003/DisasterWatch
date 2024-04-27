@@ -20,174 +20,162 @@
         <div class="col-md-11">
             <div class="container-fluid m-1">
                 <div class="row ">
-                        <div class="card">
-                            <div class="row">
-                                <!-- CITY INFO  -->
-                                <div id="cityinfo" class="card-body col-md-9">
-                                    <div class="row text-center">
-                                        <div class="col">
-                                            <h5>{{ context.disaster_city}}, {{ context.disaster_state}}, {{context.disaster_country}}</h3>
-                                        </div>
-                                        <div class="col">
-                                            <h5>{{ context.disaster_date }}</h5>
-                                        </div>
-                                        <div class="col">
-                                            <h5>Disaster Type: {{context.disaster_type}}</h5>
-                                        </div>
-                                    </div>
-                        
-                                    <div class="row text-center">
-                                        <div class="col m-2">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                                                class="bi bi-people" viewBox="0 0 16 16">
-                                                <path
-                                                    d="M15 14s1 0 1-1-1-4-5-4-5 3-5 4 1 1 1 1zm-7.978-1L7 12.996c.001-.264.167-1.03.76-1.72C8.312 10.629 9.282 10 11 10c1.717 0 2.687.63 3.24 1.276.593.69.758 1.457.76 1.72l-.008.002-.014.002zM11 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4m3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0M6.936 9.28a6 6 0 0 0-1.23-.247A7 7 0 0 0 5 9c-4 0-5 3-5 4q0 1 1 1h5.216A2.24 2.24 0 0 1 5 13c0-1.01.377-2.042 1.09-2.904.243-.294.526-.569.846-.816M4.92 10A5.5 5.5 0 0 0 4 13H1c0-.26.164-1.03.76-1.724.545-.636 1.492-1.256 3.16-1.275ZM1.5 5.5a3 3 0 1 1 6 0 3 3 0 0 1-6 0m3-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4" />
-                                            </svg> Population
-                                        </div>
-                                        <div class="col m-2">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                                                class="bi bi-thermometer" viewBox="0 0 16 16">
-                                                <path d="M8 14a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3" />
-                                                <path
-                                                    d="M8 0a2.5 2.5 0 0 0-2.5 2.5v7.55a3.5 3.5 0 1 0 5 0V2.5A2.5 2.5 0 0 0 8 0M6.5 2.5a1.5 1.5 0 1 1 3 0v7.987l.167.15a2.5 2.5 0 1 1-3.333 0l.166-.15z" />
-                                            </svg> Temperature
-                                        </div>
-                                        <div class="col m-2">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                                                class="bi bi-wind" viewBox="0 0 16 16">
-                                                <path
-                                                    d="M12.5 2A2.5 2.5 0 0 0 10 4.5a.5.5 0 0 1-1 0A3.5 3.5 0 1 1 12.5 8H.5a.5.5 0 0 1 0-1h12a2.5 2.5 0 0 0 0-5m-7 1a1 1 0 0 0-1 1 .5.5 0 0 1-1 0 2 2 0 1 1 2 2h-5a.5.5 0 0 1 0-1h5a1 1 0 0 0 0-2M0 9.5A.5.5 0 0 1 .5 9h10.042a3 3 0 1 1-3 3 .5.5 0 0 1 1 0 2 2 0 1 0 2-2H.5a.5.5 0 0 1-.5-.5" />
-                                            </svg> Wind
-                                        </div>
-                                        <div class="col m-2">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                                                class="bi bi-moisture" viewBox="0 0 16 16">
-                                                <path
-                                                    d="M13.5 0a.5.5 0 0 0 0 1H15v2.75h-.5a.5.5 0 0 0 0 1h.5V7.5h-1.5a.5.5 0 0 0 0 1H15v2.75h-.5a.5.5 0 0 0 0 1h.5V15h-1.5a.5.5 0 0 0 0 1h5a.5.5 0 0 0 .5-.5V.5a.5.5 0 0 0-.5-.5zM7 1.5l.364-.343a.5.5 0 0 0-.728 0l-.002.002-.006.007-.022.023-.08.088a29 29 0 0 0-1.274 1.517c-.769.983-1.714 2.325-2.385 3.727C2.368 7.564 2 8.682 2 9.733 2 12.614 4.212 15 7 15s5-2.386 5-5.267c0-1.05-.368-2.169-.867-3.212-.671-1.402-1.616-2.744-2.385-3.727a29 29 0 0 0-1.354-1.605l-.022-.023-.006-.007-.002-.001zm0 0-.364-.343zm-.016.766L7 2.247l.016.019c.24.274.572.667.944 1.144.611.781 1.32 1.776 1.901 2.827h5.14c.58-1.051 1.29-2.046 1.9-2.827.373-.477.706-.87.945-1.144zM3 9.733c0-.755.244-1.612.638-2.496h6.724c.395.884.638 1.741.638 2.496C11 12.117 9.182 14 7 14s-4-1.883-4-4.267" />
-                                            </svg>
-                                            Humidity
-                                        </div>
-                                    </div>
-                                </div>
+                    <!-- CITY INFO  -->
+                    <div id="cityinfo" class="bg-whitesmoke p-2 rounded">
+                        <div class="row align-items-center">
+                            <div class="col m-2">
+                                <h1 class="d-inline">{{ context.disaster_city}}, {{ context.disaster_state}},
+                                    {{context.disaster_country}}</h1>
+                            </div>
+                            <div class="col m-2">
+                                <h5 class="text-end">{{ context.disaster_date }}</h5>
 
-                                <!-- GENERATE REPORT BUTTON -->
-                                <div class='card-body col-md-2 d-flex align-self-center'>
-                                    <div class='px-5'><button class="btn btn-primary">Generate Report</button></div>
+                            </div>
+
+                        </div>
+                        <div class="row">
+                            <div class="col m-2">
+                                Disaster Type: {{context.disaster_type}}
+                            </div>
+                            <div class="col m-2">
+                                Disaster Description: {{ context.disaster_description }}
+                            </div>
+                            <div class="col m-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                    class="bi bi-people" viewBox="0 0 16 16">
+                                    <path
+                                        d="M15 14s1 0 1-1-1-4-5-4-5 3-5 4 1 1 1 1zm-7.978-1L7 12.996c.001-.264.167-1.03.76-1.72C8.312 10.629 9.282 10 11 10c1.717 0 2.687.63 3.24 1.276.593.69.758 1.457.76 1.72l-.008.002-.014.002zM11 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4m3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0M6.936 9.28a6 6 0 0 0-1.23-.247A7 7 0 0 0 5 9c-4 0-5 3-5 4q0 1 1 1h4.216A2.24 2.24 0 0 1 5 13c0-1.01.377-2.042 1.09-2.904.243-.294.526-.569.846-.816M4.92 10A5.5 5.5 0 0 0 4 13H1c0-.26.164-1.03.76-1.724.545-.636 1.492-1.256 3.16-1.275ZM1.5 5.5a3 3 0 1 1 6 0 3 3 0 0 1-6 0m3-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4" />
+                                </svg>
+                                    {% if context.population != -1 %}
+                                        Population: {{ context.population }}
+                                    {% endif %} 
+                            </div>
+
+                        </div>
+                        <div class="row">
+                            <div class="col m-2">
+                                weather description: {{context.weather.description}}
+                            </div>
+                            <div class="col m-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                    class="bi bi-thermometer" viewBox="0 0 16 16">
+                                    <path d="M8 14a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3" />
+                                    <path
+                                        d="M8 0a2.5 2.5 0 0 0-2.5 2.5v7.55a3.5 3.5 0 1 0 5 0V2.5A2.5 2.5 0 0 0 8 0M6.5 2.5a1.5 1.5 0 1 1 3 0v7.987l.167.15a2.5 2.5 0 1 1-3.333 0l.166-.15z" />
+                                </svg> Temp: {{context.weather.temperature}}
+                            </div>
+                            <div class="col m-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                    class="bi bi-wind" viewBox="0 0 16 16">
+                                    <path
+                                        d="M12.5 2A2.5 2.5 0 0 0 10 4.5a.5.5 0 0 1-1 0A3.5 3.5 0 1 1 12.5 8H.5a.5.5 0 0 1 0-1h12a2.5 2.5 0 0 0 0-5m-7 1a1 1 0 0 0-1 1 .5.5 0 0 1-1 0 2 2 0 1 1 2 2h-5a.5.5 0 0 1 0-1h5a1 1 0 0 0 0-2M0 9.5A.5.5 0 0 1 .5 9h10.042a3 3 0 1 1-3 3 .5.5 0 0 1 1 0 2 2 0 1 0 2-2H.5a.5.5 0 0 1-.5-.5" />
+                                </svg> Wind Speed: {{context.weather.wind}}
+                            </div>
+                            <div class="col m-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                    class="bi bi-moisture" viewBox="0 0 16 16">
+                                    <path
+                                        d="M13.5 0a.5.5 0 0 0 0 1H15v2.75h-.5a.5.5 0 0 0 0 1h.5V7.5h-1.5a.5.5 0 0 0 0 1H15v2.75h-.5a.5.5 0 0 0 0 1h.5V15h-1.5a.5.5 0 0 0 0 1h2a.5.5 0 0 0 .5-.5V.5a.5.5 0 0 0-.5-.5zM7 1.5l.364-.343a.5.5 0 0 0-.728 0l-.002.002-.006.007-.022.023-.08.088a29 29 0 0 0-1.274 1.517c-.769.983-1.714 2.325-2.385 3.727C2.368 7.564 2 8.682 2 9.733 2 12.614 4.212 15 7 15s5-2.386 5-5.267c0-1.05-.368-2.169-.867-3.212-.671-1.402-1.616-2.744-2.385-3.727a29 29 0 0 0-1.354-1.605l-.022-.023-.006-.007-.002-.001zm0 0-.364-.343zm-.016.766L7 2.247l.016.019c.24.274.572.667.944 1.144.611.781 1.32 1.776 1.901 2.827H4.14c.58-1.051 1.29-2.046 1.9-2.827.373-.477.706-.87.945-1.144zM3 9.733c0-.755.244-1.612.638-2.496h6.724c.395.884.638 1.741.638 2.496C11 12.117 9.182 14 7 14s-4-1.883-4-4.267" />
+                                </svg>
+                                Humidity: {{context.weather.humidity}}%
+                            </div>
+                            <div class="col m-2">
+                                Rain: {{context.weather.rain}}mm per hour
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col m-2"><button class="btn btn-primary">Generate Report</button></div>
+                        </div>
+                    </div>
+                    <!-- ASSESSMENT ROW 1 -->
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="row my-2">
+                                <div class="col mx-1 rounded bg-whitesmoke">
+                                    <h2 id="damageassessmentresults">Damage Assessment Results</h2>
+                                    <div>
+                                        <canvas id="bar_chart_assessment"></canvas>
+                                      </div>
+                                </div>
+                                <div id="damagedistribution" class="col mx-1 rounded bg-whitesmoke">
+                                    <h2 class="">Damage Distribution</h2>
+                                    <div>
+                                        <canvas id="pie_chart_assessment"></canvas>
+                                      </div>
+                                </div>
+                            </div>
+                            <div id="criticallydamagedareas" class="row my-2">
+                                <div class="col p-2 bg-whitesmoke rounded">
+                                    <h2>Critically Damaged Areas</h2>
+                                    <div class="container">
+                                        <div class="row">
+                                            <div class="col">
+                                                <div class="row">
+                                                    <div class="col"><strong>#</strong></div>
+                                                    <div class="col"><strong>District</strong></div>
+                                                    <div class="col"><strong>Coordinates</strong></div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col">1</div>
+                                                    <div class="col">District A</div>
+                                                    <div class="col">12.3456, 78.9012</div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col">2</div>
+                                                    <div class="col">District B</div>
+                                                    <div class="col">34.5678, 90.1234</div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col">3</div>
+                                                    <div class="col">District C</div>
+                                                    <div class="col">56.7890, 12.3456</div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col">4</div>
+                                                    <div class="col">District D</div>
+                                                    <div class="col">78.9012, 34.5678</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                 </div>
                             </div>
                         </div>
-                        
-                        <!-- ASSESSMENT ROW 1 -->
-                        <div class="row">
-                            <div class="col-md-8">
-                                <div class="row my-2">
-                                    <div class="col-md-7 custom-padding">
-                                        <div class="card border-info ">
-                                            <div class='card-body'>
-                                                <div class="card-title"><h5 id="damageassessmentresults">Damage Assessment Results</h5></div>
-                                                <div id = 'damageBarChart'>
-                                                    <img src="https://images.twinkl.co.uk/tw1n/image/private/t_630/u/ux/barchart_ver_1.jpg"
-                                                    class="w-100">
-                                                </div>
-                                            </div>
-                                        </div>
+                        <div class="col-md-4">
+                            <div class="row my-2">
+                                <div class="col p-2 rounded mx-1 bg-whitesmoke">
+                                    <h2>Summary Stats</h2>
+                                    <div class="d-flex justify-content-between">
+                                        <h5 class="text-start">Total Buildings Detected</h5>
+                                        <h6 class="text-end">{{context.building_count}} </h6>
                                     </div>
-                                    
-                                    <div class="col-md-3 custom-padding">
-                                        <div id="damagedistribution" class="card border-info w-100">
-                                            <div class='card-body'>
-                                                <div class="card-title"><h5 class="">Damage Distribution</h5></div>
-                                                <img src="https://images.twinkl.co.uk/tw1n/image/private/t_630/u/ux/barchart_ver_1.jpg"
-                                                    class="w-100">
-                                            </div>
-                                        </div>
+                                    <div class="d-flex justify-content-between">
+                                        <h5 class="text-start">Total Buildings Damaged</h5>
+                                        <h6 class="text-end">{{context.damaged_count}}</h6>
                                     </div>
-                                </div>
-
-                                <div id="criticallydamagedareas" class="row my-2">
-                                    <div class="col custom-padding">
-                                        <div class='card'>
-                                            <div class='card-body'>
-                                                <div class='card-title'><h5>Critically Damaged Areas</h5></div>
-                                                <div class="container">
-                                                    <div class="row">
-                                                        <div class="col">
-                                                            <div class="row">
-                                                                <div class="col"><strong>#</strong></div>
-                                                                <div class="col"><strong>District</strong></div>
-                                                                <div class="col"><strong>Coordinates</strong></div>
-                                                            </div>
-                                                            <div class="row">
-                                                                <div class="col">1</div>
-                                                                <div class="col">District A</div>
-                                                                <div class="col">12.3456, 78.9012</div>
-                                                            </div>
-                                                            <div class="row">
-                                                                <div class="col">2</div>
-                                                                <div class="col">District B</div>
-                                                                <div class="col">34.5678, 90.1234</div>
-                                                            </div>
-                                                            <div class="row">
-                                                                <div class="col">3</div>
-                                                                <div class="col">District C</div>
-                                                                <div class="col">56.7890, 12.3456</div>
-                                                            </div>
-                                                            <div class="row">
-                                                                <div class="col">4</div>
-                                                                <div class="col">District D</div>
-                                                                <div class="col">78.9012, 34.5678</div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+                                    <div class="d-flex justify-content-between">
+                                        <h5 class="text-start">Total Damaged area</h5>
+                                        <h6 class="text-end">Value</h6>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-4">
-                                <div class="row my-2">
-                                    <div class="col">
-                                        <div class='card'>
-                                            <div class='card-body'>
-                                                <div class='card-title'><h5>Summary Stats</h5>
-                                                <div class="d-flex justify-content-between">
-                                                    <h6 class="text-start">Total Buildings Detected</h6>
-                                                    <h6 class="text-end">Value</h6>
-                                                </div>
-                                                <div class="d-flex justify-content-between">
-                                                    <h6 class="text-start">Total Buildings Damaged</h6>
-                                                    <h6 class="text-end">Value</h6>
-                                                </div>
-                                                <div class="d-flex justify-content-between">
-                                                    <h6 class="text-start">Estimated cost of Damage</h6>
-                                                    <h6 class="text-end">Value</h6>
-                                                </div>
-                                                <div class="d-flex justify-content-between">
-                                                    <h6 class="text-start">Total Damaged area</h6>
-                                                    <h6 class="text-end">Value</h6>
-                                                </div>
-                                            </div>
-                                        </div>
+                            <div class="row my-2">
+                                <div class="col p-2 rounded mx-1 bg-whitesmoke">
+                                    <div>
+                                        <h2>Map</h2>
+                                        <a href="{% url 'map' %}">Go to Interactive Map</a>
                                     </div>
-                                </div>
-                                <div class="row my-2">
-                                    <div class="col p-2 rounded mx-1 bg-white">
-                                        <div>
-                                            <h5>Map</h5>
-                                            <a href="{% url 'map' %}">Go to Interactive Map</a>
-                                        </div>
-                                        <div id="heatmap" style="height: 400px;"></div>
-                                        <div id="toggler" class="my-2 py-2 px-1">
-                                            <input type="checkbox" id="redToggle" checked onclick="toggle('red')">
-                                            Destroyed
-                                            <input type="checkbox" id="orangeToggle" checked onclick="toggle('orange')">
-                                            Majorly Damaged
-                                            <input type="checkbox" id="yellowToggle" checked onclick="toggle('yellow')">
-                                            Minorly Damaged
-                                            <input type="checkbox" id="greenToggle" checked onclick="toggle('green')">
-                                            Undamaged
-                                        </div>
+                                    <div id="heatmap" style="height: 400px;"></div>
+                                    <div id="toggler" class="my-2 py-2 px-1">
+                                        <input type="checkbox" id="redToggle" checked onclick="toggle('red')">
+                                        Destroyed
+                                        <input type="checkbox" id="orangeToggle" checked onclick="toggle('orange')">
+                                        Majorly Damaged
+                                        <input type="checkbox" id="yellowToggle" checked onclick="toggle('yellow')">
+                                        Minorly Damaged
+                                        <input type="checkbox" id="greenToggle" checked onclick="toggle('green')">
+                                        Undamaged
                                     </div>
                                 </div>
                             </div>
@@ -196,87 +184,137 @@
                 </div>
             </div>
         </div>
-    </div>
-</div>
 
 
 
 
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-<script src="{% static 'Leaflet.heat-gh-pages/dist/leaflet-heat.js' %}"></script>
+        <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+        <script src="{% static 'Leaflet.heat-gh-pages/dist/leaflet-heat.js' %}"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<script>
-    var context = {{ context | safe }};
-    var disasterType = context.disaster_type;
-    var results = context.results;
-    var lat = context.tif_middle_latitude;
-    var long = context.tif_middle_longitude;
-    // map
-    var map = L.map('heatmap').setView([lat, long], 15);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
-    var heatLayers = {};
-    for (var color in results) {
-        var heatmapData = [];
-        if (results.hasOwnProperty(color)) {
-            var colorPolygonData = results[color];
-            for (var i = 0; i < colorPolygonData.length; i++) {
-                heatmapData.push([colorPolygonData[i]["center_lat"], colorPolygonData[i]["center_long"], 1]);
-            }
-            console.log(heatmapData)
-            var heatMap = L.heatLayer(heatmapData, {
-                radius: 20,
-                blur: 12,
-                maxZoom: 18,
-                gradient: {
-                    1: color
+        <script>
+            var context = {{ context | safe }};
+            var disasterType = context.disaster_type;
+            var results = context.results;
+            var lat = context.tif_middle_latitude;
+            var long = context.tif_middle_longitude;
+            var plot_data = context.graph_data;
+            var maxYAxes = Math.max(...plot_data);
+
+            // map
+            var map = L.map('heatmap').setView([lat, long], 15);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+            var heatLayers = {};
+            for (var color in results) {
+                var heatmapData = [];
+                if (results.hasOwnProperty(color)) {
+                    var colorPolygonData = results[color];
+                    for (var i = 0; i < colorPolygonData.length; i++) {
+                        heatmapData.push([colorPolygonData[i]["center_lat"], colorPolygonData[i]["center_long"], 1]);
+                    }
+                    console.log(heatmapData)
+                    var heatMap = L.heatLayer(heatmapData, {
+                        radius: 20,
+                        blur: 12,
+                        maxZoom: 18,
+                        gradient: {
+                            1: color
+                        }
+                    }).addTo(map);
+                    heatLayers[color] = heatMap;
                 }
-            }).addTo(map);
-            heatLayers[color] = heatMap;
-        }
 
-    }
-    function toggle(color) {
-        if (heatLayers[color]) {
-            heatLayers[color].remove(); // Remove heatmap layer if exists
-            delete heatLayers[color]; // Remove reference from object
-        } else {
-            var heatmapData = []; // Recreate heatmap data for the color
-            var colorPolygonData = results[color];
-            for (var i = 0; i < colorPolygonData.length; i++) {
-                heatmapData.push([colorPolygonData[i]["center_lat"], colorPolygonData[i]["center_long"], 1]);
             }
-            var heatMap = L.heatLayer(heatmapData, {
-                radius: 20,
-                blur: 12,
-                maxZoom: 18,
-                gradient: {
-                    1: color
+            function toggle(color) {
+                if (heatLayers[color]) {
+                    heatLayers[color].remove(); // Remove heatmap layer if exists
+                    delete heatLayers[color]; // Remove reference from object
+                } else {
+                    var heatmapData = []; // Recreate heatmap data for the color
+                    var colorPolygonData = results[color];
+                    for (var i = 0; i < colorPolygonData.length; i++) {
+                        heatmapData.push([colorPolygonData[i]["center_lat"], colorPolygonData[i]["center_long"], 1]);
+                    }
+                    var heatMap = L.heatLayer(heatmapData, {
+                        radius: 20,
+                        blur: 12,
+                        maxZoom: 18,
+                        gradient: {
+                            1: color
+                        }
+                    }).addTo(map);
+                    heatLayers[color] = heatMap;
                 }
-            }).addTo(map);
-            heatLayers[color] = heatMap;
-        }
-    }
-</script>
+            };
 
-<!-- Error messages -->
-{% if messages %}
-{% for message in messages %}
-<div id="alert-container" class="position-fixed top-0 start-50 translate-middle-x mt-4"
-    style="z-index: 1050">
-    <div class="alert {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% endif %}"
-        role="alert">
-        {{ message }}
-    </div>
-</div>
-{% endfor %}
-<script>
-    // Automatically remove alert after 5 seconds
-    $(document).ready(function () {
-        setTimeout(function () {
-            $('#alert-container').fadeOut();
-        }, 2000);
-    });
-</script>
-{% endif %}
+            const ctx = document.getElementById("bar_chart_assessment");
 
-{% endblock body %}
+      new Chart(ctx, {
+        type: "bar",
+        data: {
+          labels: ["Undamaged", "Minor Damage", "Major Damage", "Destroyed"],
+          datasets: [
+            {
+              label: "# of buildings",
+              data: plot_data,
+              borderWidth: 1,
+              backgroundColor: ['#296565', '#9bc8c3', '#f2cd75', '#f45f37'],
+            },
+          ],
+        },
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: maxYAxes+5,
+            },
+          },
+        },
+      });
+
+      const ctx2 = document.getElementById("pie_chart_assessment");
+
+      new Chart(ctx2, {
+        type: "pie",
+        data: {
+          labels: ["Undamaged", "Minor Damage", "Major Damage", "Destroyed"],
+          datasets: [
+            {
+              label: "# of buildings",
+              data: plot_data,
+              borderWidth: 1,
+              backgroundColor: ['#296565', '#9bc8c3', '#f2cd75', '#f45f37'],
+            },
+          ],
+        },
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true,
+            },
+          },
+        },
+      });
+        </script>
+
+        <!-- Error messages -->
+        {% if messages %}
+        {% for message in messages %}
+        <div id="alert-container" class="position-fixed top-0 start-50 translate-middle-x mt-4" style="z-index: 1050">
+            <div class="alert {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% endif %}"
+                role="alert">
+                {{ message }}
+            </div>
+        </div>
+        {% endfor %}
+        <script>
+            // Automatically remove alert after 5 seconds
+            $(document).ready(function () {
+                setTimeout(function () {
+                    $('#alert-container').fadeOut();
+                }, 2000);
+            });
+        </script>
+        {% endif %}
+
+        {% endblock body %}

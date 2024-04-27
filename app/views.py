@@ -4,10 +4,9 @@ from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, get_object_or_404
 from django.contrib import messages
-from django.http import HttpResponse
-from django.forms.models import model_to_dict
-from .models import CustomUser, JsonFileModel, InferenceModel
+from .models import CustomUser, InferenceModel, LoginHistoryModel
 from django.http import JsonResponse
+from django.utils import timezone
 import json
 import requests
 import os
@@ -17,32 +16,15 @@ import torch
 from osgeo import gdal
 import cv2
 import json
-import matplotlib.pyplot as plt
-from datetime import datetime
 from geopy.geocoders import Nominatim
 from geopy.exc import GeocoderUnavailable
-from .forms import CustomUserForm
-from django.template.loader import render_to_string
 
 PIP_DEFAULT_TIMEOUT=100
 
-current_dir = os.path.dirname(os.path.abspath(__file__))
-parent_dir = os.path.dirname(current_dir)
-server_dir = os.path.join(parent_dir, 'server')
-model_dir = os.path.join(parent_dir, 'model')
-
-
-sys.path.append(parent_dir)
-sys.path.append(server_dir)
-sys.path.append(model_dir)
-
-# print(f"paths to check for module: {sys.path}")
 
 from server.settings import *
 from .model.data_preprocessing import tif_to_img, one_hot_encoding_mask, mask_to_polygons, get_tif_transform, pixels_to_coordinates
-
-
-os.environ['TORCH_HOME'] = model_dir
+from .api import get_weather, get_population
 
 def get_address(request):
     if request.method == 'GET':
@@ -75,7 +57,8 @@ def loginPage(request):
         user = authenticate(request=request, username=username, password=password)
         if user is not None:
             login(request, user)
-            print("LOGIN SUCCESSFUL, REDIRECTING TO HOME")
+            LoginHistoryModel.objects.create(user=user, login_time=timezone.now())
+            print("LOGIN SUCCESSFUL, LOGINHISTORY CREATED,   REDIRECTING TO HOME")
             return redirect('home')
         else: 
             messages.error(request, "Invalid credentials")
@@ -83,7 +66,6 @@ def loginPage(request):
     else:
         messages.error(request, None)
         return render(request, "app/login.html")
-
 
 @login_required(login_url="login/")
 def home(request):
@@ -100,25 +82,34 @@ def home(request):
         messages.error(request, f"Failed to fetch data from API. Status code: {api_response.status_code}")
         return render(request, 'app/home.html')
 
-
-@login_required(login_url="login/")
-def about(request):
-    return render(request, "app/about.html")
-
-
 @login_required(login_url="login/")
 def logoutPage(request):
+    login_history = LoginHistoryModel.objects.filter(user=request.user).order_by('-login_time').first()
+    if login_history:
+        login_history.logout_time = timezone.now()
+        login_history.save()
+        print()
     logout(request)
+    print("logout")
     return redirect("login")
 
 def get_user_details(request, user_id):
     user = get_object_or_404(CustomUser, id=user_id)    
+    loginHistory = LoginHistoryModel.objects.filter(user=user).values('login_time', 'logout_time')
+    formatted_history = []
+    for history in loginHistory:
+        formatted_history.append({
+            'login_time': history['login_time'].strftime('%Y/%m/%d %H:%M:%S'),
+            'logout_time': history['logout_time'].strftime('%Y/%m/%d %H:%M:%S') if history['logout_time'] else "Still logged in"
+        })
+    print(formatted_history)
     return JsonResponse({
         'id': user.id,
         'username': user.username,
         'email': user.email,
         'contact': user.contact,
         'is_admin': user.is_admin,
+        'login_history':formatted_history
     })
 
 @login_required(login_url="login/")
@@ -172,6 +163,54 @@ def delete_user(request, user_id):
     return redirect('admin-panel')
 
 @login_required(login_url="login/")
+def dashboard(request):
+    inference_model = InferenceModel.objects.filter(user=request.user).last()
+    disaster_time = inference_model.disaster_date.strftime('%Y/%m/%d') if inference_model and inference_model.disaster_date else None
+    print(disaster_time )
+    disaster_city = inference_model.disaster_city if inference_model else None
+    # weather = get_weather(disaster_city, date_str=disaster_time)
+    weather = {
+        "city":"hehe",
+        "description":"hehe",
+        "temperature":"hehe",
+        "wind":"hehe",
+        "humidity":"hehe",
+        "rain": "hehe",
+        "clouds":"hehe"
+    }
+    # population = get_population(disaster_city)
+    # print(population)
+
+    # data for the graphs
+    json_graph_data = json.loads(inference_model.results)
+    classes = ["green", "yellow", "orange", "red"]
+    classes_count = []
+    
+    for i, cls in enumerate(classes): 
+        # print(len(json_graph_data["red"]))
+        classes_count.append(len(json_graph_data[cls]))
+    print(classes_count)
+    class_none = [0, 0, 0, 0]
+
+    return render(request, 'app/dashboard.html', {"context":{
+        'disaster_date': disaster_time,
+        'disaster_city': disaster_city,
+        'disaster_state': inference_model.disaster_state if inference_model else None,
+        'disaster_country': inference_model.disaster_country if inference_model else None,
+        'disaster_type': inference_model.disaster_type if inference_model else None,
+        'disaster_description': inference_model.disaster_description if inference_model else None,
+        'tif_middle_latitude': inference_model.tif_middle_latitude if inference_model else None,
+        'tif_middle_longitude': inference_model.tif_middle_longitude if inference_model else None,
+        'results': json.loads(inference_model.results) if inference_model else None,
+        'weather':weather, 
+        'population': "None", 
+        'building_count': sum(classes_count),
+        'damaged_count': sum(classes_count[1:]),
+        'graph_data': classes_count if json_graph_data else class_none,
+    }})
+
+
+@login_required(login_url="login/")
 def map(request): 
     inference_model = InferenceModel.objects.filter(user=request.user).last()
     return render(request, 'app/map.html', {"context":{
@@ -186,20 +225,6 @@ def map(request):
         'results': json.loads(inference_model.results) if inference_model else None,
     }})
 
-@login_required(login_url="login/")
-def dashboard(request):
-    inference_model = InferenceModel.objects.filter(user=request.user).last()
-    return render(request, 'app/dashboard.html', {"context":{
-        'disaster_date': inference_model.disaster_date.strftime('%Y-%m-%d') if inference_model and inference_model.disaster_date else None,
-        'disaster_city': inference_model.disaster_city if inference_model else None,
-        'disaster_state': inference_model.disaster_state if inference_model else None,
-        'disaster_country': inference_model.disaster_country if inference_model else None,
-        'disaster_type': inference_model.disaster_type if inference_model else None,
-        'disaster_description': inference_model.disaster_description if inference_model else None,
-        'tif_middle_latitude': inference_model.tif_middle_latitude if inference_model else None,
-        'tif_middle_longitude': inference_model.tif_middle_longitude if inference_model else None,
-        'results': json.loads(inference_model.results) if inference_model else None,
-    }})
 
 @login_required(login_url="login/")
 def profile(request):
