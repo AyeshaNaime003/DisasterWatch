@@ -2,3 +2,23 @@
     padding-left: 0;
     padding-right: 10px; /* Adjust as needed */
 }
+
+.custom-padding-opposite {
+    padding-right: 0;
+}
+
+.mt-3,
+.mt-2 {
+    font-size: medium;
+    font-weight:600;
+}
+
+.titleFooter {
+    font-size: small;
+    color:gray;
+    margin-top: 10px;
+}
+
+.table {
+    font-size: 11pt;
+}
