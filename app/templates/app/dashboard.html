@@ -94,13 +94,15 @@
                             <div class="row my-2">
                                 <div class="col mx-1 rounded bg-whitesmoke">
                                     <h2 id="damageassessmentresults">Damage Assessment Results</h2>
-                                    <img src="https://images.twinkl.co.uk/tw1n/image/private/t_630/u/ux/barchart_ver_1.jpg"
-                                        class="w-100">
+                                    <div>
+                                        <canvas id="bar_chart_assessment"></canvas>
+                                      </div>
                                 </div>
                                 <div id="damagedistribution" class="col mx-1 rounded bg-whitesmoke">
                                     <h2 class="">Damage Distribution</h2>
-                                    <img src="https://images.twinkl.co.uk/tw1n/image/private/t_630/u/ux/barchart_ver_1.jpg"
-                                        class="w-100">
+                                    <div>
+                                        <canvas id="pie_chart_assessment"></canvas>
+                                      </div>
                                 </div>
                             </div>
                             <div id="criticallydamagedareas" class="row my-2">
@@ -147,15 +149,11 @@
                                     <h2>Summary Stats</h2>
                                     <div class="d-flex justify-content-between">
                                         <h5 class="text-start">Total Buildings Detected</h5>
-                                        <h6 class="text-end">Value</h6>
+                                        <h6 class="text-end">{{context.building_count}} </h6>
                                     </div>
                                     <div class="d-flex justify-content-between">
                                         <h5 class="text-start">Total Buildings Damaged</h5>
-                                        <h6 class="text-end">Value</h6>
-                                    </div>
-                                    <div class="d-flex justify-content-between">
-                                        <h5 class="text-start">Estimated cost of Damage</h5>
-                                        <h6 class="text-end">Value</h6>
+                                        <h6 class="text-end">{{context.damaged_count}}</h6>
                                     </div>
                                     <div class="d-flex justify-content-between">
                                         <h5 class="text-start">Total Damaged area</h5>
@@ -193,6 +191,7 @@
 
         <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
         <script src="{% static 'Leaflet.heat-gh-pages/dist/leaflet-heat.js' %}"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
         <script>
             var context = {{ context | safe }};
@@ -200,6 +199,9 @@
             var results = context.results;
             var lat = context.tif_middle_latitude;
             var long = context.tif_middle_longitude;
+            var plot_data = context.graph_data;
+            var maxYAxes = Math.max(...plot_data);
+
             // map
             var map = L.map('heatmap').setView([lat, long], 15);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
@@ -244,7 +246,56 @@
                     }).addTo(map);
                     heatLayers[color] = heatMap;
                 }
-            }
+            };
+
+            const ctx = document.getElementById("bar_chart_assessment");
+
+      new Chart(ctx, {
+        type: "bar",
+        data: {
+          labels: ["Undamaged", "Minor Damage", "Major Damage", "Destroyed"],
+          datasets: [
+            {
+              label: "# of buildings",
+              data: plot_data,
+              borderWidth: 1,
+              backgroundColor: ['#296565', '#9bc8c3', '#f2cd75', '#f45f37'],
+            },
+          ],
+        },
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: maxYAxes+5,
+            },
+          },
+        },
+      });
+
+      const ctx2 = document.getElementById("pie_chart_assessment");
+
+      new Chart(ctx2, {
+        type: "pie",
+        data: {
+          labels: ["Undamaged", "Minor Damage", "Major Damage", "Destroyed"],
+          datasets: [
+            {
+              label: "# of buildings",
+              data: plot_data,
+              borderWidth: 1,
+              backgroundColor: ['#296565', '#9bc8c3', '#f2cd75', '#f45f37'],
+            },
+          ],
+        },
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true,
+            },
+          },
+        },
+      });
         </script>
 
         <!-- Error messages -->

@@ -168,9 +168,30 @@ def dashboard(request):
     disaster_time = inference_model.disaster_date.strftime('%Y/%m/%d') if inference_model and inference_model.disaster_date else None
     print(disaster_time )
     disaster_city = inference_model.disaster_city if inference_model else None
-    weather = get_weather(disaster_city, date_str=disaster_time)
+    # weather = get_weather(disaster_city, date_str=disaster_time)
+    weather = {
+        "city":"hehe",
+        "description":"hehe",
+        "temperature":"hehe",
+        "wind":"hehe",
+        "humidity":"hehe",
+        "rain": "hehe",
+        "clouds":"hehe"
+    }
     # population = get_population(disaster_city)
     # print(population)
+
+    # data for the graphs
+    json_graph_data = json.loads(inference_model.results)
+    classes = ["green", "yellow", "orange", "red"]
+    classes_count = []
+    
+    for i, cls in enumerate(classes): 
+        # print(len(json_graph_data["red"]))
+        classes_count.append(len(json_graph_data[cls]))
+    print(classes_count)
+    class_none = [0, 0, 0, 0]
+
     return render(request, 'app/dashboard.html', {"context":{
         'disaster_date': disaster_time,
         'disaster_city': disaster_city,
@@ -183,6 +204,9 @@ def dashboard(request):
         'results': json.loads(inference_model.results) if inference_model else None,
         'weather':weather, 
         'population': "None", 
+        'building_count': sum(classes_count),
+        'damaged_count': sum(classes_count[1:]),
+        'graph_data': classes_count if json_graph_data else class_none,
     }})
 
 
