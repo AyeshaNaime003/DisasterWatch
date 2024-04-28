@@ -311,9 +311,74 @@ def map(request):
 
 @login_required(login_url="login/")
 def map_with_id(request, inference_id): 
+    # get the inference model with the id else send error
     inference_model = InferenceModel.objects.filter(user=request.user, id=inference_id).last()
     if not inference_model:
         return HttpResponse("Inference model not found", status=404)
+    # formatting the data for api calls
+    disaster_time = inference_model.disaster_date.strftime('%Y/%m/%d') if inference_model.disaster_date else None
+    disaster_city = inference_model.disaster_city
+    results = json.loads(inference_model.results)
+    # weather
+    # weather = get_weather(disaster_city, date_str=disaster_time)
+    weather = {
+        "city": "hehe",
+        "description": "hehe",
+        "temperature": "hehe",
+        "wind": "hehe",
+        "humidity": "hehe",
+        "rain": "hehe",
+        "clouds": "hehe"
+    }
+    # population
+    # population = get_population(disaster_city)
+    # unique values of each address component
+    unique_addresses={
+        "towns":{point["address"]["town"] for color_points in results.values() for point in color_points}, 
+        "suburbs":{point["address"]["suburb_municipality"] for color_points in results.values() for point in color_points},
+        "roads":{point["address"]["road"] for color_points in results.values() for point in color_points}
+    }
+    # selecting the best component
+    best_component = max(
+    ("towns", len(unique_addresses["towns"])),
+    ("suburbs", len(unique_addresses["suburbs"])),
+    ("roads", len(unique_addresses["roads"])),key=lambda x: x[1])[0]
+    print(best_component)
+    # getting the number of each class in each unique value of the bet component
+    componentDict = {road: {"red":0,
+                       "orange":0, 
+                       "yellow":0, 
+                       "green":0} for road in unique_addresses[best_component]}
+    for color in results.keys():
+        for point in results[color]:
+            road = point["address"]["road"]
+            componentDict[road][color]+=1
+    for road, dictionary in componentDict.items():
+        rating = 3*dictionary["red"]+2*dictionary["orange"]+dictionary["yellow"]
+        componentDict[road]["rating"]=rating
+    sortedComponent = dict(sorted(componentDict.items(), key=lambda x: x[1]['rating'], reverse=True))
+    sortedComponentRevised = []
+    for componentName, componentData in sortedComponent.items():
+        componentData_formatted = {
+            'index': len(sortedComponentRevised) + 1,
+            'componentName': componentName,
+            'red': componentData['red'],
+            'orange': componentData['orange'],
+            'yellow': componentData['yellow'],
+            'green': componentData['green'],
+            'rating': componentData['rating']
+            # Add more data if needed
+        }
+        sortedComponentRevised.append(componentData_formatted)
+
+    print(sortedComponentRevised)
+    
+    # chart
+    classes = ["green", "yellow", "orange", "red"]
+    classes_count = [len(results[cls]) for cls in classes]
+    class_none = [0, 0, 0, 0]
+    # data to send to front end
+    
     return render(request, 'app/map.html', {"context":{
         'disaster_date': inference_model.disaster_date.strftime('%Y-%m-%d') if inference_model and inference_model.disaster_date else None,
         'disaster_city': inference_model.disaster_city if inference_model else None,
