@@ -47,9 +47,9 @@
                                     <path
                                         d="M15 14s1 0 1-1-1-4-5-4-5 3-5 4 1 1 1 1zm-7.978-1L7 12.996c.001-.264.167-1.03.76-1.72C8.312 10.629 9.282 10 11 10c1.717 0 2.687.63 3.24 1.276.593.69.758 1.457.76 1.72l-.008.002-.014.002zM11 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4m3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0M6.936 9.28a6 6 0 0 0-1.23-.247A7 7 0 0 0 5 9c-4 0-5 3-5 4q0 1 1 1h4.216A2.24 2.24 0 0 1 5 13c0-1.01.377-2.042 1.09-2.904.243-.294.526-.569.846-.816M4.92 10A5.5 5.5 0 0 0 4 13H1c0-.26.164-1.03.76-1.724.545-.636 1.492-1.256 3.16-1.275ZM1.5 5.5a3 3 0 1 1 6 0 3 3 0 0 1-6 0m3-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4" />
                                 </svg>
-                                    {% if context.population != -1 %}
-                                        Population: {{ context.population }}
-                                    {% endif %} 
+                                {% if context.population != -1 %}
+                                Population: {{ context.population }}
+                                {% endif %}
                             </div>
 
                         </div>
@@ -96,52 +96,54 @@
                                     <h2 id="damageassessmentresults">Damage Assessment Results</h2>
                                     <div>
                                         <canvas id="bar_chart_assessment"></canvas>
-                                      </div>
+                                    </div>
                                 </div>
                                 <div id="damagedistribution" class="col mx-1 rounded bg-whitesmoke">
                                     <h2 class="">Damage Distribution</h2>
                                     <div>
                                         <canvas id="pie_chart_assessment"></canvas>
-                                      </div>
+                                    </div>
                                 </div>
                             </div>
                             <div id="criticallydamagedareas" class="row my-2">
                                 <div class="col p-2 bg-whitesmoke rounded">
-                                    <h2>Critically Damaged Areas</h2>
+                                    <h2 class="mb-4">Critically Damaged Areas</h2>
                                     <div class="container">
                                         <div class="row">
                                             <div class="col">
-                                                <div class="row">
-                                                    <div class="col"><strong>#</strong></div>
-                                                    <div class="col"><strong>District</strong></div>
-                                                    <div class="col"><strong>Coordinates</strong></div>
-                                                </div>
-                                                <div class="row">
-                                                    <div class="col">1</div>
-                                                    <div class="col">District A</div>
-                                                    <div class="col">12.3456, 78.9012</div>
-                                                </div>
-                                                <div class="row">
-                                                    <div class="col">2</div>
-                                                    <div class="col">District B</div>
-                                                    <div class="col">34.5678, 90.1234</div>
-                                                </div>
-                                                <div class="row">
-                                                    <div class="col">3</div>
-                                                    <div class="col">District C</div>
-                                                    <div class="col">56.7890, 12.3456</div>
-                                                </div>
-                                                <div class="row">
-                                                    <div class="col">4</div>
-                                                    <div class="col">District D</div>
-                                                    <div class="col">78.9012, 34.5678</div>
+                                                <div class="table-responsive">
+                                                    <table class="table">
+                                                        <thead class="thead-light">
+                                                            <tr>
+                                                                <th scope="col">#</th>
+                                                                <th scope="col">District</th>
+                                                                <th scope="col">Damage Levels</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            {% for area in context.disasterAreas %}
+                                                            <tr>
+                                                                <td>{{ area.index }}</td>
+                                                                <td>{{ area.componentName }}</td>
+                                                                <td>
+                                                                    <ul class="list-group">
+                                                                        <li class="list-group-item text-danger">Destroyed: {{ area.red }}</li>
+                                                                        <li class="list-group-item text-warning">Major Damage: {{ area.orange }}</li>
+                                                                        <li class="list-group-item text-yellow">Minor Damage: {{ area.yellow }}</li>
+                                                                        <li class="list-group-item text-success">Undamaged: {{ area.green }}</li>
+                                                                    </ul>
+                                                                </td>
+                                                            </tr>
+                                                            {% endfor %}
+                                                        </tbody>
+                                                    </table>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-
                                 </div>
                             </div>
+                            
                         </div>
                         <div class="col-md-4">
                             <div class="row my-2">
@@ -165,7 +167,8 @@
                                 <div class="col p-2 rounded mx-1 bg-whitesmoke">
                                     <div>
                                         <h2>Map</h2>
-                                        <a href="{% url 'map_with_id' inference_id=context.inference_id %}">Go to Interactive Map</a>
+                                        <a href="{% url 'map_with_id' inference_id=context.inference_id %}">Go to
+                                            Interactive Map</a>
                                     </div>
                                     <div id="heatmap" style="height: 400px;"></div>
                                     <div id="toggler" class="my-2 py-2 px-1">
@@ -213,7 +216,7 @@
                     for (var i = 0; i < colorPolygonData.length; i++) {
                         heatmapData.push([colorPolygonData[i]["center_lat"], colorPolygonData[i]["center_long"], 1]);
                     }
-                    console.log(heatmapData)
+                    // console.log(heatmapData)
                     var heatMap = L.heatLayer(heatmapData, {
                         radius: 20,
                         blur: 12,
@@ -250,52 +253,52 @@
 
             const ctx = document.getElementById("bar_chart_assessment");
 
-      new Chart(ctx, {
-        type: "bar",
-        data: {
-          labels: ["Undamaged", "Minor Damage", "Major Damage", "Destroyed"],
-          datasets: [
-            {
-              label: "# of buildings",
-              data: plot_data,
-              borderWidth: 1,
-              backgroundColor: ['#296565', '#9bc8c3', '#f2cd75', '#f45f37'],
-            },
-          ],
-        },
-        options: {
-          scales: {
-            y: {
-              beginAtZero: true,
-              max: maxYAxes+5,
-            },
-          },
-        },
-      });
+            new Chart(ctx, {
+                type: "bar",
+                data: {
+                    labels: ["Undamaged", "Minor Damage", "Major Damage", "Destroyed"],
+                    datasets: [
+                        {
+                            label: "# of buildings",
+                            data: plot_data,
+                            borderWidth: 1,
+                            backgroundColor: ['#296565', '#9bc8c3', '#f2cd75', '#f45f37'],
+                        },
+                    ],
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: maxYAxes + 5,
+                        },
+                    },
+                },
+            });
 
-      const ctx2 = document.getElementById("pie_chart_assessment");
+            const ctx2 = document.getElementById("pie_chart_assessment");
 
-      new Chart(ctx2, {
-        type: "pie",
-        data: {
-          labels: ["Undamaged", "Minor Damage", "Major Damage", "Destroyed"],
-          datasets: [
-            {
-              label: "# of buildings",
-              data: plot_data,
-              borderWidth: 1,
-              backgroundColor: ['#296565', '#9bc8c3', '#f2cd75', '#f45f37'],
-            },
-          ],
-        },
-        options: {
-          scales: {
-            y: {
-              beginAtZero: true,
-            },
-          },
-        },
-      });
+            new Chart(ctx2, {
+                type: "pie",
+                data: {
+                    labels: ["Undamaged", "Minor Damage", "Major Damage", "Destroyed"],
+                    datasets: [
+                        {
+                            label: "# of buildings",
+                            data: plot_data,
+                            borderWidth: 1,
+                            backgroundColor: ['#296565', '#9bc8c3', '#f2cd75', '#f45f37'],
+                        },
+                    ],
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                        },
+                    },
+                },
+            });
         </script>
 
         <!-- Error messages -->
