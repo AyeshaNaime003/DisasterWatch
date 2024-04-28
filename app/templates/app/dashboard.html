@@ -116,7 +116,7 @@
                                     <div class='card'>
                                         <h5 id="damageassessmentresults" class='card-title p-2'>Damage Assessment Results</h5>
                                         <div class='card-body mt-0 pt-0'>
-                                            <canvas id="bar_chart_assessment" style='min-height:240px;max-height:240px;'></canvas>
+                                            <canvas id="bar_chart_assessment" style='min-height:220px;max-height:220px;'></canvas>
                                         </div>
                                     </div>
                                 </div>
@@ -124,7 +124,7 @@
                                     <div class='card'>
                                         <h5 class="card-title p-2">Damage Distribution</h5>
                                         <div class='card-body mt-0 pt-0'>
-                                            <canvas id="pie_chart_assessment" style='max-height:240px;'></canvas>
+                                            <canvas id="pie_chart_assessment" style='max-height:220px;'></canvas>
                                         </div>
                                     </div>
                                 </div>
@@ -134,44 +134,35 @@
                                 <div class='card'>
                                     <h5 class='card-title p-2'>Critically Damaged Areas</h5>
                                     <div class="card-body mt-0 pt-0">
-                                        <div class="table-responsive ">
-                                            <table class="table table-striped">
-                                                <thead class='thead-light'>
+                                        <div class="table-responsive">
+                                            <table class="table">
+                                                <thead class="thead-light">
                                                     <tr>
-                                                        <th>#</th>
-                                                        <th>District</th>
-                                                        <th>Coordinates</th>
+                                                        <th scope="col">#</th>
+                                                        <th scope="col">District</th>
+                                                        <th scope="col">Damage Levels</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
+                                                    {% for area in context.disasterAreas %}
                                                     <tr>
-                                                        <td>1</td>
-                                                        <td>District A</td>
-                                                        <td>12.3456, 78.9012</td>
+                                                        <td>{{ area.index }}</td>
+                                                        <td>{{ area.componentName }}</td>
+                                                        <td>
+                                                            <ul class="list-group">
+                                                                <li class="list-group-item text-danger">Destroyed: {{ area.red }}</li>
+                                                                <li class="list-group-item text-warning">Major Damage: {{ area.orange }}</li>
+                                                                <li class="list-group-item text-yellow">Minor Damage: {{ area.yellow }}</li>
+                                                                <li class="list-group-item text-success">Undamaged: {{ area.green }}</li>
+                                                            </ul>
+                                                        </td>
                                                     </tr>
-                                                    <tr>
-                                                        <td>2</td>
-                                                        <td>District B</td>
-                                                        <td>34.5678, 90.1234</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>3</td>
-                                                        <td>District C</td>
-                                                        <td>56.7890, 12.3456</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>4</td>
-                                                        <td>District D</td>
-                                                        <td>78.9012, 34.5678</td>
-                                                    </tr>
+                                                    {% endfor %}
                                                 </tbody>
                                             </table>
                                         </div>
                                     </div>
                                 </div>
-                                
-
-                                
                             </div>
                         </div>
                         <div class="col custom-padding-opposite">
@@ -243,8 +234,6 @@
                                         </div>
                                     </div>
                                 </div>
-
-                                
                             </div>
                         </div>
                     </div>
@@ -279,7 +268,7 @@
             for (var i = 0; i < colorPolygonData.length; i++) {
                 heatmapData.push([colorPolygonData[i]["center_lat"], colorPolygonData[i]["center_long"], 1]);
             }
-            console.log(heatmapData)
+            //console.log(heatmapData)
             var heatMap = L.heatLayer(heatmapData, {
                 radius: 20,
                 blur: 12,
@@ -366,22 +355,22 @@
 
 <!-- Error messages -->
 {% if messages %}
-{% for message in messages %}
-<div id="alert-container" class="position-fixed top-0 start-50 translate-middle-x mt-4" style="z-index: 1050">
-    <div class="alert {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% endif %}"
-        role="alert">
-        {{ message }}
-    </div>
-</div>
-{% endfor %}
-<script>
-    // Automatically remove alert after 5 seconds
-    $(document).ready(function () {
-        setTimeout(function () {
-            $('#alert-container').fadeOut();
-        }, 2000);
-    });
-</script>
+    {% for message in messages %}
+        <div id="alert-container" class="position-fixed top-0 start-50 translate-middle-x mt-4" style="z-index: 1050">
+            <div class="alert {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% endif %}"
+                role="alert">
+                {{ message }}
+            </div>
+        </div>
+    {% endfor %}
+    <script>
+        // Automatically remove alert after 5 seconds
+        $(document).ready(function () {
+            setTimeout(function () {
+                $('#alert-container').fadeOut();
+            }, 2000);
+        });
+    </script>
 {% endif %}
 
 {% endblock body %}

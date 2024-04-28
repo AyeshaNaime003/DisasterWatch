@@ -35,31 +35,18 @@ def get_country_province(city_name):
         }
 
 def extract_address_components(address):
-    extracted_components = {}
-    if 'country' in address:
-        extracted_components['country'] = address['country']
-    if 'state' in address:
-        extracted_components['state'] = address['state']
-    if 'city' in address:
-        extracted_components['city'] = address['city']
-    else: 
-        extracted_components['city'] = ""
-    if 'town' in address:
-        extracted_components['town'] = address['town']
-    suburb_municipality = ''
-    if 'suburb' in address:
-        suburb_municipality += address['suburb']
-    if 'municipality' in address:
-        if suburb_municipality:
-            suburb_municipality += ', ' + address['municipality']
-        else:
-            suburb_municipality += address['municipality']
-    if suburb_municipality:
-        extracted_components['suburb_municipality'] = suburb_municipality
-    if 'neighbourhood' in address:
-        extracted_components['neighbourhood'] = address['neighbourhood']
-    if 'road' in address:
-        extracted_components['road'] = address['road']
+    extracted_components = {
+    'country': address.get('country', ""),
+    'state': address.get('state', ""),
+    'city': address.get('city', ""),
+    'town': address.get('town', ""),
+    'suburb_municipality': (
+        address.get('suburb', '') +
+        (', ' + address['municipality'] if 'municipality' in address and address['suburb'] else '') if 'suburb' in address or 'municipality' in address else ""
+    ),
+    'neighbourhood': address.get('neighbourhood', ""),
+    'road': address.get('road', "")
+    }
     for key in address:
         if key not in extracted_components and not "ISO" in key and key!="country_code" and key!="postcode" and key!="city_district":
             extracted_components["name"] =  key.capitalize() + ": " + address[key]
