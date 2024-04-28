@@ -10,80 +10,16 @@
         <!-- SIDEBAR -->
         {% include 'app/navbar2.html' %}
         <!-- RIGHT PANEL -->
-        <div class="col-xl-11">
-            {% comment %} <div class="row"> {% endcomment %}
-                <div class="card">
-                    <div clas='card-body'>
-                        <div class='row'>
-                            <div class="col-8">
-                                <div class='p-5 pb-0 pageTitle'>
-                                    PROFILE
-                                    <p class='titleFooter'>Welcome to your profile page. You can check your profile details and activity here.<p>
-                                </div> 
-                                
-                                <div class="card-title mx-5 "><h4>Inference History</h4></div>
-                                <div class='card mx-5 mb-3 tableDiv ' style="height: 470px; overflow-y: auto;">
-                                    
-                                    <div class="card-body mt-0 pt-0" >
-                                        {% if user_inferences %}
-                                            <div class='mt-3'>
-                                                <table class="table table-striped table-bordered ">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>Date of Inference</th>
-                                                            <th>Disaster Date</th>
-                                                            <th>Disaster Type</th>
-                                                            <th>Disaster Location</th>
-                                                            <th>Disaster Description</th>
-                                                            <th>Disaster Comments</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        <!-- Assuming 'data' is a list of dictionaries containing the information -->
-                                                        {% for user_inference in user_inferences %}
-                                                        <tr>
-                                                            <td>{{ user_inference.created_at }}</td>
-                                                            <td>{{ user_inference.disaster_date }}</td>
-                                                            <td>{{ user_inference.disaster_type }}</td>
-                                                            <td>{{ user_inference.disaster_city }}, 
-                                                                {{user_inference.disaster_state }},
-                                                                {{ user_inference.disaster_country }}
-                                                            </td>
-                                                            <td>{{ user_inference.disaster_description }}
-                                                            </td>
-                                                            <td>{{ user_inference.disaster_comments }}</td>
-                                                        </tr>
-                                                        {% endfor %}
-                                                    </tbody>
-                                                </table>
-                                            </div>
-
-                                        {% else %}
-                                            <div class='noInference' >
-                                                <div class="d-flex flex-column align-items-center justify-content-center" >
-                                                    <!-- Placeholder SVG -->
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="lightblue" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-image">
-                                                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                                                        <circle cx="8.5" cy="8.5" r="1.5"></circle>
-                                                        <polyline points="21 15 16 10 5 21"></polyline>
-                                                    </svg>
-                                                    <p class="mt-3">You have not done any inference yet.</p>
-                                                </div>
-                                            </div>
-                                        
-                                        {% endif %}
-                                        
-                                    </div>
-                                </div>
-                            </div>
-            
-                            <div class='col '>
-                                <form action="{% url 'update-profile' %}" method="POST" enctype="multipart/form-data">
-                                    {% csrf_token %}
-                                
-                                    <div class="card m-3 profileDiv">
-                                        {% comment %} <div class='card-title mt-3'><h4 class='text-center'>Profile</h4></div> {% endcomment %}
-                                        
+        <div class="col-md-11">
+            <div class="">
+                {% comment %} <div class="container py-5" style='padding:0px;'> {% endcomment %}
+                    <div class="container form-container">
+                        <form action="{% url 'update-profile' %}" method="POST" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <div class="row">
+                                <div class="col-xl-4">
+                                    <div class="card mb-4 mb-xl-0">
+                                        <div class="card-header">Profile Picture</div>
                                         <div class="card-body text-center">
                                             <div class="profile-picture-container">
                                                 {% if user.profile_picture %}
@@ -98,83 +34,146 @@
                                                     style="display: none;" accept="image/*">
                                                 <!-- Profile picture help block-->
                                             </div>
-                                            <div class="small font-italic text-muted " style="margin-top:10px">JPG
+                                            <div class="small font-italic text-muted mb-4" style="margin-top:10px">JPG
                                                 or PNG no larger than 5 MB</div>
-            
-                                            <div class='text-start'>
-                                                <form action="{% url 'update-profile' %}" method="POST">
-                                                    {% csrf_token %}
-                                                    <!-- Form Row-->
-                                                    <div class="row gx-3 my-2">
-                                                        <!-- Form Group (first name)-->
-                                                        <div class="col-md-6">
-                                                            <label class="small mb-1" for="inputFirstName">First
-                                                                name</label>
-                                                            <input class="form-control" id="inputFirstName" type="text"
-                                                                name="first_name" value="{{ user.first_name }}">
-                                                        </div>
-                                                        <!-- Form Group (last name)-->
-                                                        <div class="col-md-6">
-                                                            <label class="small mb-1" for="inputLastName">Last name</label>
-                                                            <input class="form-control" id="inputLastName" type="text"
-                                                                name="last_name" value="{{ user.last_name }}">
-                                                        </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xl-8">
+                                    <!-- Account details card-->
+                                    <div class="card mb-4">
+                                        <div class="card-header">Account Details</div>
+                                        <div class="card-body">
+                                            <form action="{% url 'update-profile' %}" method="POST">
+                                                {% csrf_token %}
+                                                <!-- Form Group (username)-->
+                                                <div class="mb-3">
+                                                    <label class="small mb-1" for="inputUsername">Username</label>
+                                                    <input class="form-control" id="inputUsername" type="text"
+                                                        name="username" value="{{ user.username }}">
+                                                </div>
+                                                <!-- Form Row-->
+                                                <div class="row gx-3 mb-3">
+                                                    <!-- Form Group (first name)-->
+                                                    <div class="col-md-6">
+                                                        <label class="small mb-1" for="inputFirstName">First
+                                                            name</label>
+                                                        <input class="form-control" id="inputFirstName" type="text"
+                                                            name="first_name" value="{{ user.first_name }}">
                                                     </div>
+                                                    <!-- Form Group (last name)-->
+                                                    <div class="col-md-6">
+                                                        <label class="small mb-1" for="inputLastName">Last name</label>
+                                                        <input class="form-control" id="inputLastName" type="text"
+                                                            name="last_name" value="{{ user.last_name }}">
+                                                    </div>
+                                                </div>
 
-                                                    <!-- Form Row-->
-                                                    <div class="row gx-3 mb-2">
-                                                        <!-- Form Group (phone number)-->
-                                                        <div class="col-md-6">
-                                                            <label class="small mb-1" for="inputPhone">Phone number</label>
-                                                            <input class="form-control" id="inputPhone" type="tel"
-                                                                name="contact-number" value="{{ user.contact }}">
-                                                        </div>
-
-                                                        <!-- Form Group (role)-->
-                                                        <div class="col-md-6">
-                                                            <label class="small mb-1">Role</label>
-                                                            <input class="form-control" id="inputRole" type="text"
-                                                                value="{% if user.is_admin %}Admin{% else %}Employee{% endif %}"
-                                                                readonly>
-                                                        </div>
-            
-                                                    </div>
-
-                                                    <!-- Form Group (username)-->
-                                                    <div class="mb-2">
-                                                        <label class="small mb-1" for="inputUsername">Username</label>
-                                                        <input class="form-control" id="inputUsername" type="text"
-                                                            name="username" value="{{ user.username }}">
-                                                    </div>
-                                                    
-                                                    <!-- Form Group (email address)-->
-                                                    <div class="mb-2">
-                                                        <label class="small mb-1" for="inputEmailAddress">Email
-                                                            address</label>
-                                                        <input class="form-control" id="inputEmailAddress" type="email"
-                                                            name="email" value="{{ user.email }}">
-                                                    </div>
-                                    
+                                                <!-- Form Row        -->
+                                                <div class="mb-3">
                                                     <!-- Form Group (location)-->
-                                                    <div class="mb-2">
+                                                    {% comment %} <div class="col-md-6"> {% endcomment %}
                                                         <label class="small mb-1" for="inputLocation">Location</label>
                                                         <input class="form-control" id="inputLocation" type="text"
                                                             name="location" value="{{ user.location }}">
+                                                        {% comment %}
+                                                    </div> {% endcomment %}
+                                                </div>
+                                                <!-- Form Group (email address)-->
+                                                <div class="mb-3">
+                                                    <label class="small mb-1" for="inputEmailAddress">Email
+                                                        address</label>
+                                                    <input class="form-control" id="inputEmailAddress" type="email"
+                                                        name="email" value="{{ user.email }}">
+                                                </div>
+                                                <!-- Form Row-->
+                                                <div class="row gx-3 mb-3">
+                                                    <!-- Form Group (phone number)-->
+                                                    <div class="col-md-6">
+                                                        <label class="small mb-1" for="inputPhone">Phone number</label>
+                                                        <input class="form-control" id="inputPhone" type="tel"
+                                                            name="contact-number" value="{{ user.contact }}">
                                                     </div>
-                                                    <!-- Save changes button-->
-                                                    <div class="text-center mt-4">
-                                                        <button class="btn btn-primary" type="submit">Save changes</button>
+
+                                                    <!-- Form Group (role)-->
+                                                    <div class="mb-3">
+                                                        <label class="small mb-1">Role</label>
+                                                        <input class="form-control" id="inputRole" type="text"
+                                                            value="{% if user.is_admin %}Admin{% else %}Employee{% endif %}"
+                                                            readonly>
                                                     </div>
-                                                </form>
-                                            <div>
+
+                                                </div>
+                                                <!-- Save changes button-->
+                                                <div class="text-center">
+                                                    <button class="btn btn-primary" type="submit">Save changes</button>
+                                                </div>
+                                            </form>
                                         </div>
                                     </div>
-                                </form>
+                                </div>
                             </div>
-                        </div>
+                            <div class="row mt-4">
+                                <div class="col-12">
+                                    <div class="card">
+                                        <div class="card-header">Inference History</div>
+                                        <div class="card-body">
+                                            <div class="container">
+                                                <div class="row">
+                                                    <div class="col">
+                                                        <h2>Disaster Information</h2>
+                                                        <div class="table-responsive">
+                                                            <table class="table table-bordered">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th>Date of Inference</th>
+                                                                        <th>Disaster Date</th>
+                                                                        <th>Disaster Type</th>
+                                                                        <th>Disaster Location</th>
+                                                                        <th>Disaster Description</th>
+                                                                        <th>Disaster Comments</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <!-- Assuming 'data' is a list of dictionaries containing the information -->
+                                                                    
+                                                                    {% for user_inference in user_inferences %}
+                                                                    
+                                                                        <tr>
+                                                                            <td>{{ user_inference.created_at }}</td>
+                                                                            <td>{{ user_inference.disaster_date }}</td>
+                                                                            <td>{{ user_inference.disaster_type }}</td>
+                                                                            <td>{{ user_inference.disaster_city }}, 
+                                                                                {{user_inference.disaster_state }},
+                                                                                {{ user_inference.disaster_country }}
+                                                                            </td>
+                                                                            <td>{{ user_inference.disaster_description }}
+                                                                            </td>
+                                                                            <td>{{ user_inference.disaster_comments }}</td>
+                                                                            <td>
+                                                                                <a href="{% url 'dashboard_with_id' inference_id=user_inference.id %}">View Details</a>
+                                                                            </td>
+                                                                        </tr>
+                                                                    {% endfor %}
+                                                                </a>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="col-xl-12">
+
+                                </div>
+                            </div>
                     </div>
                 </div>
-            {% comment %} </div> {% endcomment %}
+            </div>
         </div>
     </div>
     <!-- Error messages -->

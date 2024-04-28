@@ -1,21 +1,11 @@
+.getAns {
+    padding-top:100px;
+}
 
-.col-md-3 .card{
+.card{
     background-color: rgb(229, 242, 255);
-     border-width: 0;
 }
 
 .card:hover {
     background-color: rgb(211, 228, 246);
-}
-
-.pageTitle {
-    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-    font-size: 30pt;
-    color: rgb(56, 56, 56);
-}
-
-.titleFooter {
-    font-family: "Assistant", sans-serif;
-    font-size: small;
-    color:gray;
 }

@@ -19,8 +19,8 @@ section.errorpage h2 i {
     border-radius: 50%;
     position: relative;
     transition: filter 0.3s;
-    width: 150px; /* Ensure the image doesn't exceed container width */
-    height: 150px; /* Ensure the image doesn't exceed container height */
+    width: 200px; /* Ensure the image doesn't exceed container width */
+    height: 200px; /* Ensure the image doesn't exceed container height */
 }
 
 .profile-picture-container:hover img {
@@ -48,46 +48,7 @@ section.errorpage h2 i {
 }
 
 
-/* .custom-padding {
-    padding-left:0;
-    margin-left:0;
-    padding-right: 10px
-} */
-
-.profileDiv {
-    background-color: #f3f3f5;
-    border-width: 0;
-    border-radius: 15px;
-}
-
-.tableDiv {
-    border-width: 0;
-}
-
-.pageTitle {
-    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-    font-size: 30pt;
-    color: rgb(56, 56, 56);
-}
-
-.titleFooter {
-    font-family: "Assistant", sans-serif;
-    font-size: small;
-    color:gray;
-}
-
-div label {
-    color: gray;
-}
-
-.noInference {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height:100%;
-    width:100%;
-}
-
-.card {
-    border-width: 0;
+.card-body{
+    height:1024;
+    width:1024;
 }

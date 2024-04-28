@@ -7,8 +7,6 @@
 
 <link rel="stylesheet" href="{% static '/styles/profile.css' %}">
 <link rel="stylesheet" href="{% static '/styles/adminPanel.css' %}">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.1/css/all.min.css" integrity="sha256-2XFplPlrFClt0bIdPgpz8H7ojnk10H69xRqd9+uTShA=" crossorigin="anonymous" />
-
 
 <div id="dashboard-page" class="container-fluid">
     <div class="row main-row">
@@ -19,16 +17,13 @@
             {% comment %} <div class="container-fluid"> {% endcomment %}
                 <div class="row gx-3">
                     <div class="col-lg-8 ">
-                        <div class="card mb-3" style="height: 95vh; overflow-y: auto;">
+                        <div class="card mb-3" style="height: 355px; overflow-y: auto;">
                             <div class="card-body">
                                 <div class='row'>
-
-                                    <div class='col p-5 pb-0 pageTitle'>
-                                        ADMIN PANEL
-                                        <p class='titleFooter'>Welcome to the admin panel. Click on any user to modify details.<p>
-                                    </div> 
-
-                                    <div class='col text-end'><a href="{% url 'add-user' %}"><button class="btn  btn-primary ">Add User</button></a>
+                                    <div class='text-start col-md-6'><h5 >All Users</h5></div>
+                                    <div class='text-end col-md-6'><p >Click on any row to select user</p></div>
+                                    <div class='text-end col-md-6'><a href="{% url 'add-user' %}"><button class="btn btn-outline-primary">Add User</button></a>
+                                    
                                     </div>
                                 </div>
                                 <table class="table table-bordered table-hover">
@@ -56,20 +51,12 @@
                             </div>
                         </div>
 
+                       
                     </div>
                     <div class="col-lg-4" >
                         <div class="card mb-4" style="max-height: 95vh; overflow-y: auto;">
                             <div class="card-body" >
                                 <h5>User Details</h5>
-                                <div class='noInference' id='updateYeWalaDiv'>
-                                    <div class="d-flex flex-column align-items-center justify-content-center">
-                                        <!-- Placeholder SVG -->
-                                        <span class="icon-circle icon-circle-lg bg-pastel-primary text-primary">
-                                            <i class="fas fa-user-cog fa-lg"></i>
-                                        </span>
-                                        <p class="mt-3">You have not selected any user yet.</p>
-                                    </div>
-                                </div>
                                 <div id="userDetailsContainer" style="display: none;">
                                     <form id="userDetailsForm" method="POST">
                                         {% csrf_token %}
@@ -133,8 +120,6 @@
             }, 2000);
         });
     </script>
-
-    
 {% endif %}
 
 
@@ -151,7 +136,6 @@
                 $('#contact').val(response.contact);
                 $('#is_admin').prop('checked', response.is_admin);
                 $('#userDetailsContainer').css('display', 'block');
-                $('#updateYeWalaDiv').css('display','none');
                 var form = document.getElementById('userDetailsForm');
                 // form.action = "{% url 'edit-user' user_id=0 %}".replace('0', response.id);
                 var loginHistoryHtml = '';
