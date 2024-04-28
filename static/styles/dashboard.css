@@ -22,3 +22,7 @@
 .table {
     font-size: 11pt;
 }
+
+#city-info .col .mt-3 {
+    width:max-content;
+}
