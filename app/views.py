@@ -20,9 +20,7 @@ from geopy.geocoders import Nominatim
 from geopy.exc import GeocoderUnavailable
 from server.settings import *
 from .model.data_preprocessing import tif_to_img, one_hot_encoding_mask, mask_to_polygons, get_tif_transform, pixels_to_coordinates
-from .api import get_weather, get_population, get_news
-from django.urls import reverse
-from django.http import HttpResponse
+from .api import get_weather, get_population
 
 def get_address(request):
     if request.method == 'GET':
@@ -50,11 +48,12 @@ def loginPage(request):
         except CustomUser.DoesNotExist:
             messages.error(request, "Invalid credentials")
             return redirect("login")
+        
         user = authenticate(request=request, username=username, password=password)
         if user is not None:
             login(request, user)
             LoginHistoryModel.objects.create(user=user, login_time=timezone.now())
-            print("LOGIN SUCCESSFUL, LOGINHISTORY CREATED")
+            print("LOGIN SUCCESSFUL, LOGINHISTORY CREATED,   REDIRECTING TO HOME")
             return redirect('home')
         else: 
             messages.error(request, "Invalid credentials")
@@ -62,20 +61,20 @@ def loginPage(request):
     else:
         messages.error(request, None)
         return render(request, "app/login.html")
-    
 @login_required(login_url="login/")
 def home(request):
     print(f"HII {request.user.username}, welcome to home page")
     api_url = "https://api.reliefweb.int/v1/reports?appname=apidoc&preset=latest&query[value]=earthquake&limit=6"
     api_response = requests.get(api_url)
     
-    reports = get_news()
-    if reports:
+    if api_response.status_code == 200:
+        api_response_json = api_response.json()        
+        reports = api_response_json.get("data", [])    
+        # print(json.dumps(reports, indent=3))
         return render(request, 'app/home.html', {'reports': reports})
     else:
         messages.error(request, f"Failed to fetch data from API. Status code: {api_response.status_code}")
         return render(request, 'app/home.html')
-
 @login_required(login_url="login/")
 def logoutPage(request):
     login_history = LoginHistoryModel.objects.filter(user=request.user).order_by('-login_time').first()
@@ -86,7 +85,6 @@ def logoutPage(request):
     logout(request)
     print("logout")
     return redirect("login")
-
 def get_user_details(request, user_id):
     user = get_object_or_404(CustomUser, id=user_id)    
     loginHistory = LoginHistoryModel.objects.filter(user=user).values('login_time', 'logout_time')
@@ -105,12 +103,10 @@ def get_user_details(request, user_id):
         'is_admin': user.is_admin,
         'login_history':formatted_history
     })
-
 @login_required(login_url="login/")
 def adminPanel(request):
     users = CustomUser.objects.all()
     return render(request, "app/adminPanel.html", {'users': users})
-
 @login_required(login_url="login/")
 def addUser(request):
     if request.method == 'POST':
@@ -131,7 +127,6 @@ def addUser(request):
             return redirect('admin-panel')
     else:
         return render(request, 'app/addUser.html')
-
 @login_required(login_url="login/")
 def edit_user(request, user_id):
     print("In edit function")
@@ -144,7 +139,6 @@ def edit_user(request, user_id):
         messages.success(request, f"User '{user.username}' updated successfully!")
         return redirect('admin-panel')
     return redirect('admin-panel')
-
 @login_required(login_url="login/")
 def delete_user(request, user_id):
     user = CustomUser.objects.filter(id=user_id).first()
@@ -155,98 +149,6 @@ def delete_user(request, user_id):
     else:
         messages.error(request, "User not found!")
     return redirect('admin-panel')
-
-
-@login_required(login_url="login/")
-def dashboard_with_id(request, inference_id):
-    # get the inference model with the id else send error
-    inference_model = InferenceModel.objects.filter(user=request.user, id=inference_id).last()
-    if not inference_model:
-        return HttpResponse("Inference model not found", status=404)
-    # formatting the data for api calls
-    disaster_time = inference_model.disaster_date.strftime('%Y/%m/%d') if inference_model.disaster_date else None
-    disaster_city = inference_model.disaster_city
-    results = json.loads(inference_model.results)
-    # weather
-    # weather = get_weather(disaster_city, date_str=disaster_time)
-    weather = {
-        "city": "hehe",
-        "description": "hehe",
-        "temperature": "hehe",
-        "wind": "hehe",
-        "humidity": "hehe",
-        "rain": "hehe",
-        "clouds": "hehe"
-    }
-    # population
-    # population = get_population(disaster_city)
-    # unique values of each address component
-    unique_addresses={
-        "towns":{point["address"]["town"] for color_points in results.values() for point in color_points}, 
-        "suburbs":{point["address"]["suburb_municipality"] for color_points in results.values() for point in color_points},
-        "roads":{point["address"]["road"] for color_points in results.values() for point in color_points}
-    }
-    # selecting the best component
-    best_component = max(
-    ("towns", len(unique_addresses["towns"])),
-    ("suburbs", len(unique_addresses["suburbs"])),
-    ("roads", len(unique_addresses["roads"])),key=lambda x: x[1])[0]
-    print(best_component)
-    # getting the number of each class in each unique value of the bet component
-    componentDict = {road: {"red":0,
-                       "orange":0, 
-                       "yellow":0, 
-                       "green":0} for road in unique_addresses[best_component]}
-    for color in results.keys():
-        for point in results[color]:
-            road = point["address"]["road"]
-            componentDict[road][color]+=1
-    for road, dictionary in componentDict.items():
-        rating = 3*dictionary["red"]+2*dictionary["orange"]+dictionary["yellow"]
-        componentDict[road]["rating"]=rating
-    sortedComponent = dict(sorted(componentDict.items(), key=lambda x: x[1]['rating'], reverse=True))
-    sortedComponentRevised = []
-    for componentName, componentData in sortedComponent.items():
-        componentData_formatted = {
-            'index': len(sortedComponentRevised) + 1,
-            'componentName': componentName,
-            'red': componentData['red'],
-            'orange': componentData['orange'],
-            'yellow': componentData['yellow'],
-            'green': componentData['green'],
-            'rating': componentData['rating']
-            # Add more data if needed
-        }
-        sortedComponentRevised.append(componentData_formatted)
-
-    print(sortedComponentRevised)
-    
-    # chart
-    classes = ["green", "yellow", "orange", "red"]
-    classes_count = [len(results[cls]) for cls in classes]
-    class_none = [0, 0, 0, 0]
-    # data to send to front end
-    return render(request, 'app/dashboard.html', {"context": {
-        'inference_id': inference_model.id,
-        'disaster_date': disaster_time,
-        'disaster_city': disaster_city,
-        'disaster_state': inference_model.disaster_state,
-        'disaster_country': inference_model.disaster_country,
-        'disaster_type': inference_model.disaster_type,
-        'disaster_description': inference_model.disaster_description,
-        'tif_middle_latitude': inference_model.tif_middle_latitude,
-        'tif_middle_longitude': inference_model.tif_middle_longitude,
-        'results': json.loads(inference_model.results),
-        'weather': weather,
-        'population': "None",
-        'building_count': sum(classes_count),
-        'damaged_count': sum(classes_count[1:]),
-        'graph_data': classes_count if results else class_none,
-        "disasterAreas": sortedComponentRevised}
-    }
-    )
-
-
 @login_required(login_url="login/")
 def dashboard(request):
     inference_model = InferenceModel.objects.filter(user=request.user).last()
@@ -293,7 +195,6 @@ def dashboard(request):
         'damaged_count': sum(classes_count[1:]),
         'graph_data': classes_count if json_graph_data else class_none,
     }})
-
 @login_required(login_url="login/")
 def map(request): 
     inference_model = InferenceModel.objects.filter(user=request.user).last()
@@ -308,25 +209,6 @@ def map(request):
         'tif_middle_longitude': inference_model.tif_middle_longitude if inference_model else None,
         'results': json.loads(inference_model.results) if inference_model else None,
     }})
-
-@login_required(login_url="login/")
-def map_with_id(request, inference_id): 
-    inference_model = InferenceModel.objects.filter(user=request.user, id=inference_id).last()
-    if not inference_model:
-        return HttpResponse("Inference model not found", status=404)
-    return render(request, 'app/map.html', {"context":{
-        'disaster_date': inference_model.disaster_date.strftime('%Y-%m-%d') if inference_model and inference_model.disaster_date else None,
-        'disaster_city': inference_model.disaster_city if inference_model else None,
-        'disaster_state': inference_model.disaster_state if inference_model else None,
-        'disaster_country': inference_model.disaster_country if inference_model else None,
-        'disaster_type': inference_model.disaster_type if inference_model else None,
-        'disaster_description': inference_model.disaster_description if inference_model else None,
-        'tif_middle_latitude': inference_model.tif_middle_latitude if inference_model else None,
-        'tif_middle_longitude': inference_model.tif_middle_longitude if inference_model else None,
-        'results': json.loads(inference_model.results) if inference_model else None,
-    }})
-
-
 @login_required(login_url="login/")
 def profile(request):
     # get current user
@@ -361,11 +243,9 @@ def profile(request):
         return redirect('profile')
     else:
         return render(request, "app/profile.html", context={'user': user, "user_inferences":user_inferences})
-        
 @login_required(login_url="login/")
 def help(request):
     return render(request, "app/help.html")
-
 @login_required(login_url="login/")
 def inferenceform(request):
     if request.method == 'POST' and request.FILES.get('pre_image') and request.FILES.get('post_image'):
@@ -430,8 +310,7 @@ def inferenceform(request):
             inference_model_instance.save()
             print("InferenceModel model created")
             messages.success(request, "InferenceModel model created")
-            dashboard_url = reverse('dashboard_with_id', kwargs={'inference_id': inference_model_instance.id})
-            return redirect(dashboard_url)
+            return redirect("dashboard")
         except Exception as e:
             print(f"Unable to save inference: {e}")
             messages.error(request, "Unable to save inference")

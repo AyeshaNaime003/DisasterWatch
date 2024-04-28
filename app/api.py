@@ -38,15 +38,6 @@ def get_weather(city_name, date_str):
         "clouds":data["clouds"]["all"]
     }
 
-def get_news():
-    api_url = "https://api.reliefweb.int/v1/reports?appname=apidoc&preset=latest&query[value]=earthquake&limit=6"
-    api_response = requests.get(api_url)
-    if api_response.status_code == 200:
-        api_response_json = api_response.json()
-        reports = api_response_json.get("data", [])
-        return reports
-    else:
-        return None
 
 
 
