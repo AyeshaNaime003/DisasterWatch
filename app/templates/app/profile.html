@@ -52,6 +52,9 @@
                                                             <td>{{ user_inference.disaster_description }}
                                                             </td>
                                                             <td>{{ user_inference.disaster_comments }}</td>
+                                                            <td>
+                                                                <a href="{% url 'dashboard_with_id' inference_id=user_inference.id %}">View Details</a>
+                                                            </td>
                                                         </tr>
                                                         {% endfor %}
                                                     </tbody>

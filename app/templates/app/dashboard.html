@@ -207,7 +207,7 @@
                                     
                                     <div id="heatmap-container" style="position: relative;">
                                         <div id="heatmap" style="height: 280px;"></div>
-                                        <a href="{% url 'map' %}" class="btn btn-primary" style="position: absolute; bottom: 0px; right: 0px; z-index: 1000;font-size:small;opacity:0.8;">Go to Interactive Map →</a>
+                                        <a href="{% url 'map_with_id' inference_id=context.inference_id %}" class="btn btn-primary" style="position: absolute; bottom: 0px; right: 0px; z-index: 1000;font-size:small;opacity:0.8;">Go to Interactive Map →</a>
                                     </div>
                                     
                                     
