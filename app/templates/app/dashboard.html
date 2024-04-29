@@ -10,7 +10,6 @@
 <link href="{% static '/styles/dashboard.css' %}" rel="stylesheet" />
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.1/css/all.min.css" integrity="sha256-2XFplPlrFClt0bIdPgpz8H7ojnk10H69xRqd9+uTShA=" crossorigin="anonymous" />
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
 
 <!-- HTML -->
 
@@ -19,14 +18,14 @@
         <!-- NAVBAR TAKING 1/12TH -->
         {% include 'app/navbar2.html' %}
         <!-- MAIN CONTENT TAKING 1/12TH -->
-        <div class="col-md-11">
-            <div class="container-fluid ">
+        <div class="col-xl-11">
+            <div class="container-fluid ps-3 pe-0">
                 <div class="row">
-                    <div class='card'>
+                    <div class='card w-100'>
                         <div class='row mb-1'>
                         <!-- CITY INFO  -->
                             <div id="cityinfo" class="col-10 rounded" >
-                                    <div class="row ml-2 text-center ">
+                                    <div class="row ms-2 text-center ">
                                         <div class="col mt-3 ">
                                             <div style="white-space: nowrap;">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-geo-alt" viewBox="0 0 16 16">
@@ -108,161 +107,163 @@
                             </div>
                         </div>
                     </div>
+                </div>
                     <!-- ASSESSMENT ROW 1 -->
-                    <div class="row pr-0 mr-0">
-                        <div class="col-md-8 pl-1 pr-2">
-                            <div class="row mt-2"style="white-space: nowrap;">
-                                <div class="col-md-6 pr-2 rounded" >
-                                    <div class='card '>
-                                        <h5 id="damageassessmentresults" class='card-title p-2'>Damage Assessment Results</h5>
-                                        <div class='card-body mt-0 pt-0'>
-                                            <canvas id="bar_chart_assessment" style='min-height:220px;max-height:220px; '></canvas>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div id="damagedistribution" class="col-md-6 rounded pl-0">
-                                    <div class='card '>
-                                        <h5 class="card-title p-2">Damage Distribution</h5>
-                                        <div class='card-body mt-0 pt-0'>
-                                            <canvas id="pie_chart_assessment" style='max-height:220px;'></canvas>
-                                        </div>
+                <div class="row pe-0 me-0">
+                    <div class="col-md-8 ps-0 pe-2">
+                        <div class="row mt-2"style="white-space: nowrap;">
+                            <div class="col-md-6 pe-2 rounded" >
+                                <div class='card '>
+                                    <h5 id="damageassessmentresults" class='card-title p-2'>Damage Assessment Results</h5>
+                                    <div class='card-body mt-0 pt-0'>
+                                        <canvas id="bar_chart_assessment" style='min-height:220px;max-height:220px; '></canvas>
                                     </div>
                                 </div>
                             </div>
+                            <div id="damagedistribution" class="col-md-6 rounded ps-0">
+                                <div class='card '>
+                                    <h5 class="card-title p-2">Damage Distribution</h5>
+                                    <div class='card-body mt-0 pt-0'>
+                                        <canvas id="pie_chart_assessment" style='max-height:220px;'></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
-                            <div id="criticallydamagedareas" class='mt-2' style="max-height: 250px; overflow-y: auto;">
-                                <div class='card'>
-                                    <h5 class='card-title p-2'>Critically Damaged Areas</h5>
-                                    <div class="card-body mt-0 pt-0">
-                                        <div class="table-responsive">
-                                            <table class="table">
-                                                <thead class="thead-light">
-                                                    <tr>
-                                                        <th scope="col">#</th>
-                                                        <th scope="col">District</th>
-                                                        <th scope="col">Damage Levels</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {% for area in context.disasterAreas %}
-                                                    <tr>
-                                                        <td>{{ area.index }}</td>
-                                                        <td>{{ area.componentName }}</td>
-                                                        <td style='font-size:large'>
-                                                            <span class="badge badge-red">Destroyed: {{ area.red }}</span>
-                                                            <span class="badge badge-orange">Major Damage: {{ area.orange }}</span>
-                                                            <span class="badge badge-yellow">Minor Damage: {{ area.yellow }}</span>
-                                                            <span class="badge badge-green">Undamaged: {{ area.green }}</span>
-                                                        </td>                                          
-                                                    </tr>
-                                                    {% endfor %}
-                                                </tbody>
-                                            </table>
+                        <div id="criticallydamagedareas" class='mt-2' style="max-height:40vh; overflow-y: auto;">
+                            <div class='card'>
+                                <h5 class='card-title p-2'>Critically Damaged Areas</h5>
+                                <div class="card-body mt-0 pt-0">
+                                    <div class="table-responsive">
+                                        <table class="table">
+                                            <thead class="thead-light">
+                                                <tr>
+                                                    <th scope="col">#</th>
+                                                    <th scope="col">District</th>
+                                                    <th scope="col">Damage Levels</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for area in context.disasterAreas %}
+                                                <tr>
+                                                    <td>{{ area.index }}</td>
+                                                    <td>{{ area.componentName }}</td>
+                                                    <td style='font-size:large'>
+                                                        <span class="badge badge-red">Destroyed: {{ area.red }}</span>
+                                                        <span class="badge badge-orange">Major Damage: {{ area.orange }}</span>
+                                                        <span class="badge badge-yellow">Minor Damage: {{ area.yellow }}</span>
+                                                        <span class="badge badge-green">Undamaged: {{ area.green }}</span>
+                                                    </td>                                          
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col pe-0 me-0">
+                        <div class="row">
+                            <div class="col-md-6 ps-0 pe-1 ">
+                                <div class="card mt-2 py-0 mx-0">
+                                    <div class="card-body px-1 py-1">
+                                        <div class="col py-2 " style="font-size: x-large;">
+                                            <div class="row text-center">
+                                                <div class='card-title '>Disaster Type</div>
+                                            </div>
+                                            <div class="row text-center">
+                                                <div>{{ context.disaster_type }}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 ps-1 pe-0">
+                                <div class="card mt-2 py-0 mx-0">
+                                    <div class="card-body px-1 py-1">
+                                        <div class="col py-2 text-center" style="font-size: x-large;">
+                                            <div class="row ">
+                                                <div class='card-title'># Buildings Detected</div>
+                                            </div>
+                                            <div class="row text-center">
+                                                <div>{{ context.building_count }}</div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="col pr-0 mr-0">
-                            <div class="row">
-                                <div class="col-md-6 pl-0 pr-1 ">
-                                    <div class="card mt-2 py-0 mx-0">
-                                        <div class="card-body px-1 py-1">
-                                            <div class="col py-2 text-center" style="font-size: x-large;">
-                                                <div class="row ">
-                                                    <div class='card-title'>Disaster Type</div>
-                                                </div>
-                                                <div class="row text-center">
-                                                    <div>{{ context.disaster_type }}</div>
-                                                </div>
+                        <div class="row">
+                            <div class="col-md-6 ps-0 pe-1 ">
+                                <div class="card mt-2 py-0 mx-0">
+                                    <div class="card-body px-1 py-1">
+                                        <div class="col py-2 text-center" style="font-size: x-large;">
+                                            <div class="row ">
+                                                <div class='card-title'># Buildings Damaged</div>
                                             </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6 pl-1 pr-0">
-                                    <div class="card mt-2 py-0 mx-0">
-                                        <div class="card-body px-1 py-1">
-                                            <div class="col py-2 text-center" style="font-size: x-large;">
-                                                <div class="row ">
-                                                    <div class='card-title'># Buildings Detected</div>
-                                                </div>
-                                                <div class="row text-center">
-                                                    <div>{{ context.building_count }}</div>
-                                                </div>
+                                            <div class="row text-center">
+                                                <div>{{ context.damaged_count }}</div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class="col-md-6 pl-0 pr-1 ">
-                                    <div class="card mt-2 py-0 mx-0">
-                                        <div class="card-body px-1 py-1">
-                                            <div class="col py-2 text-center" style="font-size: x-large;">
-                                                <div class="row ">
-                                                    <div class='card-title'># Buildings Damaged</div>
-                                                </div>
-                                                <div class="row text-center">
-                                                    <div>{{ context.damaged_count }}</div>
-                                                </div>
+                            <div class="col-md-6 ps-1 pe-0">
+                                <div class="card mt-2 py-0 mx-0">
+                                    <div class="card-body px-1 py-1">
+                                        <div class="col py-2 text-center" style="font-size: x-large;">
+                                            <div class="row ">
+                                                <div class='card-title'>Total Damaged Area</div>
                                             </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6 pl-1 pr-0">
-                                    <div class="card mt-2 py-0 mx-0">
-                                        <div class="card-body px-1 py-1">
-                                            <div class="col py-2 text-center" style="font-size: x-large;">
-                                                <div class="row ">
-                                                    <div class='card-title'>Total Damaged Area</div>
-                                                </div>
-                                                <div class="row text-center">
-                                                    <div>Value</div>
-                                                </div>
+                                            <div class="row text-center">
+                                                <div>Value</div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            
-                            <div class="row mt-2 ">
-                                <div class="col px-0">
-                                    <div class="card ">
-                                        <div class="card-body">
-                                            <div id="heatmap-container" style="position: relative;">
-                                                <div id="heatmap" style="height: 280px;"></div>
-                                                <a href="{% url 'map_with_id' inference_id=context.inference_id %}" class="btn btn-primary btn-sm" style="position: absolute; bottom: 10px; right: 10px; z-index: 1000;">Go to Interactive Map →</a>
-                                            </div>
-                                            <div id="toggler" class="mt-3 px-3 py-1 text-center" style="font-size: small;">
-                                                <div class="row">
-                                                    <div class="col-3 form-check form-switch">
-                                                        <input type="checkbox" id="redToggle" checked onclick="toggle('red')" class="form-check-input" style='background-color:red'>
-                                                        <label for="redToggle" class="form-check-label">Destroyed</label>
-                                                    </div>
-                                                    <div class="col-3 form-check form-switch">
-                                                        <input type="checkbox" id="orangeToggle" checked onclick="toggle('orange')" class="form-check-input" style='background-color:orange'>
-                                                        <label for="orangeToggle" class="form-check-label">Major Damage <label>
-                                                    </div>
-                                                    <div class="col-3 form-check form-switch">
-                                                        <input type="checkbox" id="yellowToggle" checked onclick="toggle('yellow')" class="form-check-input" style='background-color:yellow'>
-                                                        <label for="yellowToggle" class="form-check-label">Minor Damage </label>
-                                                    </div>
-                                                    <div class="col-3 form-check form-switch">
-                                                        <input type="checkbox" id="greenToggle" checked onclick="toggle('green')" class="form-check-input" style='background-color:green'>
-                                                        <label for="greenToggle" class="form-check-label">Undamaged </label>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
                         </div>
+                        
+                        <div class="row mt-2 ">
+                            <div class="col px-0">
+                                <div class="card ">
+                                    <div class="card-body">
+                                        <div id="heatmap-container" style="position: relative;">
+                                            <div id="heatmap" style="height: 280px;"></div>
+                                            <a href="{% url 'map_with_id' inference_id=context.inference_id %}" class="btn btn-primary btn-sm" style="position: absolute; bottom: 10px; right: 10px; z-index: 1000;">Go to Interactive Map →</a>
+                                        </div>
+                                        <div id="toggler" class="mt-3 px-3 py-1 text-center" style="font-size: small;">
+                                            <div class="row">
+                                                <div class="col-3 form-check form-switch">
+                                                    <input type="checkbox" id="redToggle" checked onclick="toggle('red')" class="form-check-input" style='background-color:red'>
+                                                    <label for="redToggle" class="form-check-label">Destroyed</label>
+                                                </div>
+                                                <div class="col-3 form-check form-switch">
+                                                    <input type="checkbox" id="orangeToggle" checked onclick="toggle('orange')" class="form-check-input" style='background-color:orange'>
+                                                    <label for="orangeToggle" class="form-check-label">Major Damage <label>
+                                                </div>
+                                                <div class="col-3 form-check form-switch">
+                                                    <input type="checkbox" id="yellowToggle" checked onclick="toggle('yellow')" class="form-check-input" style='background-color:yellow'>
+                                                    <label for="yellowToggle" class="form-check-label">Minor Damage </label>
+                                                </div>
+                                                <div class="col-3 form-check form-switch">
+                                                    <input type="checkbox" id="greenToggle" checked onclick="toggle('green')" class="form-check-input" style='background-color:green'>
+                                                    <label for="greenToggle" class="form-check-label">Undamaged </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
                     </div>
                 </div>
             </div>
         </div>
+    </div>
+</div>
 
 
 

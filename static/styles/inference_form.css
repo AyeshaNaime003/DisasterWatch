@@ -29,11 +29,12 @@
 .image-input label i {
     display: block;
     margin: 0 auto;
-    font-size: auto; /* Adjust size as needed */
+    font-size: small; /* Adjust size as needed */
     margin-bottom: 5px; /* Adjust spacing as needed */
     font-family: "Assistant", sans-serif;
     font-style: italic;
     padding-top:5px;
+    color:grey
 }
 
 .col-md-6 p {
