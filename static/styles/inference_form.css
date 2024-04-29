@@ -3,7 +3,6 @@
     border: 2px dashed #ced4da;
     border-radius: 5px;
     position: relative;
-    height:35%;
     cursor:pointer;
     margin-left: 20px;
     background-color: rgb(245, 245, 245);
@@ -37,10 +36,10 @@
     color:grey
 }
 
-.col-md-6 p {
-    margin:20px;
+.row .px-3 p {
     font-weight: bold;
-    margin-bottom:0px;
+    height:fit-content;
+    margin-bottom:0;
 }
 
 /* Add styles for dragover effect */

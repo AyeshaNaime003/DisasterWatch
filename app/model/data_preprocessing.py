@@ -35,18 +35,19 @@ def get_country_province(city_name):
         }
 
 def extract_address_components(address):
+    print(address)
     extracted_components = {
     'country': address.get('country', ""),
     'state': address.get('state', ""),
     'city': address.get('city', ""),
-    'town': address.get('town', ""),
-    'suburb_municipality': (
-        address.get('suburb', '') +
-        (', ' + address['municipality'] if 'municipality' in address and address['suburb'] else '') if 'suburb' in address or 'municipality' in address else ""
-    ),
-    'neighbourhood': address.get('neighbourhood', ""),
+    'town': address.get('town') or address.get('region') or "",
+    'suburb_municipality': address.get('suburb') or address.get('municipality') or "",
+    'neighbourhood': address.get('neighbourhood') or address.get('vilage') or "",
     'road': address.get('road', "")
     }
+
+
+
     for key in address:
         if key not in extracted_components and not "ISO" in key and key!="country_code" and key!="postcode" and key!="city_district":
             extracted_components["name"] =  key.capitalize() + ": " + address[key]

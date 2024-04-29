@@ -23,12 +23,12 @@
         flex-direction: column;
         min-height: 100vh;
       }
-      #dw-navbar div .logo{
-          margin-bottom: 70%;
-      }
-      #dw-navbar div{
-          position: fixed;
-          top: 50%;
-          transform: translate(0, -50%);
-      }
+    #dw-navbar div .logo{
+        margin-bottom: 70%;
+    }
+    #dw-navbar div{
+        position: fixed;
+        top: 50%;
+        transform: translate(0, -50%);
+    }
 }

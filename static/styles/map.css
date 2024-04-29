@@ -8,15 +8,7 @@
     min-height: 512px;
     width: 100%;
 }
-.equal-width {
-    width: 100%;
-    border-collapse: collapse;
-}
 
-#table .col {
-    border: 0.5px solid var(--light-black);
-    padding: 8px; /* Adjust padding as needed */
-}
 #table .red {
     background-color: #ffcccc; 
 }
