@@ -1,3 +1,4 @@
+
 {% extends 'index.html' %}
 
 {% load static %}
@@ -18,7 +19,7 @@
         <!-- NAVBAR TAKING 1/12TH -->
         {% include 'app/navbar2.html' %}
         <!-- MAIN CONTENT TAKING 1/12TH -->
-        <div class="col-xl-11">
+        <div class="col-md-11">
             <div class="container-fluid ps-3 pe-0">
                 <div class="row">
                     <div class='card w-100'>
@@ -114,7 +115,7 @@
                         <div class="row mt-2"style="white-space: nowrap;">
                             <div class="col-md-6 pe-2 rounded" >
                                 <div class='card '>
-                                    <h5 id="damageassessmentresults" class='card-title p-2'>Damage Assessment Results</h5>
+                                    <h5 id="damageassessmentresults" class='card-title ps-3 pt-2'>Damage Assessment Results</h5>
                                     <div class='card-body mt-0 pt-0'>
                                         <canvas id="bar_chart_assessment" style='min-height:220px;max-height:220px; '></canvas>
                                     </div>
@@ -122,7 +123,7 @@
                             </div>
                             <div id="damagedistribution" class="col-md-6 rounded ps-0">
                                 <div class='card '>
-                                    <h5 class="card-title p-2">Damage Distribution</h5>
+                                    <h5 class="card-title ps-3 pt-2">Damage Distribution</h5>
                                     <div class='card-body mt-0 pt-0'>
                                         <canvas id="pie_chart_assessment" style='max-height:220px;'></canvas>
                                     </div>
@@ -132,7 +133,7 @@
 
                         <div id="criticallydamagedareas" class='mt-2' style="max-height:40vh; overflow-y: auto;">
                             <div class='card'>
-                                <h5 class='card-title p-2'>Critically Damaged Areas</h5>
+                                <h5 class='card-title ps-3 pt-2'>Critically Damaged Areas</h5>
                                 <div class="card-body mt-0 pt-0">
                                     <div class="table-responsive">
                                         <table class="table">
@@ -241,7 +242,7 @@
                                                 </div>
                                                 <div class="col-3 form-check form-switch">
                                                     <input type="checkbox" id="orangeToggle" checked onclick="toggle('orange')" class="form-check-input" style='background-color:orange'>
-                                                    <label for="orangeToggle" class="form-check-label">Major Damage <label>
+                                                    <label for="orangeToggle" class="form-check-label">Major Damage </label>
                                                 </div>
                                                 <div class="col-3 form-check form-switch">
                                                     <input type="checkbox" id="yellowToggle" checked onclick="toggle('yellow')" class="form-check-input" style='background-color:yellow'>
