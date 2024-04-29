@@ -19,7 +19,8 @@ import json
 from geopy.geocoders import Nominatim
 from geopy.exc import GeocoderUnavailable
 from server.settings import *
-from .model.data_preprocessing import tif_to_img, one_hot_encoding_mask, mask_to_polygons, get_tif_transform, pixels_to_coordinates
+from .model.data_preprocessing import one_hot_encoding_mask, mask_to_polygons, get_tif_transform, pixels_to_coordinates
+from .model.preprocessing import tif_to_img
 from .api import get_weather, get_population, get_news
 from django.urls import reverse
 from django.http import HttpResponse

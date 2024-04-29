@@ -1,130 +1,505 @@
 import torch
-import torch.nn as nn
-from modules import * 
+from torch import nn
+from einops import rearrange
 import torch.nn.functional as F
-from torchvision.models import resnet50
+from importlib.machinery import SourceFileLoader
+import os
+import sys
+from osgeo import gdal
+from preprocessing import tif_to_img
+import time
 
-class SeResNext50_Unet_MultiScale(nn.Module):
-    def __init__(self, pretrained='imagenet', **kwargs):
-        super(SeResNext50_Unet_MultiScale, self).__init__()
+print(os.getcwd())
+model_dir = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(model_dir)
 
-        encoder_filters = [128, 256, 512, 1024, 2048]
-        fuse_filter = 64
+bitmodule = SourceFileLoader('bitmodule', os.path.join(model_dir, "bit_resnet.py")).load_module()
 
-        self.down12 = DownSample(encoder_filters[0], 2)
-        self.down13 = DownSample(encoder_filters[0]*2, 2)
-        self.down23 = DownSample(encoder_filters[1], 2)
-        self.up21 = UpSample(encoder_filters[1], 2)
-        self.up31 = UpSample(encoder_filters[2]//2, 2)
-        self.up32 = UpSample(encoder_filters[2], 2)
+# MODULES
+class TwoLayerConv2d(nn.Sequential):
+    def __init__(self, in_channels, out_channels, kernel_size=3):
+        super().__init__(nn.Conv2d(in_channels, in_channels, kernel_size=kernel_size,
+                            padding=kernel_size // 2, stride=1, bias=False),
+                         nn.BatchNorm2d(in_channels),
+                         nn.ReLU(),
+                         nn.Conv2d(in_channels, out_channels, kernel_size=kernel_size,
+                            padding=kernel_size // 2, stride=1))
 
-        self.conv0 = ConvRelu(encoder_filters[0]//2, encoder_filters[0])
-        self.convF1 = nn.Sequential(ConvRelu(encoder_filters[0], encoder_filters[0]), SCSEModule(encoder_filters[0], reduction=4, concat=True))
-        self.conv1_1 = ConvRelu(encoder_filters[0]*2, encoder_filters[0])
-        self.convF2 = nn.Sequential(ConvRelu(encoder_filters[1], encoder_filters[1]), SCSEModule(encoder_filters[1], reduction=8, concat=True))
-        self.conv2_1 = ConvRelu(encoder_filters[1]*2, encoder_filters[1])
-        self.convF3 = nn.Sequential(ConvRelu(encoder_filters[2], encoder_filters[2]), SCSEModule(encoder_filters[2], reduction=16, concat=True))
-        self.conv3_1 = ConvRelu(encoder_filters[2]*2, encoder_filters[2])
+class Residual(nn.Module):
+    def __init__(self, fn):
+        super().__init__()
+        self.fn = fn
+    def forward(self, x, **kwargs):
+        return self.fn(x, **kwargs) + x
 
-        self.conv1_2 = ConvRelu(encoder_filters[0] * 2, fuse_filter)
-        self.conv2_2 = ConvRelu(encoder_filters[1] * 2, fuse_filter)
-        self.conv3_2 = ConvRelu(encoder_filters[2] * 2, fuse_filter*2)
-        self.up31_2 = UpSample(fuse_filter*2, 4)   #32
-        self.up21_2 = UpSample(fuse_filter, 2)   #32
+class Residual2(nn.Module):
+    def __init__(self, fn):
+        super().__init__()
+        self.fn = fn
+    def forward(self, x, x2, **kwargs):
+        return self.fn(x, x2, **kwargs) + x
 
-        self.conv4 = ConvRelu(fuse_filter * 2, fuse_filter)  # 32+32+64
-        self.conv4_2 = nn.Conv2d(fuse_filter, fuse_filter, 1, stride=1, padding=0)
-        self.relu = nn.ReLU(inplace=True)
+class PreNorm(nn.Module):
+    def __init__(self, dim, fn):
+        super().__init__()
+        self.norm = nn.LayerNorm(dim)
+        self.fn = fn
+    def forward(self, x, **kwargs):
+        return self.fn(self.norm(x), **kwargs)
 
-        self.res = nn.Conv2d(64, 1, kernel_size=1, stride=1)
+class PreNorm2(nn.Module):
+    def __init__(self, dim, fn):
+        super().__init__()
+        self.norm = nn.LayerNorm(dim)
+        self.fn = fn
+    def forward(self, x, x2, **kwargs):
+        return self.fn(self.norm(x), self.norm(x2), **kwargs)
 
-        self.classification_head = nn.Sequential(
-            nn.Conv2d(fuse_filter * 2, 5, kernel_size=1)
+class FeedForward(nn.Module):
+    def __init__(self, dim, hidden_dim, dropout = 0.):
+        super().__init__()
+        self.net = nn.Sequential(
+            nn.Linear(dim, hidden_dim),
+            nn.GELU(),
+            nn.Dropout(dropout),
+            nn.Linear(hidden_dim, dim),
+            nn.Dropout(dropout)
+        )
+    def forward(self, x):
+        return self.net(x)
+
+class Cross_Attention(nn.Module):
+    def __init__(self, dim, heads = 8, dim_head = 64, dropout = 0., softmax=True):
+        super().__init__()
+        inner_dim = dim_head * heads
+        self.heads = heads
+        self.scale = dim ** -0.5
+
+        self.softmax = softmax
+        self.to_q = nn.Linear(dim, inner_dim, bias=False)
+        self.to_k = nn.Linear(dim, inner_dim, bias=False)
+        self.to_v = nn.Linear(dim, inner_dim, bias=False)
+
+        self.to_out = nn.Sequential(
+            nn.Linear(inner_dim, dim),
+            nn.Dropout(dropout)
         )
 
-        self._initialize_weights()
+    def forward(self, x, m, mask = None):
+        b, n, _, h = *x.shape, self.heads
+        q = self.to_q(x)
+        k = self.to_k(m)
+        v = self.to_v(m)
 
-        encoder = resnet50(pretrained = pretrained)
+        q, k, v = map(lambda t: rearrange(t, 'b n (h d) -> b h n d', h = h), [q,k,v])
 
-        self.conv1 = nn.Sequential(
-            encoder.conv1,
-            encoder.bn1,
-            encoder.relu,
-            encoder.maxpool
+        dots = torch.einsum('bhid,bhjd->bhij', q, k) * self.scale
+        mask_value = -torch.finfo(dots.dtype).max
+
+        if mask is not None:
+            mask = F.pad(mask.flatten(1), (1, 0), value = True)
+            assert mask.shape[-1] == dots.shape[-1], 'mask has incorrect dimensions'
+            mask = mask[:, None, :] * mask[:, :, None]
+            dots.masked_fill_(~mask, mask_value)
+            del mask
+
+        if self.softmax:
+            attn = dots.softmax(dim=-1)
+        else:
+            attn = dots
+
+        out = torch.einsum('bhij,bhjd->bhid', attn, v)
+        out = rearrange(out, 'b h n d -> b n (h d)')
+        out = self.to_out(out)
+        # vis_tmp2(out)
+        return out
+
+class Attention(nn.Module):
+    def __init__(self, dim, heads = 8, dim_head = 64, dropout = 0.):
+        super().__init__()
+        inner_dim = dim_head *  heads
+        self.heads = heads
+        self.scale = dim ** -0.5
+
+        self.to_qkv = nn.Linear(dim, inner_dim * 3, bias = False)
+        self.to_out = nn.Sequential(
+            nn.Linear(inner_dim, dim),
+            nn.Dropout(dropout)
         )
 
-        self.conv2 = nn.Sequential(
-            encoder.layer1,
-            nn.Conv2d(256, 256, kernel_size=3, stride=2, padding=1),  # Introduce downsampling
-            nn.BatchNorm2d(256),
-            nn.ReLU(inplace=True),
-        )
+    def forward(self, x, mask = None):
+        b, n, _, h = *x.shape, self.heads
+        qkv = self.to_qkv(x).chunk(3, dim = -1)
+        q, k, v = map(lambda t: rearrange(t, 'b n (h d) -> b h n d', h = h), qkv)
 
-        self.conv3 = nn.Sequential(
-            encoder.layer2
-        )
+        dots = torch.einsum('bhid,bhjd->bhij', q, k) * self.scale
+        mask_value = -torch.finfo(dots.dtype).max
+
+        if mask is not None:
+            mask = F.pad(mask.flatten(1), (1, 0), value = True)
+            assert mask.shape[-1] == dots.shape[-1], 'mask has incorrect dimensions'
+            mask = mask[:, None, :] * mask[:, :, None]
+            dots.masked_fill_(~mask, mask_value)
+            del mask
+
+        attn = dots.softmax(dim=-1)
+
+        out = torch.einsum('bhij,bhjd->bhid', attn, v)
+        out = rearrange(out, 'b h n d -> b n (h d)')
+        out = self.to_out(out)
+        return out
+
+class Transformer(nn.Module):
+    def __init__(self, dim, depth, heads, dim_head, mlp_dim, dropout):
+        super().__init__()
+        self.layers = nn.ModuleList([])
+        for _ in range(depth):
+            self.layers.append(nn.ModuleList([
+                Residual(PreNorm(dim, Attention(dim, heads = heads, dim_head = dim_head, dropout = dropout))),
+                Residual(PreNorm(dim, FeedForward(dim, mlp_dim, dropout = dropout)))
+            ]))
+    def forward(self, x, mask = None):
+        for attn, ff in self.layers:
+            x = attn(x, mask = mask)
+            x = ff(x)
+        return x
+
+class TransformerDecoder(nn.Module):
+    def __init__(self, dim, depth, heads, dim_head, mlp_dim, dropout, softmax=True):
+        super().__init__()
+        self.layers = nn.ModuleList([])
+        for _ in range(depth):
+            self.layers.append(nn.ModuleList([
+                Residual2(PreNorm2(dim, Cross_Attention(dim, heads = heads,
+                                                        dim_head = dim_head, dropout = dropout,
+                                                        softmax=softmax))),
+                Residual(PreNorm(dim, FeedForward(dim, mlp_dim, dropout = dropout)))
+            ]))
+    def forward(self, x, m, mask = None):
+        """target(query), memory"""
+        for attn, ff in self.layers:
+            x = attn(x, m, mask = mask)
+            x = ff(x)
+        return x
 
 
 
-    def forward1(self, x):
-        batch_size, C, H, W = x.shape
-        #print(x.shape)
-        enc1 = self.conv1(x)
-        #print("\nenc1",enc1.shape)
-        enc2 = self.conv2(enc1)
-        #print("enc2",enc2.shape)
-        enc3 = self.conv3(enc2)
-        #print("enc3",enc3.shape)
+# BASE CLASS
+class ResNet_UNet(torch.nn.Module):
+    def __init__(self, input_nc, output_nc,
+                 resnet_stages_num=5, backbone='resnet18',
+                 output_sigmoid=False, if_upsample_2x=True):
+        """
+        In the constructor we instantiate two nn.Linear modules and assign them as
+        member variables.
+        """
+        super(ResNet_UNet, self).__init__()
+        expand = 1
+        if backbone == 'resnet18':
+            self.resnet = bitmodule.resnet18(pretrained=True, replace_stride_with_dilation=[False,True,True])
+        elif backbone == 'resnet34':
+            self.resnet = bitmodule.resnet34(pretrained=True, replace_stride_with_dilation=[False,True,True])
+        else:
+            raise NotImplementedError
+        self.relu = nn.ReLU()
+        self.upsamplex2 = nn.Upsample(scale_factor=2)
+        self.upsamplex4 = nn.Upsample(scale_factor=4, mode='bilinear')
 
-        enc1 = self.conv0(enc1)
-        #print("\nenc1",enc1.shape)
-        f12 = self.down12(enc1)
-        f13 = self.down13(f12)
-        f23 = self.down23(enc2)
-        f21 = self.up21(enc2)
-        f32 = self.up32(enc3)
-        f31 = self.up31(f32)
+        self.resnet_stages_num = resnet_stages_num
 
-        #print("\nf12 ", f12.size(),"\nf13 ", f13.size(), "\nf23 ", f23.size(),"\nf21 ",  f21.size(),"\nf32 ",  f32.size(),"\nf31 ",  f31.size())
-        fusion1 = self.convF1(enc1+f21+f31)
-        fusion1 = self.conv1_1(fusion1)
-        fusion2 = self.convF2(enc2+f12+f32)
-        fusion2 = self.conv2_1(fusion2)
-        fusion3 = self.convF3(enc3+f23+f13)
-        fusion3 = self.conv3_1(fusion3)
+        self.if_upsample_2x = if_upsample_2x
+        if self.resnet_stages_num == 5:
+            layers = 512 * expand
+        elif self.resnet_stages_num == 4:
+            layers = 256 * expand
+        elif self.resnet_stages_num == 3:
+            layers = 128 * expand
+        else:
+            raise NotImplementedError
+        self.conv_pred = nn.Conv2d(384, 32, kernel_size=3, padding=1)
 
-        dec1 = self.conv1_2(torch.cat([enc1, fusion1], 1))
-        dec2 = self.conv2_2(torch.cat([enc2, fusion2], 1))
-        dec3 = self.conv3_2(torch.cat([enc3, fusion3], 1))
+    def forward_single(self, x):
+        # resnet layers
+        x = self.resnet.conv1(x)
+        x = self.resnet.bn1(x)
+        x_2 = self.resnet.relu(x)
+        x_2_pool = self.resnet.maxpool(x)
 
-        dec2 = self.up21_2(dec2)
-        dec3 = self.up31_2(dec3)
-        dec4 = self.conv4(torch.cat([dec1, dec2, dec3], 1))
-        dec4 = self.conv4_2(F.interpolate(dec4, scale_factor=2, mode='bilinear'))
-        dec4 = self.conv4_2(F.interpolate(dec4, scale_factor=2, mode='bilinear'))
-        dec4 = self.relu(dec4)
-        #print("\ndec4",dec4.shape)
+        x_4 = self.resnet.layer1(x_2_pool) # 1/4, in=64, out=64
 
-        return dec4
+        x_8 = self.resnet.layer2(x_4) # 1/8, in=64, out=128
+        x_8_pool = self.resnet.maxpool(x_8)
+
+        x_10 = self.resnet.layer3(x_8_pool) # 1/8, in=128, out=256
+
+        if self.resnet_stages_num > 4:
+            raise NotImplementedError
+
+        # print(x_2.shape, x_4.shape, x_8.shape, x_10.shape)
+        x = self.upsamplex2(x_10)
+
+        return x_2, x_4, x_8, x_10
+
+
+# UNET + TRANSFORMER MODEL
+# unet x_4 as spatial encoding to decoder
+# without x_4 upsampling
+class BASE_Transformer_UNet(ResNet_UNet):
+    """
+    Resnet of 8 downsampling + BIT + bitemporal feature Differencing + a small CNN
+    """
+    def __init__(self, input_nc, output_nc, with_pos=None, resnet_stages_num=5,
+                 token_len=4, token_trans=True,
+                 enc_depth=1, dec_depth=1,
+                 dim_head=64, decoder_dim_head=64,
+                 tokenizer=True, if_upsample_2x=True,
+                 pool_mode='max', pool_size=2,
+                 backbone='resnet34',
+                 decoder_softmax=True, with_decoder_pos=None,
+                 with_decoder=True):
+        super(BASE_Transformer_UNet, self).__init__(input_nc, output_nc,backbone=backbone,
+                                             resnet_stages_num=resnet_stages_num,
+                                               if_upsample_2x=if_upsample_2x,
+                                               )
+
+        print("using UNet Transformer !!!!")
+
+        self.token_len = token_len
+        self.tokenizer = tokenizer
+        self.token_trans = token_trans
+        self.with_decoder = with_decoder
+        self.with_pos = with_pos
+
+        if not self.tokenizer:
+            #  if not use tokenzier，then downsample the feature map into a certain size
+            self.pooling_size = pool_size
+            self.pool_mode = pool_mode
+            self.token_len = self.pooling_size * self.pooling_size
+
+
+        # conv squeeze layers before transformer
+        dim_5, dim_4, dim_3, dim_2 = 32, 32, 32, 32
+        self.conv_squeeze_5 = nn.Sequential(nn.Conv2d(256, dim_5, kernel_size=1, padding=0, bias=False),
+                                            nn.ReLU())
+        self.conv_squeeze_4 = nn.Sequential(nn.Conv2d(128, dim_4, kernel_size=1, padding=0, bias=False),
+                                            nn.ReLU())
+        self.conv_squeeze_3 = nn.Sequential(nn.Conv2d(64, dim_3, kernel_size=1, padding=0, bias=False),
+                                            nn.ReLU())
+        self.conv_squeeze_2 = nn.Sequential(nn.Conv2d(64, dim_2, kernel_size=1, padding=0, bias=False),
+                                            nn.ReLU())
+        self.conv_squeeze_layers = nn.ModuleList([self.conv_squeeze_2, self.conv_squeeze_3, self.conv_squeeze_4, self.conv_squeeze_5])
+
+        self.conv_token_5 = nn.Conv2d(dim_5, self.token_len, kernel_size=1, padding=0, bias=False)
+        self.conv_token_4 = nn.Conv2d(dim_4, self.token_len, kernel_size=1, padding=0, bias=False)
+        self.conv_token_3 = nn.Conv2d(dim_3, self.token_len, kernel_size=1, padding=0, bias=False)
+        self.conv_token_2 = nn.Conv2d(dim_2, self.token_len, kernel_size=1, padding=0, bias=False)
+        self.conv_tokens_layers = nn.ModuleList([self.conv_token_2, self.conv_token_3, self.conv_token_4, self.conv_token_5])
+
+
+        self.conv_decode_5 = nn.Conv2d(64, 32, kernel_size=3, padding=1, bias=False)
+        self.conv_decode_4 = nn.Conv2d(64, 32, kernel_size=3, padding=1, bias=False)
+        self.conv_decode_3 = nn.Conv2d(64, 32, kernel_size=3, padding=1, bias=False)
+        self.conv_decode_2 = nn.Conv2d(64, 32, kernel_size=3, padding=1, bias=False)
+        self.conv_decode_layers = nn.ModuleList([self.conv_decode_2, self.conv_decode_3, self.conv_decode_4, self.conv_decode_5])
+
+
+        if with_pos == 'learned':
+            self.pos_embedding_5 = nn.Parameter(torch.randn(1, self.token_len*2, dim_5))
+            self.pos_embedding_4 = nn.Parameter(torch.randn(1, self.token_len*2, dim_4))
+            self.pos_embedding_3 = nn.Parameter(torch.randn(1, self.token_len*2, dim_3))
+
+        decoder_pos_size = 256//2
+        self.with_decoder_pos = with_decoder_pos
+        if self.with_decoder_pos == 'learned':
+            self.pos_embedding_decoder_5 =nn.Parameter(torch.randn(1, dim_5, 16, 16))
+            self.pos_embedding_decoder_4 =nn.Parameter(torch.randn(1, dim_4, 32, 32))
+            self.pos_embedding_decoder_3 =nn.Parameter(torch.randn(1, dim_3, 64, 64))
+
+        self.enc_depth = enc_depth
+        self.dec_depth = dec_depth
+        self.dim_head = dim_head
+        self.decoder_dim_head = decoder_dim_head
+        self.transformer_5 = Transformer(dim=dim_5, depth=self.enc_depth, heads=4,
+                                        dim_head=self.dim_head, mlp_dim=dim_5, dropout=0)
+        self.transformer_decoder_5 = TransformerDecoder(dim=dim_5, depth=4, heads=4,
+                                                        dim_head=self.decoder_dim_head, mlp_dim=dim_5, dropout=0, softmax=decoder_softmax)
+        self.transformer_4 = Transformer(dim=dim_4, depth=self.enc_depth, heads=4,
+                                        dim_head=self.dim_head, mlp_dim=dim_4, dropout=0)
+        self.transformer_decoder_4 = TransformerDecoder(dim=dim_4, depth=4, heads=4, dim_head=self.decoder_dim_head,
+                                                         mlp_dim=dim_4, dropout=0, softmax=decoder_softmax)
+        self.transformer_3 = Transformer(dim=dim_3, depth=self.enc_depth, heads=8,
+                                         dim_head=self.dim_head, mlp_dim=dim_3, dropout=0)
+        self.transformer_decoder_3 = TransformerDecoder(dim=dim_3, depth=8, heads=8, dim_head=self.decoder_dim_head,
+                                                        mlp_dim=dim_3, dropout=0, softmax=decoder_softmax)
+        self.transformer_2 = Transformer(dim=dim_2, depth=self.enc_depth, heads=1,
+                                         dim_head=32, mlp_dim=dim_2, dropout=0)
+        self.transformer_decoder_2 = TransformerDecoder(dim=dim_2, depth=1, heads=1, dim_head=32,
+                                                        mlp_dim=dim_2, dropout=0, softmax=decoder_softmax)
+        self.transformer_layers = nn.ModuleList([self.transformer_2, self.transformer_3, self.transformer_4, self.transformer_5])
+        self.transformer_decoder_layers = nn.ModuleList([self.transformer_decoder_2, self.transformer_decoder_3, self.transformer_decoder_4, self.transformer_decoder_5])
+
+        self.conv_layer2_0 = TwoLayerConv2d(in_channels=128, out_channels=32, kernel_size=3)
+        self.conv_layer2 = nn.Sequential(nn.Conv2d(in_channels=32, out_channels=32, kernel_size=3, padding=1),
+                                        nn.ReLU())
+        self.conv_layer3 = nn.Sequential(nn.Conv2d(in_channels=32, out_channels=32, kernel_size=3, padding=1),
+                                        nn.ReLU())
+        self.conv_layer4 = nn.Sequential(nn.Conv2d(in_channels=32, out_channels=32, kernel_size=3, padding=1),
+                                        nn.ReLU())
+        self.classifier = nn.Conv2d(in_channels=32, out_channels=output_nc, kernel_size=3, padding=1)
+
+        #self.seg_head = nn.Conv2d(in_channels=32, out_channels=1, kernel_size=3, padding=1)
+        #self.cls_head = nn.Conv2d(in_channels=32, out_channels=4, kernel_size=3, padding=1)
+
+
+    def _forward_semantic_tokens(self, x, layer=None):
+        b, c, h, w = x.shape
+        spatial_attention = self.conv_tokens_layers[layer](x)
+        spatial_attention = spatial_attention.view([b, self.token_len, -1]).contiguous()
+        spatial_attention = torch.softmax(spatial_attention, dim=-1)
+        x = x.view([b, c, -1]).contiguous()
+        tokens = torch.einsum('bln,bcn->blc', spatial_attention, x)
+        return tokens
+
+    def _forward_transformer(self, x, layer):
+        if self.with_pos:
+            if layer == 5:
+                x = x + self.pos_embedding_5
+            if layer == 4:
+                x = x + self.pos_embedding_4
+            if layer == 3:
+                x = x + self.pos_embedding_3
+            #x += self.pos_embedding_layers[layer]
+        x = self.transformer_layers[layer](x)
+        return x
+
+    def _forward_transformer_decoder(self, x, m, layer):
+        b, c, h, w = x.shape
+        if self.with_decoder_pos == 'learned':
+            if layer == 5:
+                x = x + self.pos_embedding_decoder_5
+            if layer == 4:
+                x = x + self.pos_embedding_decoder_4
+            if layer == 3:
+                x = x + self.pos_embedding_decoder_3
+            #x = x + self.pos_embedding_decoder_layers[layer]
+        x = rearrange(x, 'b c h w -> b (h w) c')
+        x = self.transformer_decoder_layers[layer](x, m)
+        x = rearrange(x, 'b (h w) c -> b c h w', h=h)
+        return x
+
+    def _forward_trans_module(self, x1, x2, layer):
+        x1 = self.conv_squeeze_layers[layer](x1)
+        x2 = self.conv_squeeze_layers[layer](x2)
+        token1 = self._forward_semantic_tokens(x1, layer)
+        token2 = self._forward_semantic_tokens(x2, layer)
+        self.tokens_ = torch.cat([token1, token2], dim=1)
+        self.tokens = self._forward_transformer(self.tokens_, layer)
+        token1, token2 = self.tokens.chunk(2, dim=1)
+        # x1 = self._forward_transformer_decoder(x1, token1, layer)
+        # x2 = self._forward_transformer_decoder(x2, token2, layer)
+        # return torch.abs(x1 - x2)
+
+        # V1, V2
+        # x1 = self._forward_transformer_decoder(x1, token2, layer)
+        # x2 = self._forward_transformer_decoder(x2, token1, layer)
+        # return torch.add(x1, x2)
+
+        # # V3
+        diff_token = torch.abs(token2 - token1)
+        diff_x = self.conv_decode_layers[layer](torch.cat([x1,x2], axis=1))
+        x = self._forward_transformer_decoder(diff_x, diff_token, layer)
+        return x
+
 
     def forward(self, x):
-        dec10_0 = self.forward1(x[:, :3, :, :])
-        dec10_1 = self.forward1(x[:, 3:, :, :])
+        # forward backbone resnet
+        x1 = x[:, :3, :, :]
+        x2 = x[:, 3:, :, :]
+        a_128, a_64, a_32, a_16 = self.forward_single(x1)
+        b_128, b_64, b_32, b_16 = self.forward_single(x2)
 
-        dec10 = torch.cat([dec10_0, dec10_1], 1)
+        #  level 5 in=256x16x16 out=32x16x16
+        x1, x2 = a_16, b_16
+        out_5 = self._forward_trans_module(x1, x2, layer=3)
+        out_5 = self.upsamplex2(out_5)
 
-        #return self.res(dec10)
-        output = self.classification_head(dec10)
+        # level 4: in=128x32x32 out=32x32x32
+        x1, x2 = a_32, b_32
+        out_4 = self._forward_trans_module(x1, x2, layer=2)
+        out_4 = out_4 + out_5
+        # out_4 = self.conv_layer4(torch.cat([out_4, out_5], axis=1))
+        out_4 = self.upsamplex2(out_4)
+        out_4 = self.conv_layer4(out_4)
 
-        return output
+        # level 3: in=64x64x64 out=32x64x64
+        x1, x2 = a_64, b_64
+        out_3 = self._forward_trans_module(x1, x2, layer=1)
+        out_3 = out_3 + out_4
+        # out_3 = self.conv_layer3(torch.cat([out_3, out_4], axis=1))
+        out_3 = self.upsamplex2(out_3)
+        out_3 = self.conv_layer3(out_3)
+
+        # level 2: in=64x128x128
+        out_2 = self.conv_layer2_0(torch.cat([a_128, b_128], 1))
+        out_2 = out_2 + out_3
+        # out_2 = self.conv_layer2(torch.cat([out_2, out_3], axis=1))
+        out_2 = self.upsamplex2(out_2)
+        out_2 = self.conv_layer2(out_2)
+        # print(out_2.shape, out_3.shape, out_4.shape, out_5.shape)
+        # forward small cnn
+        x = self.classifier(out_2)
+        # x_seg = self.seg_head(out_2)
+        # x_cls = self.cls_head(out_2)
+        # x = torch.cat([x_seg, x_cls], axis=1)
+        return x
+
+# device
+device = "cuda" if torch.cuda.is_available() else "cpu"
+
+# create model and load checkpoint weights
+loaded_model = BASE_Transformer_UNet(input_nc=3, 
+                                     output_nc=5, 
+                                     token_len=4, 
+                                     resnet_stages_num=4,
+                                     with_pos='learned', 
+                                     enc_depth=1, 
+                                     dec_depth=8).to(device)
+
+loaded_model.load_state_dict(torch.load(os.path.join(model_dir, "checkpoint.pth"), map_location=torch.device('cpu')))
 
 
-    def _initialize_weights(self):
-        for m in self.modules():
-            if isinstance(m, nn.Conv2d) or isinstance(m, nn.ConvTranspose2d) or isinstance(m, nn.Linear):
-                m.weight.data = nn.init.kaiming_normal_(m.weight.data)
-                if m.bias is not None:
-                    m.bias.data.zero_()
-            elif isinstance(m, nn.BatchNorm2d):
-                m.weight.data.fill_(1)
-                m.bias.data.zero_()
+# preparing input data
+pre_path = os.path.join("./palu-tsunami_00000113_pre_disaster.tif")
+post_path = os.path.join("palu-tsunami_00000113_post_disaster.tif")
+print(pre_path, post_path)
+
+pre_tif, post_tif = gdal.Open(pre_path), gdal.Open(post_path)
+pre_image, post_image = torch.from_numpy(tif_to_img(pre_tif)), torch.from_numpy(tif_to_img(post_tif))
+pre_post = torch.cat((pre_image, post_image), dim=2).permute(2,0,1).unsqueeze(0).to(torch.float)
+
+print(pre_post.shape)
+
+# lets do inference
+start = time.time()
+output = loaded_model(pre_post)
+end = time.time()
+elapsed_time = end - start
+
+print(f"Inference time: {elapsed_time} seconds")
+print(type(output), output.shape)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+print("success")

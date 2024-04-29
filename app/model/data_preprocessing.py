@@ -82,12 +82,7 @@ def pixels_to_coordinates(transform, pixel):
     longitude, latitude = transform * pixel
     return latitude, longitude
 
-# FUNCTION TO GET IMAGE FROM TIF PATH
-def tif_to_img(tif_file):
-  disaster_img = np.dstack((tif_file.GetRasterBand(1).ReadAsArray(),
-                  tif_file.GetRasterBand(2).ReadAsArray(),
-                  tif_file.GetRasterBand(3).ReadAsArray()))
-  return disaster_img
+
 
 def mask_to_polygons(mask, transform, rdp=True):
     lat_offset, long_offset = 0.0003994844315009516, 0.0004862524671978008  
