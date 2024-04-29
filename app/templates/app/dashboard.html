@@ -9,9 +9,7 @@
 <!-- CUSTOM CSS -->
 <link href="{% static '/styles/dashboard.css' %}" rel="stylesheet" />
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.1/css/all.min.css"
-    integrity="sha256-2XFplPlrFClt0bIdPgpz8H7ojnk10H69xRqd9+uTShA=" crossorigin="anonymous" />
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.1/css/all.min.css" integrity="sha256-2XFplPlrFClt0bIdPgpz8H7ojnk10H69xRqd9+uTShA=" crossorigin="anonymous" />
 
 <!-- HTML -->
 
@@ -20,102 +18,88 @@
         <!-- NAVBAR TAKING 1/12TH -->
         {% include 'app/navbar2.html' %}
         <!-- MAIN CONTENT TAKING 1/12TH -->
-        <div class="col-md-11">
-            <div class="container-fluid ">
+        <div class="col-xl-11">
+            <div class="container-fluid ps-3 pe-0">
                 <div class="row">
-                    <div class='card'>
+                    <div class='card w-100'>
                         <div class='row mb-1'>
-                            <!-- CITY INFO  -->
-                            <div id="cityinfo" class="col-10 rounded">
-                                <div class="row ml-2 text-center ">
-                                    <div class="col mt-3 ">
-                                        <div style="white-space: nowrap;">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30"
-                                                fill="currentColor" class="bi bi-geo-alt" viewBox="0 0 16 16">
-                                                <path
-                                                    d="M12.166 8.94c-.524 1.062-1.234 2.12-1.96 3.07A32 32 0 0 1 8 14.58a32 32 0 0 1-2.206-2.57c-.726-.95-1.436-2.008-1.96-3.07C3.304 7.867 3 6.862 3 6a5 5 0 0 1 10 0c0 .862-.305 1.867-.834 2.94M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10" />
-                                                <path
-                                                    d="M8 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4m0 1a3 3 0 1 0 0-6 3 3 0 0 0 0 6" />
-                                            </svg>
-                                            {{ context.disaster_city }}, {{ context.disaster_country }}
+                        <!-- CITY INFO  -->
+                            <div id="cityinfo" class="col-10 rounded" >
+                                    <div class="row ms-2 text-center ">
+                                        <div class="col mt-3 ">
+                                            <div style="white-space: nowrap;">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-geo-alt" viewBox="0 0 16 16">
+                                                <path d="M12.166 8.94c-.524 1.062-1.234 2.12-1.96 3.07A32 32 0 0 1 8 14.58a32 32 0 0 1-2.206-2.57c-.726-.95-1.436-2.008-1.96-3.07C3.304 7.867 3 6.862 3 6a5 5 0 0 1 10 0c0 .862-.305 1.867-.834 2.94M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10"/>
+                                                <path d="M8 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4m0 1a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
+                                                </svg>
+                                                {{ context.disaster_city }}, {{ context.disaster_country }}</div>
+                                             <h5 class='titleFooter'> Location<h5>
                                         </div>
-                                        <h5 class='titleFooter'> Location<h5>
-                                    </div>
-                                    <div class="col mt-3">
-                                        <div style="white-space: nowrap;">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30"
-                                                fill="currentColor" class="bi bi-calendar3" viewBox="0 0 16 16">
-                                                <path
-                                                    d="M14 0H2a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2M1 3.857C1 3.384 1.448 3 2 3h12c.552 0 1 .384 1 .857v10.286c0 .473-.448.857-1 .857H2c-.552 0-1-.384-1-.857z" />
-                                                <path
-                                                    d="M6.5 7a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2m-9 3a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2m-9 3a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2" />
+                                        <div class="col mt-3">
+                                            <div style="white-space: nowrap;">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-calendar3" viewBox="0 0 16 16">
+                                                <path d="M14 0H2a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2M1 3.857C1 3.384 1.448 3 2 3h12c.552 0 1 .384 1 .857v10.286c0 .473-.448.857-1 .857H2c-.552 0-1-.384-1-.857z"/>
+                                                <path d="M6.5 7a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2m-9 3a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2m-9 3a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2"/>
                                             </svg>
-                                            {{ context.disaster_date }}
+                                            {{ context.disaster_date }}</div>
+                                            <h5 class='titleFooter'> Date<h5>
                                         </div>
-                                        <h5 class='titleFooter'> Date<h5>
-                                    </div>
-                                    <div class="col mt-3">
-                                        <div style="white-space: nowrap;">
-
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30"
-                                                fill="currentColor" class="bi bi-people" viewBox="0 0 16 16">
+                                        <div class="col mt-3">
+                                            <div style="white-space: nowrap;">
+                                            
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor"
+                                                class="bi bi-people" viewBox="0 0 16 16">
                                                 <path
                                                     d="M15 14s1 0 1-1-1-4-5-4-5 3-5 4 1 1 1 1zm-7.978-1L7 12.996c.001-.264.167-1.03.76-1.72C8.312 10.629 9.282 10 11 10c1.717 0 2.687.63 3.24 1.276.593.69.758 1.457.76 1.72l-.008.002-.014.002zM11 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4m3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0M6.936 9.28a6 6 0 0 0-1.23-.247A7 7 0 0 0 5 9c-4 0-5 3-5 4q0 1 1 1h4.216A2.24 2.24 0 0 1 5 13c0-1.01.377-2.042 1.09-2.904.243-.294.526-.569.846-.816M4.92 10A5.5 5.5 0 0 0 4 13H1c0-.26.164-1.03.76-1.724.545-.636 1.492-1.256 3.16-1.275ZM1.5 5.5a3 3 0 1 1 6 0 3 3 0 0 1-6 0m3-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4" />
                                             </svg>
-                                            {% if context.population != -1 %}
-                                            {{ context.population }}
-                                            {% endif %}
+                                                {% if context.population != -1 %}
+                                                    {{ context.population }}
+                                                {% endif %} </div>
+                                            <h5 class='titleFooter'> Population<h5>
                                         </div>
-                                        <h5 class='titleFooter'> Population<h5>
-                                    </div>
-                                    <div class="col mt-3">
-                                        <div style="white-space: nowrap;">
-
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30"
-                                                fill="currentColor" class="bi bi-thermometer" viewBox="0 0 16 16">
+                                        <div class="col mt-3">
+                                            <div style="white-space: nowrap;">
+                                            
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor"
+                                                class="bi bi-thermometer" viewBox="0 0 16 16">
                                                 <path d="M8 14a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3" />
                                                 <path
                                                     d="M8 0a2.5 2.5 0 0 0-2.5 2.5v7.55a3.5 3.5 0 1 0 5 0V2.5A2.5 2.5 0 0 0 8 0M6.5 2.5a1.5 1.5 0 1 1 3 0v7.987l.167.15a2.5 2.5 0 1 1-3.333 0l.166-.15z" />
-                                            </svg>{{context.weather.temperature}},{{context.weather.description}}
+                                            </svg>{{context.weather.temperature}},{{context.weather.description}}</div>
+                                            <h5 class='titleFooter'>Temperature<h5>
                                         </div>
-                                        <h5 class='titleFooter'>Temperature<h5>
-                                    </div>
-                                    <div class="col mt-3">
-                                        <div style="white-space: nowrap;">
-
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30"
-                                                fill="currentColor" class="bi bi-wind" viewBox="0 0 16 16">
+                                        <div class="col mt-3">
+                                            <div style="white-space: nowrap;">
+                                            
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor"
+                                                class="bi bi-wind" viewBox="0 0 16 16">
                                                 <path
                                                     d="M12.5 2A2.5 2.5 0 0 0 10 4.5a.5.5 0 0 1-1 0A3.5 3.5 0 1 1 12.5 8H.5a.5.5 0 0 1 0-1h12a2.5 2.5 0 0 0 0-5m-7 1a1 1 0 0 0-1 1 .5.5 0 0 1-1 0 2 2 0 1 1 2 2h-5a.5.5 0 0 1 0-1h5a1 1 0 0 0 0-2M0 9.5A.5.5 0 0 1 .5 9h10.042a3 3 0 1 1-3 3 .5.5 0 0 1 1 0 2 2 0 1 0 2-2H.5a.5.5 0 0 1-.5-.5" />
-                                            </svg> {{context.weather.wind}}
+                                            </svg> {{context.weather.wind}}</div>
+                                            <h5 class='titleFooter'>Wind Speed<h5>
                                         </div>
-                                        <h5 class='titleFooter'>Wind Speed<h5>
-                                    </div>
-                                    <div class="col mt-3">
-                                        <div style="white-space: nowrap;">
-
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30"
-                                                fill="currentColor" class="bi bi-moisture" viewBox="0 0 16 16">
-                                                <path
-                                                    d="M13.5 0a.5.5 0 0 0 0 1H15v2.75h-.5a.5.5 0 0 0 0 1h.5V7.5h-1.5a.5.5 0 0 0 0 1H15v2.75h-.5a.5.5 0 0 0 0 1h.5V15h-1.5a.5.5 0 0 0 0 1h2a.5.5 0 0 0 .5-.5V.5a.5.5 0 0 0-.5-.5zM7 1.5l.364-.343a.5.5 0 0 0-.728 0l-.002.002-.006.007-.022.023-.08.088a29 29 0 0 0-1.274 1.517c-.769.983-1.714 2.325-2.385 3.727C2.368 7.564 2 8.682 2 9.733 2 12.614 4.212 15 7 15s5-2.386 5-5.267c0-1.05-.368-2.169-.867-3.212-.671-1.402-1.616-2.744-2.385-3.727a29 29 0 0 0-1.354-1.605l-.022-.023-.006-.007-.002-.001zm0 0-.364-.343zm-.016.766L7 2.247l.016.019c.24.274.572.667.944 1.144.611.781 1.32 1.776 1.901 2.827H4.14c.58-1.051 1.29-2.046 1.9-2.827.373-.477.706-.87.945-1.144zM3 9.733c0-.755.244-1.612.638-2.496h6.724c.395.884.638 1.741.638 2.496C11 12.117 9.182 14 7 14s-4-1.883-4-4.267" />
+                                        <div class="col mt-3">
+                                            <div style="white-space: nowrap;">
+                                            
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor"
+                                                    class="bi bi-moisture" viewBox="0 0 16 16">
+                                                    <path
+                                                        d="M13.5 0a.5.5 0 0 0 0 1H15v2.75h-.5a.5.5 0 0 0 0 1h.5V7.5h-1.5a.5.5 0 0 0 0 1H15v2.75h-.5a.5.5 0 0 0 0 1h.5V15h-1.5a.5.5 0 0 0 0 1h2a.5.5 0 0 0 .5-.5V.5a.5.5 0 0 0-.5-.5zM7 1.5l.364-.343a.5.5 0 0 0-.728 0l-.002.002-.006.007-.022.023-.08.088a29 29 0 0 0-1.274 1.517c-.769.983-1.714 2.325-2.385 3.727C2.368 7.564 2 8.682 2 9.733 2 12.614 4.212 15 7 15s5-2.386 5-5.267c0-1.05-.368-2.169-.867-3.212-.671-1.402-1.616-2.744-2.385-3.727a29 29 0 0 0-1.354-1.605l-.022-.023-.006-.007-.002-.001zm0 0-.364-.343zm-.016.766L7 2.247l.016.019c.24.274.572.667.944 1.144.611.781 1.32 1.776 1.901 2.827H4.14c.58-1.051 1.29-2.046 1.9-2.827.373-.477.706-.87.945-1.144zM3 9.733c0-.755.244-1.612.638-2.496h6.724c.395.884.638 1.741.638 2.496C11 12.117 9.182 14 7 14s-4-1.883-4-4.267" />
+                                                </svg>
+                                                {{context.weather.humidity}}%
+                                            </div>
+                                            <h5 class='titleFooter'>Humidity<h5>
+                                        </div>
+                                        <div class="col mt-3">
+                                            <div style="white-space: nowrap;">
+                                            
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-cloud-drizzle" viewBox="0 0 16 16">
+                                                <path d="M4.158 12.025a.5.5 0 0 1 .316.633l-.5 1.5a.5.5 0 0 1-.948-.316l.5-1.5a.5.5 0 0 1 .632-.317m6 0a.5.5 0 0 1 .316.633l-.5 1.5a.5.5 0 0 1-.948-.316l.5-1.5a.5.5 0 0 1 .632-.317m-3.5 1.5a.5.5 0 0 1 .316.633l-.5 1.5a.5.5 0 0 1-.948-.316l.5-1.5a.5.5 0 0 1 .632-.317m6 0a.5.5 0 0 1 .316.633l-.5 1.5a.5.5 0 1 1-.948-.316l.5-1.5a.5.5 0 0 1 .632-.317m.747-8.498a5.001 5.001 0 0 0-9.499-1.004A3.5 3.5 0 1 0 3.5 11H13a3 3 0 0 0 .405-5.973M8.5 2a4 4 0 0 1 3.976 3.555.5.5 0 0 0 .5.445H13a2 2 0 0 1 0 4H3.5a2.5 2.5 0 1 1 .605-4.926.5.5 0 0 0 .596-.329A4 4 0 0 1 8.5 2"/>
                                             </svg>
-                                            {{context.weather.humidity}}%
+                                            {{context.weather.rain}}</div>
+                                            <h5 class='titleFooter'>Rain<h5>
                                         </div>
-                                        <h5 class='titleFooter'>Humidity<h5>
                                     </div>
-                                    <div class="col mt-3">
-                                        <div style="white-space: nowrap;">
-
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30"
-                                                fill="currentColor" class="bi bi-cloud-drizzle" viewBox="0 0 16 16">
-                                                <path
-                                                    d="M4.158 12.025a.5.5 0 0 1 .316.633l-.5 1.5a.5.5 0 0 1-.948-.316l.5-1.5a.5.5 0 0 1 .632-.317m6 0a.5.5 0 0 1 .316.633l-.5 1.5a.5.5 0 0 1-.948-.316l.5-1.5a.5.5 0 0 1 .632-.317m-3.5 1.5a.5.5 0 0 1 .316.633l-.5 1.5a.5.5 0 0 1-.948-.316l.5-1.5a.5.5 0 0 1 .632-.317m6 0a.5.5 0 0 1 .316.633l-.5 1.5a.5.5 0 1 1-.948-.316l.5-1.5a.5.5 0 0 1 .632-.317m.747-8.498a5.001 5.001 0 0 0-9.499-1.004A3.5 3.5 0 1 0 3.5 11H13a3 3 0 0 0 .405-5.973M8.5 2a4 4 0 0 1 3.976 3.555.5.5 0 0 0 .5.445H13a2 2 0 0 1 0 4H3.5a2.5 2.5 0 1 1 .605-4.926.5.5 0 0 0 .596-.329A4 4 0 0 1 8.5 2" />
-                                            </svg>
-                                            {{context.weather.rain}}
-                                        </div>
-                                        <h5 class='titleFooter'>Rain<h5>
-                                    </div>
-                                </div>
                             </div>
 
                             <div class="col-2 d-flex d-flex align-items-center justify-content-center">
@@ -123,179 +107,157 @@
                             </div>
                         </div>
                     </div>
+                </div>
                     <!-- ASSESSMENT ROW 1 -->
-                    <div class="row pr-0 mr-0">
-                        <div class="col-md-8 pl-1 pr-2">
-                            <div class="row mt-2" style="white-space: nowrap;">
-                                <div class="col-md-6 pr-2 rounded">
-                                    <div class='card '>
-                                        <h5 id="damageassessmentresults" class='card-title p-2'>Damage Assessment
-                                            Results</h5>
-                                        <div class='card-body mt-0 pt-0'>
-                                            <canvas id="bar_chart_assessment"
-                                                style='min-height:220px;max-height:220px; '></canvas>
-                                        </div>
+                <div class="row pe-0 me-0">
+                    <div class="col-md-8 ps-0 pe-2">
+                        <div class="row mt-2"style="white-space: nowrap;">
+                            <div class="col-md-6 pe-2 rounded" >
+                                <div class='card '>
+                                    <h5 id="damageassessmentresults" class='card-title p-2'>Damage Assessment Results</h5>
+                                    <div class='card-body mt-0 pt-0'>
+                                        <canvas id="bar_chart_assessment" style='min-height:220px;max-height:220px; '></canvas>
                                     </div>
                                 </div>
-                                <div id="damagedistribution" class="col-md-6 rounded pl-0">
-                                    <div class='card '>
-                                        <h5 class="card-title p-2">Damage Distribution</h5>
-                                        <div class='card-body mt-0 pt-0'>
-                                            <canvas id="pie_chart_assessment" style='max-height:220px;'></canvas>
+                            </div>
+                            <div id="damagedistribution" class="col-md-6 rounded ps-0">
+                                <div class='card '>
+                                    <h5 class="card-title p-2">Damage Distribution</h5>
+                                    <div class='card-body mt-0 pt-0'>
+                                        <canvas id="pie_chart_assessment" style='max-height:220px;'></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="criticallydamagedareas" class='mt-2' style="max-height:40vh; overflow-y: auto;">
+                            <div class='card'>
+                                <h5 class='card-title p-2'>Critically Damaged Areas</h5>
+                                <div class="card-body mt-0 pt-0">
+                                    <div class="table-responsive">
+                                        <table class="table">
+                                            <thead class="thead-light">
+                                                <tr>
+                                                    <th scope="col">#</th>
+                                                    <th scope="col">District</th>
+                                                    <th scope="col">Damage Levels</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for area in context.disasterAreas %}
+                                                <tr>
+                                                    <td>{{ area.index }}</td>
+                                                    <td>{{ area.componentName }}</td>
+                                                    <td style='font-size:large'>
+                                                        <span class="badge badge-red">Destroyed: {{ area.red }}</span>
+                                                        <span class="badge badge-orange">Major Damage: {{ area.orange }}</span>
+                                                        <span class="badge badge-yellow">Minor Damage: {{ area.yellow }}</span>
+                                                        <span class="badge badge-green">Undamaged: {{ area.green }}</span>
+                                                    </td>                                          
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col pe-0 me-0">
+                        <div class="row">
+                            <div class="col-md-6 ps-0 pe-1 ">
+                                <div class="card mt-2 py-0 mx-0">
+                                    <div class="card-body px-1 py-1">
+                                        <div class="col py-2 " style="font-size: x-large;">
+                                            <div class="row text-center">
+                                                <div class='card-title '>Disaster Type</div>
+                                            </div>
+                                            <div class="row text-center">
+                                                <div>{{ context.disaster_type }}</div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-
-                            <div id="criticallydamagedareas" class='mt-2' style="max-height: 250px; overflow-y: auto;">
-                                <div class='card'>
-                                    <h5 class='card-title p-2'>Critically Damaged Areas</h5>
-                                    <div class="card-body mt-0 pt-0">
-                                        <div class="table-responsive">
-                                            <table class="table">
-                                                <thead class="thead-light">
-                                                    <tr>
-                                                        <th scope="col">#</th>
-                                                        <th scope="col">District</th>
-                                                        <th scope="col">Damage Levels</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {% for area in context.disasterAreas %}
-                                                    <tr>
-                                                        <td>{{ area.index }}</td>
-                                                        <td>{{ area.componentName }}</td>
-                                                        <td style='font-size:large'>
-                                                            <span class="badge badge-red">Destroyed: {{ area.red
-                                                                }}</span>
-                                                            <span class="badge badge-orange">Major Damage: {{
-                                                                area.orange }}</span>
-                                                            <span class="badge badge-yellow">Minor Damage: {{
-                                                                area.yellow }}</span>
-                                                            <span class="badge badge-green">Undamaged: {{ area.green
-                                                                }}</span>
-                                                        </td>
-                                                    </tr>
-                                                    {% endfor %}
-                                                </tbody>
-                                            </table>
+                            <div class="col-md-6 ps-1 pe-0">
+                                <div class="card mt-2 py-0 mx-0">
+                                    <div class="card-body px-1 py-1">
+                                        <div class="col py-2 text-center" style="font-size: x-large;">
+                                            <div class="row ">
+                                                <div class='card-title'># Buildings Detected</div>
+                                            </div>
+                                            <div class="row text-center">
+                                                <div>{{ context.building_count }}</div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="col pr-0 mr-0">
-                            <div class="row">
-                                <div class="col-md-6 pl-0 pr-1 ">
-                                    <div class="card mt-2 py-0 mx-0">
-                                        <div class="card-body px-1 py-1">
-                                            <div class="col py-2 text-center" style="font-size: x-large;">
-                                                <div class="row ">
-                                                    <div class='card-title'>Disaster Type</div>
-                                                </div>
-                                                <div class="row text-center">
-                                                    <div>{{ context.disaster_type }}</div>
-                                                </div>
+                        <div class="row">
+                            <div class="col-md-6 ps-0 pe-1 ">
+                                <div class="card mt-2 py-0 mx-0">
+                                    <div class="card-body px-1 py-1">
+                                        <div class="col py-2 text-center" style="font-size: x-large;">
+                                            <div class="row ">
+                                                <div class='card-title'># Buildings Damaged</div>
                                             </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6 pl-1 pr-0">
-                                    <div class="card mt-2 py-0 mx-0">
-                                        <div class="card-body px-1 py-1">
-                                            <div class="col py-2 text-center" style="font-size: x-large;">
-                                                <div class="row ">
-                                                    <div class='card-title'># Buildings Detected</div>
-                                                </div>
-                                                <div class="row text-center">
-                                                    <div>{{ context.building_count }}</div>
-                                                </div>
+                                            <div class="row text-center">
+                                                <div>{{ context.damaged_count }}</div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class="col-md-6 pl-0 pr-1 ">
-                                    <div class="card mt-2 py-0 mx-0">
-                                        <div class="card-body px-1 py-1">
-                                            <div class="col py-2 text-center" style="font-size: x-large;">
-                                                <div class="row ">
-                                                    <div class='card-title'># Buildings Damaged</div>
-                                                </div>
-                                                <div class="row text-center">
-                                                    <div>{{ context.damaged_count }}</div>
-                                                </div>
+                            <div class="col-md-6 ps-1 pe-0">
+                                <div class="card mt-2 py-0 mx-0">
+                                    <div class="card-body px-1 py-1">
+                                        <div class="col py-2 text-center" style="font-size: x-large;">
+                                            <div class="row ">
+                                                <div class='card-title'>Total Damaged Area</div>
                                             </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6 pl-1 pr-0">
-                                    <div class="card mt-2 py-0 mx-0">
-                                        <div class="card-body px-1 py-1">
-                                            <div class="col py-2 text-center" style="font-size: x-large;">
-                                                <div class="row ">
-                                                    <div class='card-title'>Total Damaged Area</div>
-                                                </div>
-                                                <div class="row text-center">
-                                                    <div>{{ context.total_damaged_area }}m<sup>2</sup></div>
-                                                </div>
+                                            <div class="row text-center">
+                                                <div>{{ context.total_damaged_area }}km<sup>2</sup></div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-
-                            <div class="row mt-2 ">
-                                <div class="col px-0">
-                                    <div class="card ">
-                                        <div class="card-body">
-                                            <div id="heatmap-container" style="position: relative;">
-                                                <div id="heatmap" style="height: 280px;"></div>
-                                                <a href="{% url 'map_with_id' inference_id=context.inference_id %}"
-                                                    class="btn btn-primary btn-sm"
-                                                    style="position: absolute; bottom: 10px; right: 10px; z-index: 1000;">Go
-                                                    to Interactive Map →</a>
-                                            </div>
-                                            <div id="toggler" class="mt-3 px-3 py-1 text-center"
-                                                style="font-size: small;">
-                                                <div class="row">
-                                                    <div class="col-3 form-check form-switch">
-                                                        <input type="checkbox" id="redToggle" checked
-                                                            onclick="toggle('red')" class="form-check-input"
-                                                            style='background-color:red'>
-                                                        <label for="redToggle"
-                                                            class="form-check-label">Destroyed</label>
-                                                    </div>
-                                                    <div class="col-3 form-check form-switch">
-                                                        <input type="checkbox" id="orangeToggle" checked
-                                                            onclick="toggle('orange')" class="form-check-input"
-                                                            style='background-color:orange'>
-                                                        <label for="orangeToggle" class="form-check-label">Major Damage
-                                                            <label>
-                                                    </div>
-                                                    <div class="col-3 form-check form-switch">
-                                                        <input type="checkbox" id="yellowToggle" checked
-                                                            onclick="toggle('yellow')" class="form-check-input"
-                                                            style='background-color:yellow'>
-                                                        <label for="yellowToggle" class="form-check-label">Minor Damage
-                                                        </label>
-                                                    </div>
-                                                    <div class="col-3 form-check form-switch">
-                                                        <input type="checkbox" id="greenToggle" checked
-                                                            onclick="toggle('green')" class="form-check-input"
-                                                            style='background-color:green'>
-                                                        <label for="greenToggle" class="form-check-label">Undamaged
-                                                        </label>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
                         </div>
+                        
+                        <div class="row mt-2 ">
+                            <div class="col px-0">
+                                <div class="card ">
+                                    <div class="card-body">
+                                        <div id="heatmap-container" style="position: relative;">
+                                            <div id="heatmap" style="height: 280px;"></div>
+                                            <a href="{% url 'map_with_id' inference_id=context.inference_id %}" class="btn btn-primary btn-sm" style="position: absolute; bottom: 10px; right: 10px; z-index: 1000;">Go to Interactive Map →</a>
+                                        </div>
+                                        <div id="toggler" class="mt-3 px-3 py-1 text-center" style="font-size: small;">
+                                            <div class="row">
+                                                <div class="col-3 form-check form-switch">
+                                                    <input type="checkbox" id="redToggle" checked onclick="toggle('red')" class="form-check-input" style='background-color:red'>
+                                                    <label for="redToggle" class="form-check-label">Destroyed</label>
+                                                </div>
+                                                <div class="col-3 form-check form-switch">
+                                                    <input type="checkbox" id="orangeToggle" checked onclick="toggle('orange')" class="form-check-input" style='background-color:orange'>
+                                                    <label for="orangeToggle" class="form-check-label">Major Damage <label>
+                                                </div>
+                                                <div class="col-3 form-check form-switch">
+                                                    <input type="checkbox" id="yellowToggle" checked onclick="toggle('yellow')" class="form-check-input" style='background-color:yellow'>
+                                                    <label for="yellowToggle" class="form-check-label">Minor Damage </label>
+                                                </div>
+                                                <div class="col-3 form-check form-switch">
+                                                    <input type="checkbox" id="greenToggle" checked onclick="toggle('green')" class="form-check-input" style='background-color:green'>
+                                                    <label for="greenToggle" class="form-check-label">Undamaged </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
                     </div>
                 </div>
             </div>
@@ -304,13 +266,14 @@
 </div>
 
 
+
+
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script src="{% static 'Leaflet.heat-gh-pages/dist/leaflet-heat.js' %}"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-
 <script>
-    // get variables
+    // variabes
     var context = {{ context | safe }};
     var disasterType = context.disaster_type;
     var results = context.results;
@@ -318,9 +281,11 @@
     var long = context.tif_middle_longitude;
     var plot_data = context.graph_data;
     var maxYAxes = Math.max(...plot_data);
+    
     // map and tiles
     var map = L.map('heatmap').setView([lat, long], 15);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+    
     // heatmap
     var heatLayers = {};
     for (var color in results) {
@@ -342,16 +307,18 @@
             heatLayers[color] = heatMap;
         }
     }
-    // boundary coordinates polygon
+    
+    // boundary points
     var polygon = L.polygon(context.boundary_coordinates, {
         fillColor: "#f0f0f0",  
-        color: "gray",  
-        weight: 1,  
+        color: "gray", 
+        weight: 0.8,  
         opacity: 0.5,  
-        fillOpacity: 0.3,  
-        dashArray: '3, 3' 
+        fillOpacity: 0.4,  
+        dashArray: '3, 3'  
     }).addTo(map);
-    // toggle functionality
+ 
+
     function toggle(color) {
         if (heatLayers[color]) {
             heatLayers[color].remove(); // Remove heatmap layer if exists
@@ -373,72 +340,75 @@
             heatLayers[color] = heatMap;
         }
     };
-    // char js
+
     const ctx = document.getElementById("bar_chart_assessment");
+
     new Chart(ctx, {
-        type: "bar",
-        data: {
-            labels: ["Undamaged", "Minor Damage", "Major Damage", "Destroyed"],
-            datasets: [
-                {
-                    label: "# of buildings",
-                    data: plot_data,
-                    borderWidth: 1,
-                    backgroundColor: ['#6ab04c', '#f9ca24', '#f0932b', '#eb4d4b '], // Green for undamaged, yellow for minor damage, orange for major damage, red for destroyed
-                },
-            ],
-        },
-        options: {
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    max: maxYAxes + 5,
-                },
+    type: "bar",
+    data: {
+        labels: ["Undamaged", "Minor Damage", "Major Damage", "Destroyed"],
+        datasets: [
+            {
+                label: "# of buildings",
+                data: plot_data,
+                borderWidth: 1,
+                backgroundColor: ['#6ab04c', '#f9ca24', '#f0932b', '#eb4d4b '], // Green for undamaged, yellow for minor damage, orange for major damage, red for destroyed
             },
+        ],
+    },
+    options: {
+        scales: {
+        y: {
+            beginAtZero: true,
+            max: maxYAxes+5,
         },
+        },
+    },
     });
+
     const ctx2 = document.getElementById("pie_chart_assessment");
+
     new Chart(ctx2, {
-        type: "pie",
-        data: {
-            labels: ["Undamaged", "Minor Damage", "Major Damage", "Destroyed"],
-            datasets: [
-                {
-                    label: "# of buildings",
-                    data: plot_data,
-                    borderWidth: 1,
-                    backgroundColor: ['#6ab04c', '#f9ca24', '#f0932b', '#eb4d4b '],
-                },
-            ],
+    type: "pie",
+    data: {
+        labels: ["Undamaged", "Minor Damage", "Major Damage", "Destroyed"],
+        datasets: [
+        {
+            label: "# of buildings",
+            data: plot_data,
+            borderWidth: 1,
+            backgroundColor: ['#6ab04c', '#f9ca24', '#f0932b', '#eb4d4b '],
         },
-        options: {
-            scales: {
-                y: {
-                    beginAtZero: true,
-                },
-            },
+        ],
+    },
+    options: {
+        scales: {
+        y: {
+            beginAtZero: true,
         },
+        },
+    },
     });
 </script>
 
 <!-- Error messages -->
 {% if messages %}
-{% for message in messages %}
-<div id="alert-container" class="position-fixed top-0 start-50 translate-middle-x mt-4" style="z-index: 1050">
-    <div class="alert {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% endif %}"
-        role="alert">
-        {{ message }}
-    </div>
-</div>
-{% endfor %}
-<script>
-    // Automatically remove alert after 5 seconds
-    $(document).ready(function () {
-        setTimeout(function () {
-            $('#alert-container').fadeOut();
-        }, 2000);
-    });
-</script>
+    {% for message in messages %}
+        <div id="alert-container" class="position-fixed top-0 start-50 translate-middle-x mt-4" style="z-index: 1050">
+            <div class="alert {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% endif %}"
+                role="alert">
+                {{ message }}
+            </div>
+        </div>
+    {% endfor %}
+    <script>
+        // Automatically remove alert after 5 seconds
+        $(document).ready(function () {
+            setTimeout(function () {
+                $('#alert-container').fadeOut();
+            }, 2000);
+        });
+    </script>
 {% endif %}
 
 {% endblock body %}

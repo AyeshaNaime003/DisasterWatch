@@ -78,6 +78,8 @@ section.errorpage h2 i {
 
 div label {
     color: gray;
+    margin-bottom: 0px;
+    padding: 0;
 }
 
 .noInference {
