@@ -10,7 +10,11 @@
     --lovely-blue-lighter:#b3d2ea;
     --lovely-blue:#6AACDE;
     --lovely-blue-deeper:#1f5782;
-    --light-black: #1b1c1d; 
+    --light-black: #1b1c1d;
+    --green: #6ab04c;
+    --yellow: #f9ca24;
+    --orange: #f0932b;
+    --red: #eb4d4b ;
 }
 body{
     padding: 0;
@@ -43,5 +47,6 @@ h2, h3{
 }
 
 .card {
-    border-radius: 13px;
+    border-radius: 13px !important;
 }
+
