@@ -8,6 +8,7 @@
     margin-left: 20px;
     background-color: rgb(245, 245, 245);
     margin-top:5px;
+    
 }
 
 
@@ -29,7 +30,9 @@
     display: block;
     margin: 0 auto;
     font-size: auto; /* Adjust size as needed */
-    margin-bottom: 10px; /* Adjust spacing as needed */
+    margin-bottom: 5px; /* Adjust spacing as needed */
+    font-family: "Assistant", sans-serif;
+    font-style: italic;
 }
 
 .col-md-6 p {
@@ -72,6 +75,7 @@
 .inferenceform label {
     font-weight: bold;
     color: #343a40;
+    margin-bottom:0
 }
 
 .inferenceform input[type="text"],
@@ -84,7 +88,6 @@
     border-radius: 5px;
     box-sizing: border-box;
     padding-left:20px;
-    margin-top:5px;
 }
 
 .inferenceform select {

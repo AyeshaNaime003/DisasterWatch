@@ -5,6 +5,8 @@
 <link rel="stylesheet" href="{% static '/styles/home2.css' %}">
 <link rel="stylesheet" href="{% static '/styles/inference_form.css' %}">
 <script src="{% static '/javascript/inference_form.js' %}"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+
 
 <div id="inferencepage" class="container-fluid">
     <div class="row main-row" style="background-color: rgb(210, 210, 210)">
@@ -13,7 +15,7 @@
         <!-- MAIN CONTENT -->
         <div class="col-md-11">
             <div class="card inferenceform ">
-                <div class='p-5 pb-0 pageTitle'>
+                <div class='pt-5 px-5 pb-0 pageTitle'>
                     INFERENCE FORM
                     <p class='titleFooter'>Welcome to the inference form. Fill in the fields and submit to start the analysis process.<p>
                 </div> 
@@ -21,19 +23,19 @@
                 <div>
                 <form id="inference_form" method="POST" enctype="multipart/form-data">
                     {% csrf_token %}
-                    <div class="row mx-3">
+                    <div class="row mx-3 mt-0">
                         <!-- First Column: Image Input Fields -->
                         <div class="col-md-6">
                             <p class='mt-0 '>Pre-Disaster Image:</p>
-                            <div class="image-input 0 mb-3" id="pre_image_drop_area">
+                            <div class="image-input mb-3" id="pre_image_drop_area">
                                 <label for="pre_image">
-                                    <i class="fas fa-upload" style="font-weight:normal"> Drop or drag a file here or <br><b>Click to browse</b></br></i> </label>
+                                    <i class="fas fa-upload" > Drop or drag a file here or <br><b>Click to browse</b></br></i> </label>
                                 <input type="file" class="form-control-file" id="pre_image" name="pre_image" accept=".tif" required>
                             </div>
                             <p>Post-Disaster Image:</p>
                             <div class="image-input" id="post_image_drop_area">
                                 <label for="post_image">
-                                    <i class="fas fa-upload" style="font-weight:normal"> Drop or drag a file here or 
+                                    <i class="fas fa-upload" > Drop or drag a file here or 
                                         <br><b>Click to browse</b></br></i></label>
                                 <input type="file" class="form-control-file" id="post_image" name="post_image" accept=".tif" required>
                             </div>
@@ -65,7 +67,7 @@
                                 <label for="comments">Additional Comments:</label>
                                 <textarea class="form-control" id="comments" name="comments" rows="3"></textarea>
                             </div>
-                            <button type="submit" class="btn btn-primary bg-lovely-blue-deeper my-2">Submit</button>
+                            <button type="submit" class="btn btn-primary bg-lovely-blue-deeper my-3">Submit</button>
                         </div>
                     </div>
                 </form>
