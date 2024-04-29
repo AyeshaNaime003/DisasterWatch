@@ -13,9 +13,6 @@ urlpatterns = [
     path('update-profile/', views.profile, name="update-profile"),
     path('help/', views.help, name="help"),
     path('inferenceform/', views.inferenceform, name="inferenceform"),
-    # path('<path:not_found>', TemplateView.as_view(template_name='app/404.html'), name='not_found'),
-    # path('get-address/', views.get_address, name='get_address'),
-    # admin panel
     path('admin-panel/', views.adminPanel, name="admin-panel"),
     path('add-user/', views.addUser, name="add-user"),
     path('edit-user/<int:user_id>/', views.edit_user, name="edit-user"),

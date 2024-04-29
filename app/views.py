@@ -24,23 +24,46 @@ from .api import get_weather, get_population, get_news
 from django.urls import reverse
 from django.http import HttpResponse
 
-def get_address(request):
-    if request.method == 'GET':
-        try:
-            lat = request.GET.get('lat')
-            lon = request.GET.get('lon')
-            
-            geolocator = Nominatim(user_agent="my_geocoder")
-            location = geolocator.reverse((lat, lon), exactly_one=True)
-            print("1")
-            return JsonResponse({'address': location.address})
-        
-        except GeocoderUnavailable:
-            # Handle the exception
-            messages.error(request, "Address retrieval failed. Please try again later.")
-            return redirect("inferenceform")
-        
-    return JsonResponse({'error': 'Invalid request'})
+def get_critically_damaged_areas(results):
+    unique_addresses={
+    "towns":{point["address"]["town"] for color_points in results.values() for point in color_points}, 
+    "suburbs":{point["address"]["suburb_municipality"] for color_points in results.values() for point in color_points},
+    "roads":{point["address"]["road"] for color_points in results.values() for point in color_points}
+}
+    # selecting the best component
+    best_component = max(
+    ("towns", len(unique_addresses["towns"])),
+    ("suburbs", len(unique_addresses["suburbs"])),
+    ("roads", len(unique_addresses["roads"])),key=lambda x: x[1])[0]
+    print(best_component)
+    # getting the number of each class in each unique value of the bet component
+    componentDict = {road: {"red":0,
+                    "orange":0, 
+                    "yellow":0, 
+                    "green":0} for road in unique_addresses[best_component]}
+    for color in results.keys():
+        for point in results[color]:
+            road = point["address"]["road"]
+            componentDict[road][color]+=1
+    for road, dictionary in componentDict.items():
+        rating = 3*dictionary["red"]+2*dictionary["orange"]+dictionary["yellow"]
+        componentDict[road]["rating"]=rating
+    sortedComponent = dict(sorted(componentDict.items(), key=lambda x: x[1]['rating'], reverse=True))
+    sortedComponentRevised = []
+    for componentName, componentData in sortedComponent.items():
+        componentData_formatted = {
+            'index': len(sortedComponentRevised) + 1,
+            'componentName': componentName,
+            'red': componentData['red'],
+            'orange': componentData['orange'],
+            'yellow': componentData['yellow'],
+            'green': componentData['green'],
+            'rating': componentData['rating']
+            # Add more data if needed
+        }
+        sortedComponentRevised.append(componentData_formatted)
+    return sortedComponentRevised
+
 def loginPage(request):
     if request.method=="POST":
         username = request.POST.get('username')
@@ -163,88 +186,52 @@ def dashboard_with_id(request, inference_id):
     inference_model = InferenceModel.objects.filter(user=request.user, id=inference_id).last()
     if not inference_model:
         return HttpResponse("Inference model not found", status=404)
-    # formatting the data for api calls
-    disaster_time = inference_model.disaster_date.strftime('%Y/%m/%d') if inference_model.disaster_date else None
-    disaster_city = inference_model.disaster_city
-    results = json.loads(inference_model.results)
-    # weather
-    # weather = get_weather(disaster_city, date_str=disaster_time)
-    weather = {
-        "city": "hehe",
-        "description": "hehe",
-        "temperature": "hehe",
-        "wind": "hehe",
-        "humidity": "hehe",
-        "rain": "hehe",
-        "clouds": "hehe"
-    }
-    # population
-    # population = get_population(disaster_city)
-    # unique values of each address component
-    unique_addresses={
-        "towns":{point["address"]["town"] for color_points in results.values() for point in color_points}, 
-        "suburbs":{point["address"]["suburb_municipality"] for color_points in results.values() for point in color_points},
-        "roads":{point["address"]["road"] for color_points in results.values() for point in color_points}
-    }
-    # selecting the best component
-    best_component = max(
-    ("towns", len(unique_addresses["towns"])),
-    ("suburbs", len(unique_addresses["suburbs"])),
-    ("roads", len(unique_addresses["roads"])),key=lambda x: x[1])[0]
-    print(best_component)
-    # getting the number of each class in each unique value of the bet component
-    componentDict = {road: {"red":0,
-                       "orange":0, 
-                       "yellow":0, 
-                       "green":0} for road in unique_addresses[best_component]}
-    for color in results.keys():
-        for point in results[color]:
-            road = point["address"]["road"]
-            componentDict[road][color]+=1
-    for road, dictionary in componentDict.items():
-        rating = 3*dictionary["red"]+2*dictionary["orange"]+dictionary["yellow"]
-        componentDict[road]["rating"]=rating
-    sortedComponent = dict(sorted(componentDict.items(), key=lambda x: x[1]['rating'], reverse=True))
-    sortedComponentRevised = []
-    for componentName, componentData in sortedComponent.items():
-        componentData_formatted = {
-            'index': len(sortedComponentRevised) + 1,
-            'componentName': componentName,
-            'red': componentData['red'],
-            'orange': componentData['orange'],
-            'yellow': componentData['yellow'],
-            'green': componentData['green'],
-            'rating': componentData['rating']
-            # Add more data if needed
+    else:
+        # formatting the data for api calls
+        disaster_time = inference_model.disaster_date.strftime('%Y/%m/%d') if inference_model.disaster_date else None
+        disaster_city = inference_model.disaster_city
+        results = json.loads(inference_model.results)
+        # weather
+        # weather = get_weather(disaster_city, date_str=disaster_time)
+        weather = {
+            "city": "hehe",
+            "description": "hehe",
+            "temperature": "hehe",
+            "wind": "hehe",
+            "humidity": "hehe",
+            "rain": "hehe",
+            "clouds": "hehe"
         }
-        sortedComponentRevised.append(componentData_formatted)
+        # population
+        # population = get_population(disaster_city)
+        # unique values of each address component
+        sortedComponentRevised = get_critically_damaged_areas(results)
 
-    print(sortedComponentRevised)
-    
-    # chart
-    classes = ["green", "yellow", "orange", "red"]
-    classes_count = [len(results[cls]) for cls in classes]
-    class_none = [0, 0, 0, 0]
-    # data to send to front end
-    return render(request, 'app/dashboard.html', {"context": {
-        'inference_id': inference_model.id,
-        'disaster_date': disaster_time,
-        'disaster_city': disaster_city,
-        'disaster_state': inference_model.disaster_state,
-        'disaster_country': inference_model.disaster_country,
-        'disaster_type': inference_model.disaster_type,
-        'disaster_description': inference_model.disaster_description,
-        'tif_middle_latitude': inference_model.tif_middle_latitude,
-        'tif_middle_longitude': inference_model.tif_middle_longitude,
-        'results': json.loads(inference_model.results),
-        'weather': weather,
-        'population': "None",
-        'building_count': sum(classes_count),
-        'damaged_count': sum(classes_count[1:]),
-        'graph_data': classes_count if results else class_none,
-        "disasterAreas": sortedComponentRevised}
-    }
-    )
+        print(sortedComponentRevised)
+        
+        # chart
+        classes = ["green", "yellow", "orange", "red"]
+        classes_count = [len(results[cls]) for cls in classes]
+        class_none = [0, 0, 0, 0]
+        # data to send to front end
+        return render(request, 'app/dashboard.html', {"context": {
+            'inference_id': inference_model.id,
+            'disaster_date': disaster_time,
+            'disaster_city': disaster_city,
+            'disaster_state': inference_model.disaster_state,
+            'disaster_country': inference_model.disaster_country,
+            'disaster_type': inference_model.disaster_type,
+            'disaster_description': inference_model.disaster_description,
+            'tif_middle_latitude': inference_model.tif_middle_latitude,
+            'tif_middle_longitude': inference_model.tif_middle_longitude,
+            'results': json.loads(inference_model.results),
+            'weather': weather,
+            'population': "None",
+            'building_count': sum(classes_count),
+            'damaged_count': sum(classes_count[1:]),
+            'graph_data': classes_count if results else class_none,
+            "disasterAreas": sortedComponentRevised}
+        })
 
 
 @login_required(login_url="login/")
@@ -314,17 +301,18 @@ def map_with_id(request, inference_id):
     inference_model = InferenceModel.objects.filter(user=request.user, id=inference_id).last()
     if not inference_model:
         return HttpResponse("Inference model not found", status=404)
-    return render(request, 'app/map.html', {"context":{
-        'disaster_date': inference_model.disaster_date.strftime('%Y-%m-%d') if inference_model and inference_model.disaster_date else None,
-        'disaster_city': inference_model.disaster_city if inference_model else None,
-        'disaster_state': inference_model.disaster_state if inference_model else None,
-        'disaster_country': inference_model.disaster_country if inference_model else None,
-        'disaster_type': inference_model.disaster_type if inference_model else None,
-        'disaster_description': inference_model.disaster_description if inference_model else None,
-        'tif_middle_latitude': inference_model.tif_middle_latitude if inference_model else None,
-        'tif_middle_longitude': inference_model.tif_middle_longitude if inference_model else None,
-        'results': json.loads(inference_model.results) if inference_model else None,
-    }})
+    else:
+        return render(request, 'app/map.html', {"context":{
+            'disaster_date': inference_model.disaster_date.strftime('%Y-%m-%d') if inference_model and inference_model.disaster_date else None,
+            'disaster_city': inference_model.disaster_city if inference_model else None,
+            'disaster_state': inference_model.disaster_state if inference_model else None,
+            'disaster_country': inference_model.disaster_country if inference_model else None,
+            'disaster_type': inference_model.disaster_type if inference_model else None,
+            'disaster_description': inference_model.disaster_description if inference_model else None,
+            'tif_middle_latitude': inference_model.tif_middle_latitude if inference_model else None,
+            'tif_middle_longitude': inference_model.tif_middle_longitude if inference_model else None,
+            'results': json.loads(inference_model.results) if inference_model else None,
+        }})
 
 
 @login_required(login_url="login/")
@@ -332,9 +320,9 @@ def profile(request):
     # get current user
     user = request.user
     print(user.email, user.first_name, user.last_name, user.contact, user.profile_picture.url if user.profile_picture else '')
-    user_inferences = InferenceModel.objects.filter(user=user)
+    user_inferences = InferenceModel.objects.filter(user=user).order_by('-created_at')
     print(user_inferences)
-    # make chnages to the fields of current user using the form
+    # make changes to the fields of current user using the form
     if request.method == 'POST':
         first_name = request.POST.get('first_name')
         last_name = request.POST.get('last_name')
@@ -453,88 +441,3 @@ def inferenceform(request):
 
 
 
-
-    # # @login_required(login_url="login/")
-# def inferenceform(request):
-#     if request.method == 'POST' and request.POST["comments"]=="EMPTY":
-#             return redirect("dashboard")
-#     if request.method == 'POST' and request.FILES.get('pre_image') != None and request.FILES.get('post_image') != None:
-#         # get data from form 
-#         pre_image = request.FILES.get('pre_image')
-#         post_image = request.FILES.get('post_image')
-#         city = request.POST['city']
-#         date = request.POST['date']
-#         disaster_type = request.POST['disaster_type']
-#         disaster_description = request.POST['disaster_description']
-#         comments = request.POST['comments']
-
-#         # save the tiff files temporarily in media root
-#         file_name = f"{date}_{city}_{disaster_type}"
-#         pre_path = os.path.join(MEDIA_ROOT, 'tiff', file_name+"_pre.tif")
-#         post_path = os.path.join(MEDIA_ROOT, 'tiff', file_name+"_post.tif")
-#         with open(pre_path, 'wb') as f: 
-#             for chunk in pre_image.chunks():
-#                 f.write(chunk)
-#         with open(post_path, 'wb') as f:
-#             for chunk in post_image.chunks():
-#                 f.write(chunk)
-#         print("pre and post tifs saved")
-        
-#         # convert the tiff files to RGB images to run for inference
-#         pre_tif, post_tif = gdal.Open(pre_path), gdal.Open(post_path)
-#         pre_image, post_image = torch.from_numpy(tif_to_img(pre_tif)), torch.from_numpy(tif_to_img(post_tif))
-#         pre_post = torch.cat((pre_image, post_image), dim=2).permute(2,0,1).unsqueeze(0).to(torch.float)
-#         print(f"Tifs converted to concatenated images of {pre_post.shape}, {pre_post.dtype}")
-#         # INFERENCE------------------------------------------------------------------
-#         # model = SeResNext50_Unet_MultiScale()
-#         # output = model(pre_post)
-       
-#         # DUMMY DATA----------------------------------------------------------------------
-#         dummy_mask = cv2.imread("woolsey-fire_00000715_post_disaster.png") 
-#         print(f"Dummy mask shape an type {dummy_mask.shape}, {dummy_mask.dtype}")
-#         dummy_masks = one_hot_encoding_mask(dummy_mask)
-#         print(f"Dummy mask after hot encoding  {dummy_masks.shape}, {dummy_masks.dtype}")
-#         tranform = get_tif_transform(pre_path)
-#         classes=["red","orange","yellow","green"]
-        
-#         # format the inference for database
-#         polygons_data={}
-#         for i, mask in enumerate(dummy_masks):
-#             color=classes[i]
-#             _, mask = cv2.threshold(mask.astype('uint8'), 0, 255, cv2.THRESH_BINARY)
-#             polygons_in_mask = mask_to_polygons(mask, tranform, rdp=False)
-#             print(f"{color}: {len(polygons_in_mask)}")
-#             polygons_data[color]=polygons_in_mask
-#         # Convert the dictionary to JSON format
-#         print(request.POST['city'])
-#         print( polygons_in_mask[0]['address']['city'])
-#         print( polygons_in_mask[0]['address']['town'])
-#         transform = get_tif_transform(pre_path)
-#         map_middle_lat, map_middle_long = pixels_to_coordinates(transform, (612,612))
-#         json_data = json.dumps({
-#             "date": date,
-#             "city": polygons_in_mask[0]['address']['city'] if polygons_in_mask[0]['address']['city'] == request.POST['city'] else polygons_in_mask[0]['address']['town'],
-#             "state":polygons_in_mask[0]['address']['state'],
-#             "country":polygons_in_mask[0]['address']['country'],
-#             "disaster_type":disaster_type, 
-#             "disaster_description":disaster_description, 
-#             "comments":comments,
-#             'map_middle_lat': map_middle_lat,
-#             'map_middle_long': map_middle_long,
-#             "pre_path":pre_path, 
-#             "post_path":post_path,
-#             "polygon_data": polygons_data, 
-#         })
-#         try:
-#             # Create and save an instance of JsonFileModel
-#             json_model_instance = JsonFileModel.objects.create(user=request.user, json_file=json_data)
-#             json_model_instance.save()
-#             print("JsonFileModel model created")
-#             messages.success(request, "JsonFileModel model created")
-#             return redirect("dashboard")
-#         except:
-#             print("Unable to save inference")
-#             messages.error(request, "Unable to save inference")
-#             return redirect("inferenceform")
-#     else:
-#         return render(request, "app/inferenceform.html")
