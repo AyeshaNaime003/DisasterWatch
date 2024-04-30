@@ -12,10 +12,21 @@
         {% include 'app/navbar2.html' %}
         <!-- MAIN CONTENT -->
         <div class="col-md-11">
-            <div class="spinner-border " style="width: 3rem; height: 3rem;display:none" role="status" id='loading'>
-                <span class="sr-only">Loading...</span>
+            <div id="loading" style='display:none'> 
+                <div id="loading-content" class='card w-25 h-50 d-flex justify-content-center'>
+                  <div id="loading-animation" class='mb-4'>
+                    <!-- SVGs for animation -->
+                    <lord-icon id='loading-svg'
+                        src="https://cdn.lordicon.com/prgqueup.json"
+                        trigger="loop"
+                        style="width:150px;height:150px">
+                    </lord-icon>
+                  </div>
+                  <div id="loading-text" class="fadeInOut ">Processing images...</div>
+                </div>
             </div>
-            <div class="card inferenceform ">
+
+            <div class="card inferenceform " id='yeWala'>
                 <div class='pt-5 px-5 pb-0 pageTitle'>
                     INFERENCE FORM
                     <p class='titleFooter'>Welcome to the inference form. Fill in the fields and submit to start the analysis process.<p>
@@ -79,6 +90,11 @@
                                     <option value="Earthquake">Earthquake</option>
                                     <option value="Flood">Flood</option>
                                     <option value="Fire">Fire</option>
+                                    <option value="Landslide">Landslide</option>
+                                    <option value="Hurricane">Hurricane</option>
+                                    <option value="Tsunami">Tsunami</option>
+                                    <option value="Monsoon">Monsoon</option>
+                                    <option value="Tornado">Tornado</option>
                                     <!-- Add more options as needed -->
                                 </select>
                             </div>
@@ -94,7 +110,7 @@
                         </div>
                     </div>
                 </form>
-            </div>
+            </div>        
         </div>
     </div>
 </div>
@@ -116,15 +132,37 @@
 {% endif %}
 
 <script>
+    // Function to cycle through loading text
+    const loadingTexts = [
+        "Analyzing results...",
+        "Finding buildings...",
+        "Assessing damage...",
+        "Getting your dashboard ready...",
+        "Processing images..."
+    ];
+
+
+    let currentIndex = 0;
+    const loadingTextElement = document.getElementById('loading-text');
+
+    function cycleLoadingText() {
+        loadingTextElement.textContent = loadingTexts[currentIndex];
+        currentIndex = (currentIndex + 1) % loadingTexts.length;
+    }
+
     document.addEventListener("DOMContentLoaded", function() {
         var form = document.getElementById("inference_form");
         var hiddenDiv = document.getElementById("loading");
+        var otherDiv = document.getElementById("yeWala");
     
         form.addEventListener("submit", function(event) {
             event.preventDefault(); // Prevent the default form submission
     
             // Show the hidden div
-            hiddenDiv.style.display = "block"; // or "inline" depending on the div's original display property
+            hiddenDiv.style.display = "flex"; // or "inline" depending on the div's original display property
+            otherDiv.style.display='none';
+            // Call the function every 2.5 seconds
+            setInterval(cycleLoadingText, 3000);
             form.submit();
         });
 

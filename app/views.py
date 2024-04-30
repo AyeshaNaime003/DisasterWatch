@@ -257,18 +257,18 @@ def dashboard_with_id(request, inference_id):
         address_components.remove("country")
         address_components.remove("state")
         # weather
-        # weather = get_weather(disaster_city, date_str=disaster_time)
-        weather = {
-            "city": "hehe",
-            "description": "hehe",
-            "temperature": "hehe",
-            "wind": "hehe",
-            "humidity": "hehe",
-            "rain": "hehe",
-            "clouds": "hehe"
-        }
+        weather = get_weather(disaster_city, date_str=disaster_time)
+        # weather = {
+        #     "city": "hehe",
+        #     "description": "hehe",
+        #     "temperature": "hehe",
+        #     "wind": "hehe",
+        #     "humidity": "hehe",
+        #     "rain": "hehe",
+        #     "clouds": "hehe"
+        # }
         # population
-        # population = get_population(disaster_city)
+        population = get_population(disaster_city)
         boundary_coordinates = get_extreme_points([(point["center_lat"], point["center_long"]) for color, points in results.items() if color != "green" for point in points])
         # print(boundary_coordinates)
 
@@ -290,7 +290,7 @@ def dashboard_with_id(request, inference_id):
             'tif_middle_longitude': inference_model.tif_middle_longitude,
             'results': json.loads(inference_model.results),
             'weather': weather,
-            'population': "None",
+            'population': population,
             'building_count': sum(classes_count),
             'damaged_count': sum(classes_count[1:]),
             'graph_data': classes_count if results else class_none,
@@ -460,82 +460,6 @@ def inferenceform(request):
             return redirect("inferenceform")
     else:
         return render(request, "app/inferenceform.html")
-    
-
-
-
-
-
-
-"""
-
-@login_required(login_url="login/")
-def dashboard(request):
-    inference_model = InferenceModel.objects.filter(user=request.user).last()
-    disaster_time = inference_model.disaster_date.strftime('%Y/%m/%d') if inference_model and inference_model.disaster_date else None
-    print(disaster_time )
-    disaster_city = inference_model.disaster_city if inference_model else None
-    # weather = get_weather(disaster_city, date_str=disaster_time)
-    weather = {
-        "city":"hehe",
-        "description":"hehe",
-        "temperature":"hehe",
-        "wind":"hehe",
-        "humidity":"hehe",
-        "rain": "hehe",
-        "clouds":"hehe"
-    }
-    # population = get_population(disaster_city)
-    # print(population)
-
-    # data for the graphs
-    json_graph_data = json.loads(inference_model.results)
-    classes = ["green", "yellow", "orange", "red"]
-    classes_count = []
-    
-    for i, cls in enumerate(classes): 
-        # print(len(json_graph_data["red"]))
-        classes_count.append(len(json_graph_data[cls]))
-    print(classes_count)
-    class_none = [0, 0, 0, 0]
-
-    return render(request, 'app/dashboard.html', {"context":{
-        'disaster_date': disaster_time,
-        'disaster_city': disaster_city,
-        'disaster_state': inference_model.disaster_state if inference_model else None,
-        'disaster_country': inference_model.disaster_country if inference_model else None,
-        'disaster_type': inference_model.disaster_type if inference_model else None,
-        'disaster_description': inference_model.disaster_description if inference_model else None,
-        'tif_middle_latitude': inference_model.tif_middle_latitude if inference_model else None,
-        'tif_middle_longitude': inference_model.tif_middle_longitude if inference_model else None,
-        'results': json.loads(inference_model.results) if inference_model else None,
-        'weather':weather, 
-        'population': "None", 
-        'building_count': sum(classes_count),
-        'damaged_count': sum(classes_count[1:]),
-        'graph_data': classes_count if json_graph_data else class_none,
-    }})
-
-    
-
-@login_required(login_url="login/")
-def map(request): 
-    inference_model = InferenceModel.objects.filter(user=request.user).last()
-    return render(request, 'app/map.html', {"context":{
-        'disaster_date': inference_model.disaster_date.strftime('%Y-%m-%d') if inference_model and inference_model.disaster_date else None,
-        'disaster_city': inference_model.disaster_city if inference_model else None,
-        'disaster_state': inference_model.disaster_state if inference_model else None,
-        'disaster_country': inference_model.disaster_country if inference_model else None,
-        'disaster_type': inference_model.disaster_type if inference_model else None,
-        'disaster_description': inference_model.disaster_description if inference_model else None,
-        'tif_middle_latitude': inference_model.tif_middle_latitude if inference_model else None,
-        'tif_middle_longitude': inference_model.tif_middle_longitude if inference_model else None,
-        'results': json.loads(inference_model.results) if inference_model else None,
-    }})
-
-
-"""
-
 
 
 

@@ -58,7 +58,6 @@ section.errorpage h2 i {
 .carousel-item {
     min-height: max-content;
 }
-
 .card-body {
     overflow: hidden;
     text-overflow: ellipsis;
