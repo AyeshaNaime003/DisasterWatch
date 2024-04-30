@@ -19,16 +19,19 @@ import json
 from geopy.geocoders import Nominatim
 from geopy.exc import GeocoderUnavailable
 from server.settings import *
-from .model.data_preprocessing import one_hot_encoding_mask, mask_to_polygons, get_tif_transform, pixels_to_coordinates
-from .model.preprocessing import tif_to_img
-from .api import get_weather, get_population, get_news
+from .model.preprocessing import *
+from .model.postprocessing import *
+from .model.datastorage import *
+from .model.models import BASE_Transformer_UNet
+from .api import *
 from django.urls import reverse
 from django.http import HttpResponse
 from math import pi, cos, radians, atan2
+from importlib.machinery import SourceFileLoader
 
-
-
-
+cwd = os.getcwd()
+model_dir = os.path.join(cwd, "app", "model")
+bitmodule = SourceFileLoader('bitmodule', os.path.join(model_dir, "bit_resnet.py")).load_module()
 
 
 
@@ -157,32 +160,35 @@ def delete_user(request, user_id):
     return redirect('admin-panel')
 
 
-def get_critically_damaged_areas(results):
-    unique_addresses={
-    "towns":{point["address"]["town"] for color_points in results.values() for point in color_points}, 
-    "suburbs":{point["address"]["suburb_municipality"] for color_points in results.values() for point in color_points},
-    "roads":{point["address"]["road"] for color_points in results.values() for point in color_points}
-}
-    # selecting the best component
-    best_component = max(
-    ("towns", len(unique_addresses["towns"])),
-    ("suburbs", len(unique_addresses["suburbs"])),
-    ("roads", len(unique_addresses["roads"])),key=lambda x: x[1])[0]
-    print(best_component)
+def get_critically_damaged_areas(results, address_components):
+    # finding the best compoent, i.e one with the most unique values
+    unique_addresses={}
+    for component in address_components:
+        unique_addresses[component] = {point["address"][component] for color_points in results.values() for point in color_points if component in point["address"]}
+
+    chosen_component = max(
+    [(component, len(unique_addresses[component])) for component in address_components],
+    key=lambda x: x[1])[0]
+    print(chosen_component)
+    
     # getting the number of each class in each unique value of the bet component
-    componentDict = {road: {"red":0,
+    componentDict = {chosen: {"red":0,
                     "orange":0, 
                     "yellow":0, 
-                    "green":0} for road in unique_addresses[best_component]}
+                    "green":0} for chosen in unique_addresses[chosen_component]}
+    
     for color in results.keys():
         for point in results[color]:
-            road = point["address"]["road"]
-            componentDict[road][color]+=1
-    for road, dictionary in componentDict.items():
+            chosen = point["address"][chosen_component]
+            componentDict[chosen][color]+=1
+
+    for chosen, dictionary in componentDict.items():
         rating = 3*dictionary["red"]+2*dictionary["orange"]+dictionary["yellow"]
-        componentDict[road]["rating"]=rating
+        componentDict[chosen]["rating"]=rating
+    
     sortedComponent = dict(sorted(componentDict.items(), key=lambda x: x[1]['rating'], reverse=True))
     sortedComponentRevised = []
+    
     for componentName, componentData in sortedComponent.items():
         componentData_formatted = {
             'index': len(sortedComponentRevised) + 1,
@@ -191,8 +197,6 @@ def get_critically_damaged_areas(results):
             'orange': componentData['orange'],
             'yellow': componentData['yellow'],
             'green': componentData['green'],
-            'rating': componentData['rating']
-            # Add more data if needed
         }
         sortedComponentRevised.append(componentData_formatted)
     return sortedComponentRevised
@@ -249,6 +253,9 @@ def dashboard_with_id(request, inference_id):
         disaster_time = inference_model.disaster_date.strftime('%Y/%m/%d') if inference_model.disaster_date else None
         disaster_city = inference_model.disaster_city
         results = json.loads(inference_model.results)
+        address_components = list(results["green"][0]["address"].keys())
+        address_components.remove("country")
+        address_components.remove("state")
         # weather
         # weather = get_weather(disaster_city, date_str=disaster_time)
         weather = {
@@ -263,7 +270,7 @@ def dashboard_with_id(request, inference_id):
         # population
         # population = get_population(disaster_city)
         boundary_coordinates = get_extreme_points([(point["center_lat"], point["center_long"]) for color, points in results.items() if color != "green" for point in points])
-        print(boundary_coordinates)
+        # print(boundary_coordinates)
 
         # chart
         classes = ["green", "yellow", "orange", "red"]
@@ -287,9 +294,9 @@ def dashboard_with_id(request, inference_id):
             'building_count': sum(classes_count),
             'damaged_count': sum(classes_count[1:]),
             'graph_data': classes_count if results else class_none,
-            "disasterAreas": get_critically_damaged_areas(results),
+            "disasterAreas": get_critically_damaged_areas(results, address_components),
             "boundary_coordinates": boundary_coordinates, 
-            "total_damaged_area": int(area_calculator(boundary_coordinates))/ 1e6 
+            "total_damaged_area": int(area_calculator(boundary_coordinates))/ 1e6, 
             }
         })
 
@@ -301,6 +308,10 @@ def map_with_id(request, inference_id):
     if not inference_model:
         return HttpResponse("Inference model not found", status=404)
     else:
+        results = json.loads(inference_model.results)
+        address_components = list(results["green"][0]["address"].keys())[::-1]
+        address_components.remove("country")
+        address_components.remove("state")
         return render(request, 'app/map.html', {"context":{
             'disaster_date': inference_model.disaster_date.strftime('%Y-%m-%d') if inference_model and inference_model.disaster_date else None,
             'disaster_city': inference_model.disaster_city if inference_model else None,
@@ -311,6 +322,8 @@ def map_with_id(request, inference_id):
             'tif_middle_latitude': inference_model.tif_middle_latitude if inference_model else None,
             'tif_middle_longitude': inference_model.tif_middle_longitude if inference_model else None,
             'results': json.loads(inference_model.results) if inference_model else None,
+            "address_components": address_components, 
+
         }})
 
 
@@ -366,6 +379,7 @@ def inferenceform(request):
         disaster_type = request.POST['disaster_type']
         disaster_description = request.POST['disaster_description']
         disaster_comments = request.POST['comments']
+        
         # Save the tiff files temporarily in media root
         file_name = f"{disaster_date}_{disaster_city}_{disaster_type}"
         pre_path = os.path.join(MEDIA_ROOT, 'tiff', file_name+"_pre.tif")
@@ -376,51 +390,70 @@ def inferenceform(request):
         with open(post_path, 'wb') as f:
             for chunk in post_image.chunks():
                 f.write(chunk)
-        print("Pre and post tifs saved")
-        # Convert the tiff files to RGB images to run for inference
-        pre_tif, post_tif = gdal.Open(pre_path), gdal.Open(post_path)
-        pre_image, post_image = torch.from_numpy(tif_to_img(pre_tif)), torch.from_numpy(tif_to_img(post_tif))
-        pre_post = torch.cat((pre_image, post_image), dim=2).permute(2,0,1).unsqueeze(0).to(torch.float)
-        print(f"Tifs converted to concatenated images of {pre_post.shape}, {pre_post.dtype}")
-        # Dummy data (for testing purposes)
-        dummy_mask = cv2.imread("woolsey-fire_00000715_post_disaster.png")
-        print(f"Dummy mask shape and type {dummy_mask.shape}, {dummy_mask.dtype}")
-        dummy_masks = one_hot_encoding_mask(dummy_mask)
-        print(f"Dummy mask after hot encoding {dummy_masks.shape}, {dummy_masks.dtype}")
+        print("Pre and post tifs saved in media")
+
+        # convert to image
+        pre_image, post_image = tif_to_img(pre_path, post_path)
+        h, w = post_image.shape[0], post_image.shape[1]
+
+        
+        # model and inference
+        device = "cuda" if torch.cuda.is_available() else "cpu"
+        loaded_model = BASE_Transformer_UNet(input_nc=3, 
+                                            output_nc=5, 
+                                            token_len=4, 
+                                            resnet_stages_num=4,
+                                            with_pos='learned', 
+                                            enc_depth=1, 
+                                            dec_depth=8).to(device)
+
+        loaded_model.load_state_dict(torch.load(os.path.join(model_dir, "checkpoint.pth"), map_location=torch.device('cpu')))
+        start = time.time()
+        processed_output_masks = postprocessing(pre_image, post_image, loaded_model)
+        end = time.time()
+        elapsed_time = end - start 
+        print(f"Inference time: {elapsed_time} seconds")
+
+        # data storage
         transform = get_tif_transform(pre_path)
-        classes = ["red", "orange", "yellow", "green"]
-         # Format the inference data for the database
-        results = {}
-        for i, mask in enumerate(dummy_masks):
-            color = classes[i]
-            _, mask = cv2.threshold(mask.astype('uint8'), 0, 255, cv2.THRESH_BINARY)
-            polygons_in_mask = mask_to_polygons(mask, transform, rdp=False)
+        classes = ['Green', 'Yellow', 'Orange', 'Red']
+        results={}
+        for index, mask in enumerate(processed_output_masks[1: ]):
+            color = classes[index]
+            polygons_in_mask = get_polygons(mask, transform, rdp=False)
             print(f"{color}: {len(polygons_in_mask)}")
             results[color] = polygons_in_mask
-        # Convert the dictionary to JSON format
-        tif_middle_latitude, tif_middle_longitude = pixels_to_coordinates(transform, (612, 612))
+            # break
+        tif_middle_latitude, tif_middle_longitude = pixels_to_coordinates(transform, (h/2, w/2))
+        
+        # using the last polygons_in_mask to get data
+        last_polygons_in_mask_address = polygons_in_mask[0]['address'] 
+        # Get the value for "city" if it exists, otherwise get "region" or "town" with an empty string as default
+        disaster_city = last_polygons_in_mask_address.get("city", last_polygons_in_mask_address.get("region", last_polygons_in_mask_address.get("town", "")))
+
+        address_components = last_polygons_in_mask_address.keys()
+        print(address_components)
         try:
             # Create and save an instance of InferenceModel
             inference_model_instance = InferenceModel.objects.create(
-                user=request.user,
-                disaster_date=disaster_date,
-                disaster_city=polygons_in_mask[0]['address']['city'] if polygons_in_mask[0]['address']['city'] == request.POST['city'] else polygons_in_mask[0]['address']['town'],
-                disaster_state=polygons_in_mask[0]['address']['state'],
-                disaster_country=polygons_in_mask[0]['address']['country'],
-                disaster_type=disaster_type,
-                disaster_description=disaster_description,
-                disaster_comments=disaster_comments,
-                tif_middle_latitude=tif_middle_latitude,
-                tif_middle_longitude=tif_middle_longitude,
-                pre_tif_path=pre_path,
-                post_tif_path=post_path,
-                results=json.dumps(results),
+                user = request.user,
+                disaster_date = disaster_date,
+                disaster_city =  disaster_city,
+                disaster_state = last_polygons_in_mask_address["state"],
+                disaster_country = last_polygons_in_mask_address["country"],
+                disaster_type = disaster_type,
+                disaster_description = disaster_description,
+                disaster_comments = disaster_comments,
+                tif_middle_latitude = tif_middle_latitude,
+                tif_middle_longitude = tif_middle_longitude,
+                pre_tif_path = pre_path,
+                post_tif_path = post_path,
+                results = json.dumps(results),
             )
             inference_model_instance.save()
             print("InferenceModel model created")
             messages.success(request, "InferenceModel model created")
-            dashboard_url = reverse('dashboard_with_id', kwargs={'inference_id': inference_model_instance.id})
-            return redirect(dashboard_url)
+            return redirect(reverse('dashboard_with_id', kwargs={'inference_id': inference_model_instance.id}))
         except Exception as e:
             print(f"Unable to save inference: {e}")
             messages.error(request, "Unable to save inference")

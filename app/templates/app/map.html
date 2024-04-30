@@ -139,11 +139,11 @@
                                     <table class="table table-striped">
                                         <thead>
                                             <tr>
-                                                <th>Building</th>
-                                                <th>Neighbourhood</th>
-                                                <th>Road</th>
-                                                <th>Suburb</th>
-                                                <th>Town</th>
+                                                {% for component in context.address_components %}
+                                                <th>{{ component }}</th>
+
+                                                {% endfor %}
+
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -185,6 +185,7 @@
     var results = context.results;
     var lat = context.tif_middle_latitude;
     var long = context.tif_middle_longitude;
+    var addressComponents = context.address_components;
     // map and tiles
     var map = L.map('map').setView([lat, long], 18);
     var streetView = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -216,16 +217,16 @@
                     color: color,
                     fillOpacity: 0.5
                 }).addTo(map);
-                polygon.bindPopup(`<div>${displayAddressComponents(address)}</div>`);
+                // polygon.bindPopup(`<div>${displayAddressComponents(address, )}</div>`);
                 colorPolygons.push(polygon);
-                // adding addresses to the table
-                $('#table tbody').append(`<tr class="${color}">
-                    <td>${address.name}</td>
-                    <td>${address.neighbourhood}</td>
-                    <td>${address.road}</td>
-                    <td>${address.suburb_municipality}</td>
-                    <td>${address.town}</td>
-                </tr>`);
+                var rowHtml = '<tr class="' + color + '">';
+                addressComponents.forEach(component => {
+                    rowHtml += '<td>' + (address[component] || '') + '</td>';
+                });
+                rowHtml += '</tr>';
+
+        // Append the row to the table body
+        $('#table tbody').append(rowHtml);
             }
         }
         allPolygons.push(colorPolygons)
@@ -264,11 +265,9 @@
         });
     }
     // helper functions
-    function displayAddressComponents(address) {
-        let components = [];
-        const keys = ['name', 'neighbourhood', 'road', 'suburb_municipality', "town"];
+    function displayAddressComponents(address, addressComponents) {
 
-        for (const key of keys) {
+        for (const key of addressComponents) {
             if (key in address) {
                 components.push(address[key]);
             }

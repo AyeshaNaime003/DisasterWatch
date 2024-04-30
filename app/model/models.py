@@ -6,8 +6,13 @@ from importlib.machinery import SourceFileLoader
 import os
 import sys
 from osgeo import gdal
-from preprocessing import tif_to_img
-import time
+# from preprocessing import tif_to_img
+# from postprocessing import postprocessing
+# # import time
+# import matplotlib.pyplot as plt
+# from datastorage import get_tif_transform, get_polygons, pixels_to_coordinates
+# import cv2
+
 
 print(os.getcwd())
 model_dir = os.path.dirname(os.path.abspath(__file__))
@@ -454,52 +459,49 @@ class BASE_Transformer_UNet(ResNet_UNet):
         return x
 
 # device
-device = "cuda" if torch.cuda.is_available() else "cpu"
+# device = "cuda" if torch.cuda.is_available() else "cpu"
 
-# create model and load checkpoint weights
-loaded_model = BASE_Transformer_UNet(input_nc=3, 
-                                     output_nc=5, 
-                                     token_len=4, 
-                                     resnet_stages_num=4,
-                                     with_pos='learned', 
-                                     enc_depth=1, 
-                                     dec_depth=8).to(device)
+# # create model and load checkpoint weights
+# loaded_model = BASE_Transformer_UNet(input_nc=3, 
+#                                      output_nc=5, 
+#                                      token_len=4, 
+#                                      resnet_stages_num=4,
+#                                      with_pos='learned', 
+#                                      enc_depth=1, 
+#                                      dec_depth=8).to(device)
 
-loaded_model.load_state_dict(torch.load(os.path.join(model_dir, "checkpoint.pth"), map_location=torch.device('cpu')))
-
-
-# preparing input data
-pre_path = os.path.join("./palu-tsunami_00000113_pre_disaster.tif")
-post_path = os.path.join("palu-tsunami_00000113_post_disaster.tif")
-print(pre_path, post_path)
-
-pre_tif, post_tif = gdal.Open(pre_path), gdal.Open(post_path)
-pre_image, post_image = torch.from_numpy(tif_to_img(pre_tif)), torch.from_numpy(tif_to_img(post_tif))
-pre_post = torch.cat((pre_image, post_image), dim=2).permute(2,0,1).unsqueeze(0).to(torch.float)
-
-print(pre_post.shape)
-
-# lets do inference
-start = time.time()
-output = loaded_model(pre_post)
-end = time.time()
-elapsed_time = end - start
-
-print(f"Inference time: {elapsed_time} seconds")
-print(type(output), output.shape)
+# loaded_model.load_state_dict(torch.load(os.path.join(model_dir, "checkpoint.pth"), map_location=torch.device('cpu')))
 
 
+# # preparing input data
+# pre_tif_path = os.path.join("palu-tsunami_00000113_pre_disaster.tif")
+# post_tif_path = os.path.join("palu-tsunami_00000113_post_disaster.tif")
+# print(pre_tif_path, post_tif_path)
+
+# pre_image, post_image = tif_to_img(pre_tif_path, post_tif_path)
+# h, w = post_image.shape[0], post_image.shape[1]
 
 
+# # lets do inference
+# start = time.time()
+# processed_output_masks = postprocessing(pre_image, post_image, loaded_model)
+# end = time.time()
+# elapsed_time = end - start
 
+# print(f"Inference time: {elapsed_time} seconds")
 
+# transform = get_tif_transform(pre_tif_path)
+# classes = ['Green', 'Yellow', 'Orange', 'Red']
+# results={}
+# # DATA FROM MASKS
+# for index, mask in enumerate(processed_output_masks[1: ]):
+#     color = classes[index]
+#     polygons_in_mask = get_polygons(mask, transform, rdp=False)
+#     print(f"{color}: {len(polygons_in_mask)}")
+#     results[color] = polygons_in_mask
+#     # break
+# # Convert the dictionary to JSON format
+# # tif_middle_latitude, tif_middle_longitude = pixels_to_coordinates(transform, (h/2, w/2))
 
-
-
-
-
-
-
-
-
-print("success")
+# print(results)
+# print("success")
