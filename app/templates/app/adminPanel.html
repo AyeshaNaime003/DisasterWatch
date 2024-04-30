@@ -62,7 +62,7 @@
 
                     </div>
                     <div class="col-md-4" >
-                        <div class="card mb-4" style="max-height: 95vh; overflow-y: auto;">
+                        <div class="card mb-4">
                             <div class="card-body" >
                                 <h5>User Details</h5>
                                 <div class='noInference' id='updateYeWalaDiv'>
@@ -108,12 +108,19 @@
                             </div>
                             <div id="loginHistory" class="card-body">
                                 <h5>Login History</h5>
-                                <div id="loginHistoryContainer">
-
+                                <div class='mb-3 mt-0 tableDiv ' style="max-height: 45vh; overflow-y: auto;">
+                                    <table class="table table-striped " >
+                                        <thead>
+                                            <tr >
+                                                <th>Date</th>
+                                                <th>Time</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="loginHistoryContainer">
+                                        </tbody>
+                                    </table>
                                 </div>
-            
                             </div>
-                          
                         </div>
                     </div>
                 </div>
@@ -164,7 +171,9 @@
                 var loginHistoryHtml = '';
             for (var i = 0; i < response.login_history.length; i++) {
                 var history = response.login_history[i];
-                loginHistoryHtml += `<div class="row"><div class="col">${history.login_time} ${history.logout_time ? history.logout_time : 'Still logged in'}</div></div>`;
+                var loginDate = history.login_time.slice(0, 10);
+                var loginTime = history.login_time.slice(10);
+                loginHistoryHtml += `<tr><td>${loginDate}</td><td>${loginTime}</tr>`;
 
             }
             $('#loginHistoryContainer').html(loginHistoryHtml);
