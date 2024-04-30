@@ -33,9 +33,10 @@ def format_address(address):
         for component in address.keys():
             if "ISO" in component or component=="country_code" or component=="postcode" or component=="city_district" or component=="state_district":
                 components.remove(component)
-        final_components = ["country","state"]
+        final_components = ["country"]
         if (len(set(components)-set(final_components))):
-            city_substitute = "city" if "city" in components else components[components.index("state") + 1]
+            state_substitute = "state" if "state" in components else components[components.index("country") + 1]
+            city_substitute = "city" if "city" in components else components[components.index(state_substitute) + 1]
             city_index = components.index(city_substitute)
             final_components.append(city_substitute)
             final_components.extend(components[city_index+1 : ])    

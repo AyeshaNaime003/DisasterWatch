@@ -32,7 +32,7 @@ def get_weather(city_name, date_str):
     return {
         "city":city_name,
         "description":data["weather"][0]["description"],
-        "temperature":data["main"]["temp"],
+        "temperature":int(data["main"]["temp"]-273),
         "wind":data["wind"]["speed"],
         "humidity":data["main"]["humidity"],
         "rain": data["rain"]["1h"] if "rain" in data.keys() else 0,

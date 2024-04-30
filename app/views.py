@@ -160,31 +160,100 @@ def delete_user(request, user_id):
     return redirect('admin-panel')
 
 
-def get_critically_damaged_areas(results, address_components):
-    # finding the best compoent, i.e one with the most unique values
-    unique_addresses={}
-    for component in address_components:
-        unique_addresses[component] = {point["address"][component] for color_points in results.values() for point in color_points if component in point["address"]}
+@login_required(login_url="login/")
+def profile(request):
+    # get current user
+    user = request.user
+    print(user.email, user.first_name, user.last_name, user.contact, user.profile_picture.url if user.profile_picture else '')
+    user_inferences = InferenceModel.objects.filter(user=user).order_by('-created_at')
+    print(user_inferences)
+    # make changes to the fields of current user using the form
+    if request.method == 'POST':
+        first_name = request.POST.get('first_name')
+        last_name = request.POST.get('last_name')
+        email = request.POST.get('email')
+        contact_number = request.POST.get('contact-number')
+        location = request.POST.get('location')
+        profile_picture = request.FILES.get('profile_picture')
 
-    chosen_component = max(
-    [(component, len(unique_addresses[component])) for component in address_components],
-    key=lambda x: x[1])[0]
-    print(chosen_component)
+        user.first_name = first_name
+        user.last_name = last_name
+        user.email = email
+        user.contact = contact_number
+        user.location = location
+
+        # Check if profile picture exists
+        if profile_picture:
+            user.profile_picture.delete()
+            user.profile_picture = profile_picture
+            print("picture saved")
+
+        # Save the changes
+        user.save()
+        messages.success(request, 'Profile updated successfully!')
+        return redirect('profile')
+    else:
+        return render(request, "app/profile.html", context={'user': user, "user_inferences":user_inferences})
+        
+
+@login_required(login_url="login/")
+def help(request):
+    return render(request, "app/help.html")
+
+
+@login_required(login_url="login/")
+def map_with_id(request, inference_id): 
+    # get the inference model with the id else send error
+    inference_model = InferenceModel.objects.filter(user=request.user, id=inference_id).last()
+    if not inference_model:
+        return HttpResponse("Inference model not found", status=404)
+    else:
+        results = json.loads(inference_model.results)
+        address_components = None
+        if len(results["green"])>0:
+             address_components = list(results["green"][0]["address"].keys())
+        elif len(results["yellow"])>0:
+             address_components = list(results["yellow"][0]["address"].keys())
+        elif len(results["orange"])>0:
+             address_components = list(results["orange"][0]["address"].keys())
+        else:
+             address_components = list(results["red"][0]["address"].keys())
+        address_components.pop(0)
+        address_components.pop(1)
+        return render(request, 'app/map.html', {"context":{
+            'disaster_date': inference_model.disaster_date.strftime('%Y-%m-%d') if inference_model and inference_model.disaster_date else None,
+            'disaster_city': inference_model.disaster_city if inference_model else None,
+            'disaster_state': inference_model.disaster_state if inference_model else None,
+            'disaster_country': inference_model.disaster_country if inference_model else None,
+            'disaster_type': inference_model.disaster_type if inference_model else None,
+            'disaster_description': inference_model.disaster_description if inference_model else None,
+            'tif_middle_latitude': inference_model.tif_middle_latitude if inference_model else None,
+            'tif_middle_longitude': inference_model.tif_middle_longitude if inference_model else None,
+            'results': json.loads(inference_model.results) if inference_model else None,
+            "address_components": address_components, 
+
+        }})
+
+
+def get_critically_damaged_areas(results, address_components):
+    chosen_component = address_components[0]
+    unique_addresses = [point["address"][chosen_component] for color_points in results.values() for point in color_points if chosen_component in point["address"]]
     
     # getting the number of each class in each unique value of the bet component
-    componentDict = {chosen: {"red":0,
+    componentDict = {address: {"red":0,
                     "orange":0, 
                     "yellow":0, 
-                    "green":0} for chosen in unique_addresses[chosen_component]}
+                    "green":0} for address in unique_addresses}
     
     for color in results.keys():
         for point in results[color]:
-            chosen = point["address"][chosen_component]
-            componentDict[chosen][color]+=1
+            if chosen_component in point["address"].keys():
+                address = point["address"][chosen_component]
+                componentDict[address][color]+=1
 
-    for chosen, dictionary in componentDict.items():
+    for address, dictionary in componentDict.items():
         rating = 3*dictionary["red"]+2*dictionary["orange"]+dictionary["yellow"]
-        componentDict[chosen]["rating"]=rating
+        componentDict[address]["rating"]=rating
     
     sortedComponent = dict(sorted(componentDict.items(), key=lambda x: x[1]['rating'], reverse=True))
     sortedComponentRevised = []
@@ -253,27 +322,38 @@ def dashboard_with_id(request, inference_id):
         disaster_time = inference_model.disaster_date.strftime('%Y/%m/%d') if inference_model.disaster_date else None
         disaster_city = inference_model.disaster_city
         results = json.loads(inference_model.results)
-        address_components = list(results["green"][0]["address"].keys())
-        address_components.remove("country")
-        address_components.remove("state")
+        classes = ["green", "yellow", "orange", "red"]
+        address_components = None
+        yellowCount = len(results["yellow"])
+        orangeCount = len(results["orange"])
+        totalDamagedBuildings = yellowCount+orangeCount+ len(results["red"])
+        if len(results["green"])>0:
+             address_components = list(results["green"][0]["address"].keys())
+        elif yellowCount>0:
+             address_components = list(results["yellow"][0]["address"].keys())
+        elif orangeCount>0:
+             address_components = list(results["orange"][0]["address"].keys())
+        else:
+             address_components = list(results["red"][0]["address"].keys())
+        address_components.pop(0)
+        address_components.pop(1)
         # weather
-        weather = get_weather(disaster_city, date_str=disaster_time)
-        # weather = {
-        #     "city": "hehe",
-        #     "description": "hehe",
-        #     "temperature": "hehe",
-        #     "wind": "hehe",
-        #     "humidity": "hehe",
-        #     "rain": "hehe",
-        #     "clouds": "hehe"
-        # }
+        # weather = get_weather(disaster_city, date_str=disaster_time)
+        weather = {
+            "city": "hehe",
+            "description": "hehe",
+            "temperature": "hehe",
+            "wind": "hehe",
+            "humidity": "hehe",
+            "rain": "hehe",
+            "clouds": "hehe"
+        }
         # population
-        population = get_population(disaster_city)
+        # population = get_population(disaster_city)
         boundary_coordinates = get_extreme_points([(point["center_lat"], point["center_long"]) for color, points in results.items() if color != "green" for point in points])
         # print(boundary_coordinates)
 
         # chart
-        classes = ["green", "yellow", "orange", "red"]
         classes_count = [len(results[cls]) for cls in classes]
         class_none = [0, 0, 0, 0]
 
@@ -290,82 +370,17 @@ def dashboard_with_id(request, inference_id):
             'tif_middle_longitude': inference_model.tif_middle_longitude,
             'results': json.loads(inference_model.results),
             'weather': weather,
-            'population': population,
+            'population': 100,
             'building_count': sum(classes_count),
             'damaged_count': sum(classes_count[1:]),
             'graph_data': classes_count if results else class_none,
             "disasterAreas": get_critically_damaged_areas(results, address_components),
             "boundary_coordinates": boundary_coordinates, 
-            "total_damaged_area": int(area_calculator(boundary_coordinates))/ 1e6, 
+            "total_damaged_area": int(area_calculator(boundary_coordinates))/ 1e6 if totalDamagedBuildings>3 else 0, 
             }
         })
 
 
-@login_required(login_url="login/")
-def map_with_id(request, inference_id): 
-    # get the inference model with the id else send error
-    inference_model = InferenceModel.objects.filter(user=request.user, id=inference_id).last()
-    if not inference_model:
-        return HttpResponse("Inference model not found", status=404)
-    else:
-        results = json.loads(inference_model.results)
-        address_components = list(results["green"][0]["address"].keys())[::-1]
-        address_components.remove("country")
-        address_components.remove("state")
-        return render(request, 'app/map.html', {"context":{
-            'disaster_date': inference_model.disaster_date.strftime('%Y-%m-%d') if inference_model and inference_model.disaster_date else None,
-            'disaster_city': inference_model.disaster_city if inference_model else None,
-            'disaster_state': inference_model.disaster_state if inference_model else None,
-            'disaster_country': inference_model.disaster_country if inference_model else None,
-            'disaster_type': inference_model.disaster_type if inference_model else None,
-            'disaster_description': inference_model.disaster_description if inference_model else None,
-            'tif_middle_latitude': inference_model.tif_middle_latitude if inference_model else None,
-            'tif_middle_longitude': inference_model.tif_middle_longitude if inference_model else None,
-            'results': json.loads(inference_model.results) if inference_model else None,
-            "address_components": address_components, 
-
-        }})
-
-
-@login_required(login_url="login/")
-def profile(request):
-    # get current user
-    user = request.user
-    print(user.email, user.first_name, user.last_name, user.contact, user.profile_picture.url if user.profile_picture else '')
-    user_inferences = InferenceModel.objects.filter(user=user).order_by('-created_at')
-    print(user_inferences)
-    # make changes to the fields of current user using the form
-    if request.method == 'POST':
-        first_name = request.POST.get('first_name')
-        last_name = request.POST.get('last_name')
-        email = request.POST.get('email')
-        contact_number = request.POST.get('contact-number')
-        location = request.POST.get('location')
-        profile_picture = request.FILES.get('profile_picture')
-
-        user.first_name = first_name
-        user.last_name = last_name
-        user.email = email
-        user.contact = contact_number
-        user.location = location
-
-        # Check if profile picture exists
-        if profile_picture:
-            user.profile_picture.delete()
-            user.profile_picture = profile_picture
-            print("picture saved")
-
-        # Save the changes
-        user.save()
-        messages.success(request, 'Profile updated successfully!')
-        return redirect('profile')
-    else:
-        return render(request, "app/profile.html", context={'user': user, "user_inferences":user_inferences})
-        
-
-@login_required(login_url="login/")
-def help(request):
-    return render(request, "app/help.html")
 
 
 @login_required(login_url="login/")
@@ -395,7 +410,6 @@ def inferenceform(request):
         # convert to image
         pre_image, post_image = tif_to_img(pre_path, post_path)
         h, w = post_image.shape[0], post_image.shape[1]
-
         
         # model and inference
         device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -416,18 +430,20 @@ def inferenceform(request):
 
         # data storage
         transform = get_tif_transform(pre_path)
-        classes = ['Green', 'Yellow', 'Orange', 'Red']
+        classes = ['green', 'yellow', 'orange', 'red']
         results={}
+        last_polygons_in_mask_address = None
         for index, mask in enumerate(processed_output_masks[1: ]):
             color = classes[index]
             polygons_in_mask = get_polygons(mask, transform, rdp=False)
-            print(f"{color}: {len(polygons_in_mask)}")
+            color_count = len(polygons_in_mask)
+            print(f"{color}: {color_count}")
+            if last_polygons_in_mask_address is None and color_count>0:
+                last_polygons_in_mask_address = polygons_in_mask[0]['address']
             results[color] = polygons_in_mask
             # break
         tif_middle_latitude, tif_middle_longitude = pixels_to_coordinates(transform, (h/2, w/2))
         
-        # using the last polygons_in_mask to get data
-        last_polygons_in_mask_address = polygons_in_mask[0]['address'] 
         # Get the value for "city" if it exists, otherwise get "region" or "town" with an empty string as default
         disaster_city = last_polygons_in_mask_address.get("city", last_polygons_in_mask_address.get("region", last_polygons_in_mask_address.get("town", "")))
 
@@ -439,7 +455,7 @@ def inferenceform(request):
                 user = request.user,
                 disaster_date = disaster_date,
                 disaster_city =  disaster_city,
-                disaster_state = last_polygons_in_mask_address["state"],
+                disaster_state = last_polygons_in_mask_address.get("state", last_polygons_in_mask_address.get("county", "")),
                 disaster_country = last_polygons_in_mask_address["country"],
                 disaster_type = disaster_type,
                 disaster_description = disaster_description,
