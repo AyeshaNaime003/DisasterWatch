@@ -1,10 +1,24 @@
 #dw-navbar{
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    border-radius: 5px;
+}
+.backgroundhehe{
     background-color:rgb(255, 255, 255);
     flex-direction: row;
     justify-content: center;
     align-items: center;
     position: relative;
     border-radius: 5px;
+    
+    max-height: 96vh;
+    min-height: 96vh;
+    
+    max-width: 17vh;
+    min-width: 17vh;
+    
 }
 #dw-av div ul{
     margin: auto;
@@ -21,10 +35,12 @@
     #dw-navbar{
         display: flex;
         flex-direction: column;
-        min-height: 100vh;
+        max-height: 96vh;
+        min-height: 96vh;
       }
     #dw-navbar div .logo{
         margin-bottom: 70%;
+        padding-top:60%;
     }
     #dw-navbar div{
         position: fixed;

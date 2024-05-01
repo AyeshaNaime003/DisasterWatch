@@ -45,4 +45,4 @@ class LoginHistoryModel(models.Model):
     login_time = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.user.username} - Login: {self.login_time}, Logout: {self.logout_time}"
+        return f"{self.user.username} - Login: {self.login_time}"

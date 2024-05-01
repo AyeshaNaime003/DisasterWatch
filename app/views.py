@@ -72,12 +72,11 @@ def logoutPage(request):
 
 def get_user_details(request, user_id):
     user = get_object_or_404(CustomUser, id=user_id)    
-    loginHistory = LoginHistoryModel.objects.filter(user=user).values('login_time', 'logout_time')
+    loginHistory = LoginHistoryModel.objects.filter(user=user).values('login_time')
     formatted_history = []
     for history in loginHistory:
         formatted_history.append({
             'login_time': history['login_time'].strftime('%Y/%m/%d %H:%M:%S'),
-            'logout_time': history['logout_time'].strftime('%Y/%m/%d %H:%M:%S') if history['logout_time'] else "Still logged in"
         })
     print(formatted_history)
     return JsonResponse({
