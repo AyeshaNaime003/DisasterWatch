@@ -1,12 +1,8 @@
 from django.db import models
-
-# Create your models here.
-from django.db import models
 from django.contrib.auth.models import AbstractUser
 
 
-# Create your models here.
-
+# Custom User Model with additional fields
 class CustomUser(AbstractUser):
     # additional fields for user
     location = models.TextField(null=True, blank=True)
@@ -16,9 +12,12 @@ class CustomUser(AbstractUser):
     profile_picture = models.ImageField(upload_to='profile_pics/', default='profile_pics/default_profile_pic.jpg')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    # String representation of the user object
     def _str_(self):
         return self.username
 
+
+# Model for storing inference results related to disasters
 class InferenceModel(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     disaster_date = models.DateField(null=False)
@@ -45,4 +44,4 @@ class LoginHistoryModel(models.Model):
     login_time = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.user.username} - Login: {self.login_time}"
+        return f"{self.user.username} - Login: {self.login_time}, Logout: {self.logout_time}"

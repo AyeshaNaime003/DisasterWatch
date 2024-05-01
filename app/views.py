@@ -3,11 +3,10 @@ from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, get_object_or_404
 from django.contrib import messages
-from .models import CustomUser, InferenceModel, LoginHistoryModel
+from .models import CustomUser,InferenceModel, LoginHistoryModel
 from django.http import JsonResponse
 from django.utils import timezone
 import json
-import requests
 import os
 import torch
 import json
@@ -22,6 +21,7 @@ from django.http import HttpResponse
 from math import pi, cos, radians, atan2
 from importlib.machinery import SourceFileLoader
 
+
 cwd = os.getcwd()
 model_dir = os.path.join(cwd, "app", "model")
 bitmodule = SourceFileLoader('bitmodule', os.path.join(model_dir, "bit_resnet.py")).load_module()
@@ -29,6 +29,7 @@ bitmodule = SourceFileLoader('bitmodule', os.path.join(model_dir, "bit_resnet.py
 
 
 def loginPage(request):
+    # loggin the use in
     if request.method=="POST":
         username = request.POST.get('username')
         password = request.POST.get('password')
@@ -46,6 +47,7 @@ def loginPage(request):
         else: 
             messages.error(request, "Invalid credentials")
             return redirect("login")
+    # showing the login page
     else:
         messages.error(request, None)
         return render(request, "app/login.html")
@@ -119,13 +121,11 @@ def addUser(request):
 
 @login_required(login_url="login/")
 def edit_user(request, user_id):
-    print("In edit function")
     user = get_object_or_404(CustomUser, id=user_id)
     if request.method == 'POST':
         is_admin = request.POST.get('is_admin') == 'on'  
         user.is_admin = is_admin
         user.save()
-        print("Role updated")
         messages.success(request, f"User '{user.username}' updated successfully!")
         return redirect('admin-panel')
     return redirect('admin-panel')
@@ -226,7 +226,6 @@ def get_critically_damaged_areas(results, address_components):
     # address_components = address_components[::-1]
     all_addresses = [point["address"] for color in results.keys() for point in results[color]]
     for index, component in enumerate(address_components):
-        print(component)
         presentInAll=all([True if component in address.keys() else False for address in all_addresses])
         if not presentInAll:
             continue
