@@ -11,6 +11,7 @@
         <!-- NAVBAR -->
         {% include 'app/navbar2.html' %}
         <!-- MAIN CONTENT -->
+<<<<<<< Updated upstream
         <div class="col-md-11 my-3 " style='margin-left:9%'>
             <div id="loading" style='display:none'> 
                 <div id="loading-content" class='card w-25 h-50 d-flex justify-content-center'>
@@ -111,6 +112,72 @@
                     </div>
                 </form>
             </div>        
+=======
+        <div class="col-md-11">
+            <div class="card inferenceform ">
+                <div class='class-body'>
+                    <div class='row'>
+                        <div class='p-5 pb-0 pageTitle'>
+                            INFERENCE FORM
+                            <p class='titleFooter'>Welcome to the inference form. Fill in the fields and submit to start the analysis process.<p>
+                        </div> 
+                    </div>
+
+                    <div class='px-3' >
+                        <form id="inference_form" method="POST" enctype="multipart/form-data" >
+                            {% csrf_token %}
+                            <div class="row">
+                                <!-- First Column: Image Input Fields -->
+                                <div class="col-md-6">
+                                    <p class='mt-0 '>Pre-Disaster Image:</p>
+                                    <div class="image-input mb-3" id="pre_image_drop_area">
+                                        <label for="pre_image">
+                                            <i class="fas fa-upload" style="font-weight:normal"> Drop or drag a file here or <br><b>Click to browse</b></br></i> </label>
+                                        <input type="file" class="form-control-file" id="pre_image" name="pre_image" accept=".tif" required>
+                                    </div>
+                                    <p>Post-Disaster Image:</p>
+                                    <div class="image-input" id="post_image_drop_area">
+                                        <label for="post_image">
+                                            <i class="fas fa-upload" style="font-weight:normal"> Drop or drag a file here or 
+                                                <br><b>Click to browse</b></br></i></label>
+                                        <input type="file" class="form-control-file" id="post_image" name="post_image" accept=".tif" required>
+                                    </div>
+                                </div>
+                                <!-- Second Column: Other Input Fields -->
+                                <div class="col-md-6">
+                                    <div class="mb-2">
+                                        <label for="city">City:</label>
+                                        <input type="text" class="form-control" id="city" name="city" required>
+                                    </div>
+                                    <div class="mb-2">
+                                        <label for="date">Date of Satellite Imagery:</label>
+                                        <input type="date" class="form-control" id="date" name="date" required>
+                                    </div>
+                                    <div class="mb-2">
+                                        <label for="disaster_type">Type of Disaster:</label>
+                                        <select class="form-control" id="disaster_type" name="disaster_type" required>
+                                            <option value="earthquake">Earthquake</option>
+                                            <option value="flood">Flood</option>
+                                            <option value="fire">Fire</option>
+                                            <!-- Add more options as needed -->
+                                        </select>
+                                    </div>
+                                    <div class="mb-2">
+                                        <label for="disaster_description">Description of Disaster:</label>
+                                        <textarea class="form-control" id="disaster_description" name="disaster_description" rows="3"></textarea>
+                                    </div>
+                                    <div class="mb-2">
+                                        <label for="comments">Additional Comments:</label>
+                                        <textarea class="form-control" id="comments" name="comments" rows="3"></textarea>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary bg-lovely-blue-deeper my-3">Submit</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+>>>>>>> Stashed changes
         </div>
     </div>
 </div>
