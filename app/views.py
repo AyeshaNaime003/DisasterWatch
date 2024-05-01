@@ -319,6 +319,7 @@ def dashboard_with_id(request, inference_id):
         # formatting the data for api calls
         disaster_time = inference_model.disaster_date.strftime('%Y/%m/%d') if inference_model.disaster_date else None
         disaster_city = inference_model.disaster_city
+        disaster_state = inference_model.disaster_state
         results = json.loads(inference_model.results)
         classes = ["green", "yellow", "orange", "red"]
         address_components = None
@@ -335,27 +336,18 @@ def dashboard_with_id(request, inference_id):
              address_components = list(results["red"][0]["address"].keys())
         address_components.pop(0)
         address_components.pop(1)
-        # weather
-        weather = get_weather(disaster_city, date_str=disaster_time)
-        # weather = {
-        #     "city": "hehe",
-        #     "description": "hehe",
-        #     "temperature": "hehe",
-        #     "wind": "hehe",
-        #     "humidity": "hehe",
-        #     "rain": "hehe",
-        #     "clouds": "hehe"
-        # }
-        # population
-        population = get_population(disaster_city)
-        request.session['weather'] = weather
-        request.session['population'] = population
+       
+        
         boundary_coordinates = get_extreme_points([(point["center_lat"], point["center_long"]) for color, points in results.items() if color != "green" for point in points])
-        # print(boundary_coordinates)
 
         # chart
         classes_count = [len(results[cls]) for cls in classes]
         class_none = [0, 0, 0, 0]
+
+        weather = get_weather(disaster_city if disaster_city else disaster_state, date_str=disaster_time)
+        population = get_population(disaster_city if disaster_city else disaster_state)
+        request.session['weather'] = weather
+        request.session['population'] = population
 
         # data to send to front end
         return render(request, 'app/dashboard.html', {"context": {
@@ -369,8 +361,8 @@ def dashboard_with_id(request, inference_id):
             'tif_middle_latitude': inference_model.tif_middle_latitude,
             'tif_middle_longitude': inference_model.tif_middle_longitude,
             'results': json.loads(inference_model.results),
-            'weather': weather,
-            'population': population,
+            'weather': weather if weather is not None else {},
+            'population': population if population is not None else "None",
             'building_count': sum(classes_count),
             'damaged_count': sum(classes_count[1:]),
             'graph_data': classes_count if results else class_none,

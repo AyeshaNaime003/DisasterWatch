@@ -29,16 +29,28 @@ def get_weather(city_name, date_str):
     unix_timestamp = convert_to_unix_timestamp(date_str)
     url = f"http://api.openweathermap.org/data/2.5/weather?q={city_name}&dt={unix_timestamp}&appid={api_key}"
     print(url)
-    data = requests.get(url).json()
-    return {
-        "city":city_name,
-        "description":data["weather"][0]["description"],
-        "temperature":int(data["main"]["temp"]-273),
-        "wind":data["wind"]["speed"],
-        "humidity":data["main"]["humidity"],
-        "rain": data["rain"]["1h"] if "rain" in data.keys() else 0,
-        "clouds":data["clouds"]["all"]
-    }
+    response = requests.get(url)
+    if response.status_code==200: 
+        data = response.json()
+        return {
+            "city":city_name,
+            "description":data["weather"][0]["description"],
+            "temperature":int(data["main"]["temp"]-273),
+            "wind":data["wind"]["speed"],
+            "humidity":data["main"]["humidity"],
+            "rain": data["rain"]["1h"] if "rain" in data.keys() else 0,
+            "clouds":data["clouds"]["all"]
+        }
+    else:
+        return {
+            "city":"",
+            "description":"",
+            "temperature":"",
+            "wind":"",
+            "humidity":"",
+            "rain": "",
+            "clouds":""
+        }
 
 def get_news():
     api_url = "https://api.reliefweb.int/v1/reports?appname=apidoc&preset=latest&query[value]=earthquake&limit=6"
@@ -87,9 +99,9 @@ def get_population(city_name):
                 population = int(population*(1+rate/100)**6)
             return(population)
         else: 
-            return -1
+            return ""
     else:
-        return -1
+        return ""
  
 # print(get_population("Balakot"))
 
