@@ -20,12 +20,12 @@ def get_address(latitude, longitude):
     # Check if the request was successful (status code 200)
     if response.status_code == 200:
         try:
-            data = response.json()  
-            return(data["address"])  
+            data = response.json()["address"] 
+            return response.status_code, data
         except ValueError as e:
-            print("Error decoding JSON:", e)
+            return 404, data
     else:
-        print("Error:", response.status_code) 
+        return response.status_code, data
 
 def format_address(address):
     components = list(address.keys()).copy()[::-1]
@@ -74,8 +74,8 @@ def get_polygons(mask, transform, rdp=True):
             center_long = sum(point[1] for point in coordinates_of_polygon) / len(coordinates_of_polygon)
             
             # ADDRESS
-            address = get_address(center_lat, center_long)
-            if address is None:
+            status_code, address = get_address(center_lat, center_long)
+            if status_code!=200:
                 continue
             else: 
                 formatted_address = format_address(address)

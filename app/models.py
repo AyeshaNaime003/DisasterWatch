@@ -43,7 +43,6 @@ class InferenceModel(models.Model):
 class LoginHistoryModel(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     login_time = models.DateTimeField(auto_now_add=True)
-    logout_time = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.user.username} - Login: {self.login_time}, Logout: {self.logout_time}"

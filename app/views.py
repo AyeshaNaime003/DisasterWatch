@@ -28,8 +28,6 @@ bitmodule = SourceFileLoader('bitmodule', os.path.join(model_dir, "bit_resnet.py
 
 
 
-
-
 def loginPage(request):
     if request.method=="POST":
         username = request.POST.get('username')
@@ -43,7 +41,7 @@ def loginPage(request):
         if user is not None:
             login(request, user)
             LoginHistoryModel.objects.create(user=user, login_time=timezone.now())
-            print("LOGIN SUCCESSFUL, LOGINHISTORY CREATED")
+            print("LOGIN SUCCESSFUL, LOGIN HISTORY CREATED")
             return redirect('home')
         else: 
             messages.error(request, "Invalid credentials")
@@ -55,11 +53,8 @@ def loginPage(request):
 
 @login_required(login_url="login/")
 def home(request):
-    print(f"HII {request.user.username}, welcome to home page")
-    api_url = "https://api.reliefweb.int/v1/reports?appname=apidoc&preset=latest&query[value]=earthquake&limit=6"
-    api_response = requests.get(api_url)
-    
-    reports = get_news()
+    print(f"Welcome to home page {request.user.username}")
+    api_response, reports = get_news()
     if reports:
         return render(request, 'app/home.html', {'reports': reports})
     else:
@@ -69,13 +64,9 @@ def home(request):
 
 @login_required(login_url="login/")
 def logoutPage(request):
-    login_history = LoginHistoryModel.objects.filter(user=request.user).order_by('-login_time').first()
-    if login_history:
-        login_history.logout_time = timezone.now()
-        login_history.save()
-        print()
     logout(request)
     print("logout")
+    print(request.user.is_authenticated)
     return redirect("login")
 
 
@@ -210,8 +201,7 @@ def map_with_id(request, inference_id):
              address_components = list(results["orange"][0]["address"].keys())
         else:
              address_components = list(results["red"][0]["address"].keys())
-        address_components.pop(0)
-        address_components.pop(1)
+        print(f"address cmponents: {address_components}")
 
         weather = request.session.get('weather')
         population = request.session.get('population')
@@ -234,7 +224,17 @@ def map_with_id(request, inference_id):
 
 
 def get_critically_damaged_areas(results, address_components):
-    chosen_component = address_components[0]
+    # address_components = address_components[::-1]
+    all_addresses = [point["address"] for color in results.keys() for point in results[color]]
+    for index, component in enumerate(address_components):
+        print(component)
+        presentInAll=all([True if component in address.keys() else False for address in all_addresses])
+        if not presentInAll:
+            continue
+        uniqueValues=len({address[component] for address in all_addresses})>1
+        if presentInAll and uniqueValues:
+            break
+    chosen_component = address_components[index]
     unique_addresses = [point["address"][chosen_component] for color_points in results.values() for point in color_points if chosen_component in point["address"]]
     
     # getting the number of each class in each unique value of the bet component
@@ -266,7 +266,7 @@ def get_critically_damaged_areas(results, address_components):
             'green': componentData['green'],
         }
         sortedComponentRevised.append(componentData_formatted)
-    return sortedComponentRevised
+    return sortedComponentRevised, chosen_component
 
 
 def get_extreme_points(coordinates):
@@ -334,8 +334,6 @@ def dashboard_with_id(request, inference_id):
              address_components = list(results["orange"][0]["address"].keys())
         else:
              address_components = list(results["red"][0]["address"].keys())
-        address_components.pop(0)
-        address_components.pop(1)
        
         
         boundary_coordinates = get_extreme_points([(point["center_lat"], point["center_long"]) for color, points in results.items() if color != "green" for point in points])
@@ -348,7 +346,7 @@ def dashboard_with_id(request, inference_id):
         population = get_population(disaster_city if disaster_city else disaster_state)
         request.session['weather'] = weather
         request.session['population'] = population
-
+        sorted_critically_damaged_areas, chosen_component = get_critically_damaged_areas(results, address_components)
         # data to send to front end
         return render(request, 'app/dashboard.html', {"context": {
             'inference_id': inference_model.id,
@@ -366,8 +364,9 @@ def dashboard_with_id(request, inference_id):
             'building_count': sum(classes_count),
             'damaged_count': sum(classes_count[1:]),
             'graph_data': classes_count if results else class_none,
-            "disasterAreas": get_critically_damaged_areas(results, address_components),
-            "boundary_coordinates": boundary_coordinates, 
+            'boundary_coordinates': boundary_coordinates,
+            "disaster_areas": sorted_critically_damaged_areas,
+            "chosen_component": chosen_component.capitalize(), 
             "total_damaged_area": int(area_calculator(boundary_coordinates))/ 1e6 if totalDamagedBuildings>3 else 0, 
             }
         })

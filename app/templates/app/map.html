@@ -266,14 +266,20 @@
     }
     // helper functions
     function displayAddressComponents(address, addressComponents) {
+    // const components = [];
+    
+    // for (const key of addressComponents) {
+    //     if (address.hasOwnProperty(key)) {
+    //         components.push(address[key]);
+    //     }
+    // }
 
-        for (const key of addressComponents) {
-            if (key in address) {
-                components.push(address[key]);
-            }
-        }
+    // return components.join(', ');
+    console.log(addressComponents)
+}
 
-        return components.join(', ');
-    }
+    map.on('click', function(e) {
+    alert("Latitude: " + e.latlng.lat.toFixed(6) + "\nLongitude: " + e.latlng.lng.toFixed(6));
+});
 </script>
 {% endblock body %}

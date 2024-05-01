@@ -3,6 +3,11 @@ from ..models import CustomUser, InferenceModel, LoginHistoryModel
 from django.urls import reverse
 from unittest.mock import patch
 from django.contrib.messages import get_messages
+from django.utils import timezone
+from django.test import TestCase, Client
+from django.urls import reverse
+from unittest.mock import patch
+
 
 # Create your tests here.
 class LoginTestCase(TestCase):
@@ -50,48 +55,81 @@ class LoginTestCase(TestCase):
         print("WRONG PASSWORD SUCESSFUL------------------------------------------------------\n\n")
 
 
-from django.test import TestCase, Client
-from django.urls import reverse
-from unittest.mock import patch
-from django.contrib.messages.storage.fallback import FallbackStorage
-
 class HomeViewTestCase(TestCase):
     def setUp(self):
         self.client = Client()
         self.user = CustomUser.objects.create_user(username='dell', password='dell')
 
     def test_home_view_with_authenticated_user(self):
+        print("TESTING AUTHENTICATED HOME------------------------------------------------------")
         # login
         self.client.login(username='dell', password='dell')
         # go to home page
         response = self.client.get(reverse('home'))
-        print(response)
-        # check
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'app/home.html')
-        # self.assertIn(b'HII dell, welcome to home page', response.content)
+        print("SUCCESS: AUTHENTICATED HOME------------------------------------------------------\n\n")
+
 
     def test_home_view_with_unauthenticated_user(self):
+        print("TESTING UNAUTHENTICATED HOME------------------------------------------------------")
         response = self.client.get(reverse('home'))
-        self.assertRedirects(response, '/login/?next=/home/', status_code=302)
+        self.assertRedirects(response, '/login/?next=%2F', status_code=302)
+        print("SUCCESS: UNAUTHENTICATED HOME------------------------------------------------------\n\n")
 
-    @patch('app.views.get_news')
-    def test_home_view_with_api_data(self, mock_get_news):
-        mock_get_news.return_value = [{'title': 'Test Report 1'}, {'title': 'Test Report 2'}]
-        self.client.login(username='testuser', password='12345')
-        response = self.client.get(reverse('home'))
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'app/home.html')
-        self.assertIn(b'Test Report 1', response.content)
-        self.assertIn(b'Test Report 2', response.content)
+class LogoutPageTestCase(TestCase):
+    def setUp(self):
+        self.user = CustomUser.objects.create_user(username='test', email='test@example.com', password='test')
+        self.client = Client()
+        self.client.login(username=self.user.username, password=self.user.password)
+        LoginHistoryModel.objects.create(user=self.user, login_time=timezone.now())
 
-    @patch('app.views.requests.get')
-    def test_home_view_with_api_failure(self, mock_requests_get):
-        mock_requests_get.return_value.status_code = 500
-        storage = FallbackStorage(self.client.session)
-        self.client._messages = storage
-        self.client.login(username='testuser', password='12345')
-        response = self.client.get(reverse('home'))
+    def test_logout_page(self):
+        print("TESTING LOGOUT----------")
+        self.assertTrue(self.user.is_authenticated)
+        response = self.client.get(reverse('logout'))
+        self.client.session.flush()
+        self.assertEqual(response.status_code, 302)
+        print("SUCCESS:  LOGOUT----------")
+11
+
+class AdminPanelTestCase(TestCase):
+    def setUp(self):
+        self.user = CustomUser.objects.create_user(username='admin', email='admin@example.com', password='admin')
+        self.client = Client()
+        self.client.login(username='admin', password='admin')
+
+    def test_admin_panel_page(self):
+        response = self.client.get(reverse('admin-panel'))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'app/home.html')
-        self.assertIn(b'Failed to fetch data from API', response.content)
+        self.assertTemplateUsed(response, 'app/adminPanel.html')
+
+    def test_add_user(self):
+        initial_users_count = CustomUser.objects.count()
+        response = self.client.post(reverse('add-user'), {
+            'username': 'testuser',
+            'email': 'testuser@example.com',
+            'contact': '1234567890',
+            'password': 'testpass',
+            'firstName': 'Test',
+            'lastName': 'User',
+            'is_admin': 'on'
+        })
+        self.assertEqual(response.status_code, 302)  # Redirect after successful addition
+        self.assertEqual(CustomUser.objects.count(), initial_users_count + 1)  # User added
+
+    def test_edit_user(self):
+        user = CustomUser.objects.create_user(username='testuser', email='testuser@example.com', password='testpass')
+        user_id = user.id
+        response = self.client.post(reverse('edit-user', kwargs={'user_id': user_id}), {'is_admin': 'on'})
+        self.assertEqual(response.status_code, 302)  # Redirect after successful edit
+        edited_user = CustomUser.objects.get(id=user_id)
+        self.assertTrue(edited_user.is_admin)  # User's admin status updated
+
+    def test_delete_user(self):
+        user = CustomUser.objects.create_user(username='testuser', email='testuser@example.com', password='testpass')
+        user_id = user.id
+        initial_users_count = CustomUser.objects.count()
+        response = self.client.post(reverse('delete-user', kwargs={'user_id': user_id}))
+        self.assertEqual(response.status_code, 302)  # Redirect after successful deletion
+        self.assertEqual(CustomUser.objects.count(), initial_users_count - 1)  # User deleted

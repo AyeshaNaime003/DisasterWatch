@@ -145,12 +145,12 @@
                                             <thead class="thead-light">
                                                 <tr>
                                                     <th scope="col">#</th>
-                                                    <th scope="col">District</th>
+                                                    <th scope="col">{{ context.chosen_component }}</th>
                                                     <th scope="col">Damage Levels</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                {% for area in context.disasterAreas %}
+                                                {% for area in context.disaster_areas %}
                                                 <tr>
                                                     <td>{{ area.index }}</td>
                                                     <td>{{ area.componentName }}</td>
