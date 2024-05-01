@@ -3,9 +3,9 @@
 
 <div class="col-md-1 px-0 rounded fixed-div" >
   <div class="card w-100 h-100 mx-0 ">
-    <img class="logo d-none d-md-block mx-auto mt-1 py-lg-5 mb-lg-5" src="{% static '/assets/logo.png' %}" width="50px">
+    <img class="logo d-none d-md-block mx-auto mt-1 py-lg-5 mb-lg-4" src="{% static '/assets/logo.png' %}" width="50px">
     
-    <ul class="nav nav-pills flex-row flex-md-column my-auto justify-content-evenly text-center">
+    <ul class="nav nav-pills flex-row flex-md-column mt-3 mb-auto justify-content-evenly text-center">
       <li class="nav-item {% if request.path == '/' %} active {% endif %}">
         <a href="{% url 'home' %}" class="nav-link">
           <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-house my-1" viewBox="0 0 16 16">

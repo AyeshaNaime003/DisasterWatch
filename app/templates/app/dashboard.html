@@ -20,13 +20,13 @@
         {% include 'app/navbar2.html' %}
         <!-- MAIN CONTENT TAKING 1/12TH -->
         <div class="col-md-11 mt-1 " style='margin-left:9%'>
-            <div class="container-fluid px-0 mx-0">
-                <div class="row">
-                    <div class='card w-100'>
+            <div class="container-fluid px-0 mx-0  w-100" style='height:98%'>
+                <div class="row " style='height:12%'>
+                    <div class='card w-100 h-100 '>
                         <div class='row mb-1'>
                         <!-- CITY INFO  -->
                             <div id="cityinfo" class="col-12 rounded" >
-                                    <div class="row ms-2 text-center ">
+                                    <div class="row mx-2 text-center d-flex align-items-center">
                                         <div class="col mt-3 " >
                                             <div style="white-space: nowrap;">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-geo-alt" viewBox="0 0 16 16">
@@ -123,31 +123,31 @@
                     </div>
                 </div>
                     <!-- ASSESSMENT ROW 1 -->
-                <div class="row pe-0 me-0">
+                <div class="row pe-0 me-0 mt-1" style='height:85%'>
                     <div class="col-md-8 ps-3 pe-0">
-                        <div class="row w-100 my-2"style="white-space: nowrap;height:45%">
-                            <div class="col-md-6 ps-0 pe-2 rounded" >
-                                <div class='card '>
+                        <div class="row w-100 mt-2 mb-2"style="white-space: nowrap;height:40%">
+                            <div class="col-md-6 ps-0 pe-2 h-100 rounded" >
+                                <div class='card h-100'>
                                     <h5 id="damageassessmentresults" class='card-title ps-3 pt-2'>Damage Assessment Results</h5>
-                                    <div class='card-body mt-0 pt-0'>
-                                        <canvas id="bar_chart_assessment" style='min-height:220px;max-height:220px; '></canvas>
+                                    <div class='card-body mt-0 pt-0 h-100' >
+                                        <canvas id="bar_chart_assessment" style='min-height:100%;max-height:100%; '></canvas>
                                     </div>
                                 </div>
                             </div>
-                            <div id="damagedistribution" class="col-md-6 pe-0 rounded ps-0">
-                                <div class='card '>
+                            <div id="damagedistribution" class="col-md-6 pe-0 h-100 rounded ps-0">
+                                <div class='card 'style='height:100%;'>
                                     <h5 class="card-title ps-3 pt-2">Damage Distribution</h5>
-                                    <div class='card-body mt-0 pt-0'>
-                                        <canvas id="pie_chart_assessment" style='max-height:220px;'></canvas>
+                                    <div class='card-body mt-0 pt-0 h-100' >
+                                        <canvas id="pie_chart_assessment" style='min-height:90%;max-height:90%;'></canvas>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div id="criticallydamagedareas" class='row w-100' style='height:55%' >
+                        <div id="criticallydamagedareas" class='row w-100 mt-1' style='height:43%' >
                             <div class='card ' >
-                                <h5 class='card-title ps-3 pt-2'>Critically Damaged Areas</h5>
-                                <div class="card-body"style="min-height:40h;max-height:40vh; overflow-y: auto;">
+                                <h5 class='card-title ps-3 pt-2 '>Critically Damaged Areas</h5>
+                                <div class="card-body"style="max-height:40vh; overflow-y: auto;">
                                     <div class="table-responsive">
                                         <table class="table">
                                             <thead class="thead-light">
@@ -178,11 +178,11 @@
                         </div>
                     </div>
                     <div class="col pe-0 me-0">
-                        <div class="row" style='height:20%'>
-                            <div class="col-md-6 ps-0 pe-1 pb-2">
-                                <div class="card h-100 mt-2 py-0 mx-0">
+                        <div class="row mb-2" style='height:15%'>
+                            <div class="col-md-6 ps-0 pe-1 my-2 pb-2">
+                                <div class="card h-100  py-0 mx-0">
                                     <div class="card-body d-flex align-items-center px-1 py-1">
-                                        <div class="col py-2 my-2 my-2" style="font-size: x-large;">
+                                        <div class="col py-2 my-2 text-center" style="font-size: x-large;">
                                             <div class="row text-center ">
                                                 <div class='card-title text-muted mb-0  pb-0' ><h6 class='mb-0 pb-0'>Disaster Type</h6></div>
                                             </div>
@@ -193,8 +193,8 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-6 ps-1 pe-0 pb-2">
-                                <div class="card h-100 mt-2 py-0 mx-0">
+                            <div class="col-md-6 ps-1 pe-0 my-2 pb-2">
+                                <div class="card h-100 py-0 mx-0">
                                     <div class="card-body d-flex align-items-center px-1 py-1">
                                         <div class="col py-2 my-2 text-center" style="font-size: x-large;">
                                             <div class="row ">
@@ -208,9 +208,9 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="row" style='height:20%'>
-                            <div class="col-md-6 ps-0 pe-1 pb-2">
-                                <div class="card h-100 mt-2 py-0 mx-0">
+                        <div class="row mb-2" style='height:15%'>
+                            <div class="col-md-6 ps-0 pe-1 my-2 pb-2">
+                                <div class="card h-100 py-0 mx-0">
                                     <div class="card-body d-flex align-items-center px-1 py-1">
                                         <div class="col py-2 my-2 text-center" style="font-size: x-large;">
                                             <div class="row ">
@@ -223,8 +223,8 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-6 ps-1 pe-0 pb-2">
-                                <div class="card h-100 mt-2 py-0 mx-0">
+                            <div class="col-md-6 ps-1 pe-0 my-2 pb-2">
+                                <div class="card h-100 py-0 mx-0">
                                     <div class="card-body d-flex align-items-center px-1 py-1">
                                         <div class="col py-2 my-2 text-center" style="font-size: x-large;">
                                             <div class="row ">
@@ -246,29 +246,29 @@
                             </div>
                         </div>
                         
-                        <div class="row mt-2 " style='height:60%'>
+                        <div class="row mt-3 " style='height:70%'>
                             <div class="col px-0">
                                 <div class="card ">
                                     <div class="card-body">
                                         <div id="heatmap-container" style="position: relative;">
-                                            <div id="heatmap" style="height: 280px;"></div>
+                                            <div id="heatmap" style="height: 260px;"></div>
                                             <a href="{% url 'map_with_id' inference_id=context.inference_id %}" class="btn btn-primary btn-sm" style="position: absolute; bottom: 10px; right: 10px; z-index: 1000;">Go to Interactive Map →</a>
                                         </div>
                                         <div id="toggler" class="mt-3 px-3 py-1 text-center" style="font-size: small;">
                                             <div class="row">
-                                                <div class="col-3 form-check form-switch">
+                                                <div class="col-6 col-md-3 form-check form-switch">
                                                     <input type="checkbox" id="redToggle" checked onclick="toggle('red')" class="form-check-input" style='background-color:red'>
                                                     <label for="redToggle" class="form-check-label">Destroyed</label>
                                                 </div>
-                                                <div class="col-3 form-check form-switch">
+                                                <div class="col-6 col-md-3 form-check form-switch">
                                                     <input type="checkbox" id="orangeToggle" checked onclick="toggle('orange')" class="form-check-input" style='background-color:orange'>
                                                     <label for="orangeToggle" class="form-check-label">Major Damage </label>
                                                 </div>
-                                                <div class="col-3 form-check form-switch">
+                                                <div class="col-6 col-md-3 form-check form-switch">
                                                     <input type="checkbox" id="yellowToggle" checked onclick="toggle('yellow')" class="form-check-input" style='background-color:yellow'>
                                                     <label for="yellowToggle" class="form-check-label">Minor Damage </label>
                                                 </div>
-                                                <div class="col-3 form-check form-switch">
+                                                <div class="col-6 col-md-3 form-check form-switch">
                                                     <input type="checkbox" id="greenToggle" checked onclick="toggle('green')" class="form-check-input" style='background-color:green'>
                                                     <label for="greenToggle" class="form-check-label">Undamaged </label>
                                                 </div>
