@@ -36,8 +36,11 @@ h2, h3{
 }
 .main-row{
     background-color: var(--lovely-blue-lighter);
-    padding: 1%;
+    height:100vh;
+    padding:1.2%;
+    padding-right:2%;
 }   
+
 
 .btn,
 .btn-primary {

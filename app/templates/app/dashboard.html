@@ -19,8 +19,8 @@
         <!-- NAVBAR TAKING 1/12TH -->
         {% include 'app/navbar2.html' %}
         <!-- MAIN CONTENT TAKING 1/12TH -->
-        <div class="col-md-11">
-            <div class="container-fluid ps-3 pe-0">
+        <div class="col-md-11 mt-1 " style='margin-left:9%'>
+            <div class="container-fluid px-0 mx-0">
                 <div class="row">
                     <div class='card w-100'>
                         <div class='row mb-1'>
@@ -124,9 +124,9 @@
                 </div>
                     <!-- ASSESSMENT ROW 1 -->
                 <div class="row pe-0 me-0">
-                    <div class="col-md-8 ps-0 pe-2">
-                        <div class="row mt-2"style="white-space: nowrap;">
-                            <div class="col-md-6 pe-2 rounded" >
+                    <div class="col-md-8 ps-3 pe-0">
+                        <div class="row w-100 my-2"style="white-space: nowrap;height:45%">
+                            <div class="col-md-6 ps-0 pe-2 rounded" >
                                 <div class='card '>
                                     <h5 id="damageassessmentresults" class='card-title ps-3 pt-2'>Damage Assessment Results</h5>
                                     <div class='card-body mt-0 pt-0'>
@@ -134,7 +134,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div id="damagedistribution" class="col-md-6 rounded ps-0">
+                            <div id="damagedistribution" class="col-md-6 pe-0 rounded ps-0">
                                 <div class='card '>
                                     <h5 class="card-title ps-3 pt-2">Damage Distribution</h5>
                                     <div class='card-body mt-0 pt-0'>
@@ -144,10 +144,10 @@
                             </div>
                         </div>
 
-                        <div id="criticallydamagedareas" class='mt-2' >
-                            <div class='card' style="min-height:43vh;max-height:43vh; overflow-y: auto;">
+                        <div id="criticallydamagedareas" class='row w-100' style='height:55%' >
+                            <div class='card ' >
                                 <h5 class='card-title ps-3 pt-2'>Critically Damaged Areas</h5>
-                                <div class="card-body mt-0 pt-0">
+                                <div class="card-body"style="min-height:40h;max-height:40vh; overflow-y: auto;">
                                     <div class="table-responsive">
                                         <table class="table">
                                             <thead class="thead-light">
@@ -178,10 +178,10 @@
                         </div>
                     </div>
                     <div class="col pe-0 me-0">
-                        <div class="row">
-                            <div class="col-md-6 ps-0 pe-1 ">
-                                <div class="card mt-2 py-0 mx-0">
-                                    <div class="card-body px-1 py-1">
+                        <div class="row" style='height:20%'>
+                            <div class="col-md-6 ps-0 pe-1 pb-2">
+                                <div class="card h-100 mt-2 py-0 mx-0">
+                                    <div class="card-body d-flex align-items-center px-1 py-1">
                                         <div class="col py-2 my-2 my-2" style="font-size: x-large;">
                                             <div class="row text-center ">
                                                 <div class='card-title text-muted mb-0  pb-0' ><h6 class='mb-0 pb-0'>Disaster Type</h6></div>
@@ -193,9 +193,9 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-6 ps-1 pe-0">
-                                <div class="card mt-2 py-0 mx-0">
-                                    <div class="card-body px-1 py-1">
+                            <div class="col-md-6 ps-1 pe-0 pb-2">
+                                <div class="card h-100 mt-2 py-0 mx-0">
+                                    <div class="card-body d-flex align-items-center px-1 py-1">
                                         <div class="col py-2 my-2 text-center" style="font-size: x-large;">
                                             <div class="row ">
                                                 <div class='card-title text-muted mb-0  pb-0'><h6 class='mb-0 pb-0'># Buildings Detected</h6></div>
@@ -208,10 +208,10 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col-md-6 ps-0 pe-1 ">
-                                <div class="card mt-2 py-0 mx-0">
-                                    <div class="card-body px-1 py-1">
+                        <div class="row" style='height:20%'>
+                            <div class="col-md-6 ps-0 pe-1 pb-2">
+                                <div class="card h-100 mt-2 py-0 mx-0">
+                                    <div class="card-body d-flex align-items-center px-1 py-1">
                                         <div class="col py-2 my-2 text-center" style="font-size: x-large;">
                                             <div class="row ">
                                                 <div class='card-title text-muted mb-0  pb-0'><h6 class='mb-0 pb-0'># Buildings Damaged</h6></div>
@@ -223,9 +223,9 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-6 ps-1 pe-0">
-                                <div class="card mt-2 py-0 mx-0">
-                                    <div class="card-body px-1 py-1">
+                            <div class="col-md-6 ps-1 pe-0 pb-2">
+                                <div class="card h-100 mt-2 py-0 mx-0">
+                                    <div class="card-body d-flex align-items-center px-1 py-1">
                                         <div class="col py-2 my-2 text-center" style="font-size: x-large;">
                                             <div class="row ">
                                                 <div class='card-title text-muted mb-0  pb-0'><h6 class='mb-0 pb-0'>Total Damaged Area</h6></div>
@@ -246,7 +246,7 @@
                             </div>
                         </div>
                         
-                        <div class="row mt-2 ">
+                        <div class="row mt-2 " style='height:60%'>
                             <div class="col px-0">
                                 <div class="card ">
                                     <div class="card-body">

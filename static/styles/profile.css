@@ -74,6 +74,7 @@ section.errorpage h2 i {
     font-family: "Assistant", sans-serif;
     font-size: small;
     color:gray;
+    padding-left: 0;
 }
 
 div label {

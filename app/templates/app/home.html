@@ -10,7 +10,7 @@
     <!-- NAVBAR -->
     {% include 'app/navbar2.html' %}
     <!-- MAIN CONTENT -->
-    <div class="col-md-11 home-container">
+    <div class="col-md-11 mt-1 home-container" style='margin-left:9%'>
         <!-- error -->
       <div class="container error-container">
         {% if messages %}
@@ -24,16 +24,16 @@
       </div>
 
       <!-- ABOUT US -->
-      <div class="aboutus">
-        <div class="mb-2 py-2 px-4">
-          <h1 class="display-4 fw-normal fst-italic">DisasterWatch</h1>
+      <div class="row aboutus" style='height:25%'>
+        <div class="py-4  px-4">
+          <h1 class="display-4 fw-normal  fst-italic">DisasterWatch</h1>
           <p class="lead my-3">An AI-Driven Web Service for Disaster Damage Assessment
           </p>
         </div>
       </div>
 
       <!-- TAKE TO FORM -->
-      <div class="taketoform my-3 py-3 px-4" style='background-color:white'>
+      <div class="row taketoform my-3 py-3 px-4" style='background-color:white;height:30%'>
         <div class="d-flex flex-column align-items-start">
           <h2 class="fw-bold  mt-2">Experience DisasterWatch's Cutting-Edge AI Model</h2>
           <p class="text-body-secondary mt-2">
@@ -47,8 +47,8 @@
       </div>
 
       <!-- NEWS -->
-      <div class="news my-3 p-2">
-        <h3 class="m-3" style = 'font-size: x-large; background-color:white'>Recent Disaster Related News</h3>
+      <div class="row news my-3 p-2" style='height:40%'>
+        <h3 class="ms-3 mt-3">Recent Disaster Related News</h3>
         <div id="news-carousel" class="carousel carousel-dark slide" data-bs-ride="carousel" >
           <div class="carousel-indicators mb-0 pb-0">
             <button type="button" data-bs-target="#news-carousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1" ></button>

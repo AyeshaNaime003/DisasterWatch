@@ -121,6 +121,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    padding-left:20px;
 }
 
 #loading-content {

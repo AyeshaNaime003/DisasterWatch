@@ -1,9 +1,9 @@
 {% load static %}
 <link href="{% static '/styles/navbar2.css' %}" rel="stylesheet" />
 
-<nav id="dw-navbar" class="col-md-1 rounded fixed-top">
-  <div class="backgroundhehe">
-    <img class="logo d-none d-md-block mx-auto mt-1" src="{% static '/assets/logo.png' %}" width="50px">
+<div class="col-md-1 px-0 rounded fixed-div" >
+  <div class="card w-100 h-100 mx-0 ">
+    <img class="logo d-none d-md-block mx-auto mt-1 py-lg-5 mb-lg-5" src="{% static '/assets/logo.png' %}" width="50px">
     
     <ul class="nav nav-pills flex-row flex-md-column my-auto justify-content-evenly text-center">
       <li class="nav-item {% if request.path == '/' %} active {% endif %}">
@@ -53,4 +53,4 @@
       </li>
     </ul>  
   </div>
-</nav>
+</div>
