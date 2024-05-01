@@ -21,7 +21,8 @@
     #dw-navbar{
         display: flex;
         flex-direction: column;
-        min-height: 100vh;
+        max-height: 96vh;
+        min-height: 96vh;
       }
     #dw-navbar div .logo{
         margin-bottom: 70%;
