@@ -3,11 +3,18 @@
     border: 2px dashed #ced4da;
     border-radius: 5px;
     position: relative;
+<<<<<<< Updated upstream
+=======
+    height:35%;
+>>>>>>> Stashed changes
     cursor:pointer;
     margin-left: 20px;
     background-color: rgb(245, 245, 245);
     margin-top:5px;
+<<<<<<< Updated upstream
     
+=======
+>>>>>>> Stashed changes
 }
 
 
@@ -89,6 +96,7 @@
     border-radius: 5px;
     box-sizing: border-box;
     padding-left:20px;
+    margin-top:5px;
 }
 
 .inferenceform select {
@@ -109,6 +117,7 @@
     font-family: "Assistant", sans-serif;
     font-size: small;
     color:gray;
+<<<<<<< Updated upstream
 }
 
 /* Add this CSS to your stylesheet or inside a <style> tag in your HTML */
@@ -121,6 +130,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    padding-left:20px;
 }
 
 #loading-content {
@@ -162,3 +172,6 @@ animation: fadeInOut 3.0s linear infinite;
     50% { opacity: 1; }
     100% { opacity: 0.5; }
 } */
+=======
+}
+>>>>>>> Stashed changes

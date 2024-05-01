@@ -107,7 +107,7 @@ def addUser(request):
         password = request.POST.get('password')
         fName = request.POST.get('firstName')
         lName = request.POST.get('lastName')
-        is_admin = request.POST.get('is_admin') == 'on'  
+        is_admin = request.POST.get('is_admin') 
         try:
             user = CustomUser.objects.create_user(username=username, email=email, password=password, first_name=fName, last_name=lName, contact=contact, is_admin=is_admin)
             messages.success(request, f"User '{username}' added successfully!")

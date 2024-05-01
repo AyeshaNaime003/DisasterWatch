@@ -6,18 +6,11 @@
     border-radius: 5px;
 }
 .backgroundhehe{
-    background-color:rgb(255, 255, 255);
     flex-direction: row;
     justify-content: center;
     align-items: center;
     position: relative;
     border-radius: 5px;
-    
-    max-height: 96vh;
-    min-height: 96vh;
-    
-    max-width: 17vh;
-    min-width: 17vh;
     
 }
 #dw-av div ul{
@@ -30,21 +23,31 @@
     margin-top:-5px;
 }
 
+.fixed-div {
+    position: fixed;
+    top: 20px;; /* Adjust as needed */
+    left: 10px; /* Adjust as needed */
+    z-index: 999; /* Adjust as needed to ensure it's above other content */
+    height:96vh;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional: Add shadow */
+    
+}
+
 /* BIG SCREENS */
-@media (min-width: 768px) {
+/* @media (min-width: 768px) {
     #dw-navbar{
         display: flex;
         flex-direction: column;
         max-height: 96vh;
         min-height: 96vh;
       }
-    #dw-navbar div .logo{
+    #backgroundhehe .logo{
         margin-bottom: 70%;
         padding-top:60%;
     }
-    #dw-navbar div{
+    #backgroundhehe {
         position: fixed;
         top: 50%;
         transform: translate(0, -50%);
     }
-}
+} */

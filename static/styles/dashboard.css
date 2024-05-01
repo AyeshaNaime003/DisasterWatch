@@ -39,3 +39,6 @@
     font-size: large !important;
 }
 
+.form-check-label{
+    overflow-wrap: break-word !important;
+}

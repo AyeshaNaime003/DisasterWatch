@@ -11,8 +11,8 @@
     <div class="row main-row">
         <!-- NAVBAR -->
         {% include 'app/navbar2.html' %}
-        <div class="col-md-11">
-            <div class="container-fluid ps-3 pe-0">
+        <div class="col-md-11 mt-1" style='margin-left:9%'>
+            <div class="container-fluid ps-0 pe-0">
                 <!-- MAIN CONTENT -->
                 <div class="row">
                     <div class='card w-100'>
@@ -254,16 +254,16 @@
         // map
         switch (color) {
             case 'red':
-                togglePolygonsVisibility(allPolygons[0]);
+                togglePolygonsVisibility(allPolygons[3]);
                 break;
             case 'orange':
-                togglePolygonsVisibility(allPolygons[1]);
-                break;
-            case 'yellow':
                 togglePolygonsVisibility(allPolygons[2]);
                 break;
+            case 'yellow':
+                togglePolygonsVisibility(allPolygons[1]);
+                break;
             case 'green':
-                togglePolygonsVisibility(allPolygons[3]);
+                togglePolygonsVisibility(allPolygons[0]);
                 break;
             default:
                 break;
