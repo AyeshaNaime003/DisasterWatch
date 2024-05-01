@@ -28,6 +28,7 @@ def get_weather(city_name, date_str):
     api_key = "7f38900c01ca65bdb8d01da8d642cbf3"
     unix_timestamp = convert_to_unix_timestamp(date_str)
     url = f"http://api.openweathermap.org/data/2.5/weather?q={city_name}&dt={unix_timestamp}&appid={api_key}"
+    print(url)
     data = requests.get(url).json()
     return {
         "city":city_name,

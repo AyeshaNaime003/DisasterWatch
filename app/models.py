@@ -18,16 +18,6 @@ class CustomUser(AbstractUser):
     updated_at = models.DateTimeField(auto_now=True)
     def _str_(self):
         return self.username
-    
-class JsonFileModel(models.Model):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    json_file = models.JSONField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    # You can add more fields as needed
-
-    def _str_(self):
-        return f"JsonFileModel - {self.id} (User: {self.user.username})"
 
 class InferenceModel(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)

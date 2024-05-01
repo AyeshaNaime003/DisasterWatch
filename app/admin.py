@@ -1,6 +1,6 @@
 # Register your models here.
 from django.contrib import admin
-from .models import CustomUser, JsonFileModel, InferenceModel, LoginHistoryModel
+from .models import CustomUser, InferenceModel, LoginHistoryModel
 
 
 # Register your models here.
@@ -14,5 +14,4 @@ class InferenceModelAdmin(admin.ModelAdmin):
 
 admin.site.register(CustomUser, CustomUserAdmin)
 admin.site.register(InferenceModel, InferenceModelAdmin)
-admin.site.register(JsonFileModel)
 admin.site.register(LoginHistoryModel)

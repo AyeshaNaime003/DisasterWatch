@@ -370,7 +370,7 @@ def dashboard_with_id(request, inference_id):
             'tif_middle_longitude': inference_model.tif_middle_longitude,
             'results': json.loads(inference_model.results),
             'weather': weather,
-            'population': 100,
+            'population': population,
             'building_count': sum(classes_count),
             'damaged_count': sum(classes_count[1:]),
             'graph_data': classes_count if results else class_none,
