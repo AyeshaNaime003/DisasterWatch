@@ -1,5 +1,4 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth.models import User
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, get_object_or_404
@@ -10,14 +9,8 @@ from django.utils import timezone
 import json
 import requests
 import os
-import sys
-from PIL import Image
 import torch
-from osgeo import gdal
-import cv2
 import json
-from geopy.geocoders import Nominatim
-from geopy.exc import GeocoderUnavailable
 from server.settings import *
 from .model.preprocessing import *
 from .model.postprocessing import *
@@ -166,7 +159,6 @@ def profile(request):
     user = request.user
     print(user.email, user.first_name, user.last_name, user.contact, user.profile_picture.url if user.profile_picture else '')
     user_inferences = InferenceModel.objects.filter(user=user).order_by('-created_at')
-    print(user_inferences)
     # make changes to the fields of current user using the form
     if request.method == 'POST':
         first_name = request.POST.get('first_name')
@@ -220,6 +212,10 @@ def map_with_id(request, inference_id):
              address_components = list(results["red"][0]["address"].keys())
         address_components.pop(0)
         address_components.pop(1)
+
+        weather = request.session.get('weather')
+        population = request.session.get('population')
+
         return render(request, 'app/map.html', {"context":{
             'disaster_date': inference_model.disaster_date.strftime('%Y-%m-%d') if inference_model and inference_model.disaster_date else None,
             'disaster_city': inference_model.disaster_city if inference_model else None,
@@ -231,6 +227,8 @@ def map_with_id(request, inference_id):
             'tif_middle_longitude': inference_model.tif_middle_longitude if inference_model else None,
             'results': json.loads(inference_model.results) if inference_model else None,
             "address_components": address_components, 
+            'weather': weather,
+            'population': population,
 
         }})
 
@@ -338,18 +336,20 @@ def dashboard_with_id(request, inference_id):
         address_components.pop(0)
         address_components.pop(1)
         # weather
-        # weather = get_weather(disaster_city, date_str=disaster_time)
-        weather = {
-            "city": "hehe",
-            "description": "hehe",
-            "temperature": "hehe",
-            "wind": "hehe",
-            "humidity": "hehe",
-            "rain": "hehe",
-            "clouds": "hehe"
-        }
+        weather = get_weather(disaster_city, date_str=disaster_time)
+        # weather = {
+        #     "city": "hehe",
+        #     "description": "hehe",
+        #     "temperature": "hehe",
+        #     "wind": "hehe",
+        #     "humidity": "hehe",
+        #     "rain": "hehe",
+        #     "clouds": "hehe"
+        # }
         # population
-        # population = get_population(disaster_city)
+        population = get_population(disaster_city)
+        request.session['weather'] = weather
+        request.session['population'] = population
         boundary_coordinates = get_extreme_points([(point["center_lat"], point["center_long"]) for color, points in results.items() if color != "green" for point in points])
         # print(boundary_coordinates)
 
