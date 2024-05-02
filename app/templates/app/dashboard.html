@@ -389,27 +389,31 @@
 
     const ctx2 = document.getElementById("pie_chart_assessment");
 
+    const total = plot_data.reduce((acc, cur) => acc + cur, 0);
+
+    const percentages = plot_data.map(value => ((value / total) * 100).toFixed(2));
+
     new Chart(ctx2, {
-    type: "pie",
-    data: {
-        labels: ["Undamaged", "Minor Damage", "Major Damage", "Destroyed"],
-        datasets: [
-        {
-            label: "# of buildings",
-            data: plot_data,
-            borderWidth: 1,
-            backgroundColor: ['#6ab04c', '#f9ca24', '#f0932b', '#eb4d4b '],
+        type: "pie",
+        data: {
+            labels: ["Undamaged", "Minor Damage", "Major Damage", "Destroyed"],
+            datasets: [
+            {
+                label: "% of buildings",
+                data: percentages,
+                borderWidth: 1,
+                backgroundColor: ['#6ab04c', '#f9ca24', '#f0932b', '#eb4d4b'],
+            },
+            ],
         },
-        ],
-    },
-    options: {
-        scales: {
-        y: {
-            beginAtZero: true,
-        },
-        },
-    },
-    });
+        options: {
+            scales: {
+            y: {
+                beginAtZero: true,
+            },
+            },
+        },
+    });
 </script>
 
 <!-- Error messages -->
