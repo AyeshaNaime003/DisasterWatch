@@ -19,113 +19,111 @@
         <!-- NAVBAR TAKING 1/12TH -->
         {% include 'app/navbar2.html' %}
         <!-- MAIN CONTENT TAKING 1/12TH -->
-        <div class="col-md-11 mt-1 " style='margin-left:9%'>
+        <div id='bodyDiv' class="col-md-11 mt-1 " style='margin-left:9%'>
             <div class="container-fluid px-0 mx-0  w-100" style='height:98%'>
                 <div class="row " style='height:12%'>
-                    <div class='card w-100 h-100 '>
-                        <div class='row mb-1'>
-                        <!-- CITY INFO  -->
-                            <div id="cityinfo" class="col-12 rounded" >
-                                    <div class="row mx-2 text-center d-flex align-items-center">
-                                        <div class="col mt-3 " >
-                                            <div style="white-space: nowrap;">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-geo-alt" viewBox="0 0 16 16">
-                                                <path d="M12.166 8.94c-.524 1.062-1.234 2.12-1.96 3.07A32 32 0 0 1 8 14.58a32 32 0 0 1-2.206-2.57c-.726-.95-1.436-2.008-1.96-3.07C3.304 7.867 3 6.862 3 6a5 5 0 0 1 10 0c0 .862-.305 1.867-.834 2.94M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10"/>
-                                                <path d="M8 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4m0 1a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
-                                                </svg>
-                                                {% if context.disaster_city %}
-                                                {{ context.disaster_city }},
-                                                {% else %}
-                                                {{ context.disaster_state }},
-                                                {% endif %}
-                                                {{ context.disaster_country }}</div>
-                                             <h5 class='titleFooter'> Location<h5>
-                                        </div>
-                                        <div class="col mt-3 " >
-                                            <div style="white-space: nowrap;">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-calendar3" viewBox="0 0 16 16">
-                                                <path d="M14 0H2a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2M1 3.857C1 3.384 1.448 3 2 3h12c.552 0 1 .384 1 .857v10.286c0 .473-.448.857-1 .857H2c-.552 0-1-.384-1-.857z"/>
-                                                <path d="M6.5 7a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2m-9 3a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2m-9 3a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2"/>
-                                            </svg>
-                                            {{ context.disaster_date }}</div>
-                                            <h5 class='titleFooter'> Date<h5>
-                                        </div>
-                                        <div class="col mt-3 " >
-                                            <div style="white-space: nowrap;">
-                                            
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor"
-                                                class="bi bi-people" viewBox="0 0 16 16">
-                                                <path
-                                                    d="M15 14s1 0 1-1-1-4-5-4-5 3-5 4 1 1 1 1zm-7.978-1L7 12.996c.001-.264.167-1.03.76-1.72C8.312 10.629 9.282 10 11 10c1.717 0 2.687.63 3.24 1.276.593.69.758 1.457.76 1.72l-.008.002-.014.002zM11 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4m3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0M6.936 9.28a6 6 0 0 0-1.23-.247A7 7 0 0 0 5 9c-4 0-5 3-5 4q0 1 1 1h4.216A2.24 2.24 0 0 1 5 13c0-1.01.377-2.042 1.09-2.904.243-.294.526-.569.846-.816M4.92 10A5.5 5.5 0 0 0 4 13H1c0-.26.164-1.03.76-1.724.545-.636 1.492-1.256 3.16-1.275ZM1.5 5.5a3 3 0 1 1 6 0 3 3 0 0 1-6 0m3-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4" />
-                                            </svg>
-                                                {% if context.population != -1 %}
-                                                    {{ context.population }}
-                                                {% endif %} </div>
-                                            <h5 class='titleFooter'> Population<h5>
-                                        </div>
-                                        <div class="col mt-3 " >
-                                            <div style="white-space: nowrap;">
-                                            
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor"
-                                                class="bi bi-thermometer" viewBox="0 0 16 16">
-                                                <path d="M8 14a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3" />
-                                                <path
-                                                    d="M8 0a2.5 2.5 0 0 0-2.5 2.5v7.55a3.5 3.5 0 1 0 5 0V2.5A2.5 2.5 0 0 0 8 0M6.5 2.5a1.5 1.5 0 1 1 3 0v7.987l.167.15a2.5 2.5 0 1 1-3.333 0l.166-.15z" />
-                                            </svg>{{context.weather.temperature}}°C</div>
-                                            <h5 class='titleFooter'>Temperature<h5>
-                                        </div>
-                                        <div class="col mt-3 " >
-                                            <div style="white-space: nowrap;">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle" viewBox="0 0 16 16">
-                                                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
-                                                    <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0"/>
-                                                  </svg> {{context.weather.description}}</div>
-                                            <h5 class='titleFooter'>Description<h5>
-                                        </div>
-                                        <div class="col mt-3 " >
-                                            <div style="white-space: nowrap;">
-                                            
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor"
-                                                class="bi bi-wind" viewBox="0 0 16 16">
-                                                <path
-                                                    d="M12.5 2A2.5 2.5 0 0 0 10 4.5a.5.5 0 0 1-1 0A3.5 3.5 0 1 1 12.5 8H.5a.5.5 0 0 1 0-1h12a2.5 2.5 0 0 0 0-5m-7 1a1 1 0 0 0-1 1 .5.5 0 0 1-1 0 2 2 0 1 1 2 2h-5a.5.5 0 0 1 0-1h5a1 1 0 0 0 0-2M0 9.5A.5.5 0 0 1 .5 9h10.042a3 3 0 1 1-3 3 .5.5 0 0 1 1 0 2 2 0 1 0 2-2H.5a.5.5 0 0 1-.5-.5" />
-                                            </svg> {{context.weather.wind}}</div>
-                                            <h5 class='titleFooter'>Wind Speed<h5>
-                                        </div>
-                                        <div class="col mt-3 " >
-                                            <div style="white-space: nowrap;">
-                                            
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor"
-                                                    class="bi bi-moisture" viewBox="0 0 16 16">
-                                                    <path
-                                                        d="M13.5 0a.5.5 0 0 0 0 1H15v2.75h-.5a.5.5 0 0 0 0 1h.5V7.5h-1.5a.5.5 0 0 0 0 1H15v2.75h-.5a.5.5 0 0 0 0 1h.5V15h-1.5a.5.5 0 0 0 0 1h2a.5.5 0 0 0 .5-.5V.5a.5.5 0 0 0-.5-.5zM7 1.5l.364-.343a.5.5 0 0 0-.728 0l-.002.002-.006.007-.022.023-.08.088a29 29 0 0 0-1.274 1.517c-.769.983-1.714 2.325-2.385 3.727C2.368 7.564 2 8.682 2 9.733 2 12.614 4.212 15 7 15s5-2.386 5-5.267c0-1.05-.368-2.169-.867-3.212-.671-1.402-1.616-2.744-2.385-3.727a29 29 0 0 0-1.354-1.605l-.022-.023-.006-.007-.002-.001zm0 0-.364-.343zm-.016.766L7 2.247l.016.019c.24.274.572.667.944 1.144.611.781 1.32 1.776 1.901 2.827H4.14c.58-1.051 1.29-2.046 1.9-2.827.373-.477.706-.87.945-1.144zM3 9.733c0-.755.244-1.612.638-2.496h6.724c.395.884.638 1.741.638 2.496C11 12.117 9.182 14 7 14s-4-1.883-4-4.267" />
-                                                </svg>
-                                                {{context.weather.humidity}}%
-                                            </div>
-                                            <h5 class='titleFooter'>Humidity<h5>
-                                        </div>
-                                        <div class="col mt-3 " >
-                                            <div style="white-space: nowrap;">
-                                            
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-cloud-drizzle" viewBox="0 0 16 16">
-                                                <path d="M4.158 12.025a.5.5 0 0 1 .316.633l-.5 1.5a.5.5 0 0 1-.948-.316l.5-1.5a.5.5 0 0 1 .632-.317m6 0a.5.5 0 0 1 .316.633l-.5 1.5a.5.5 0 0 1-.948-.316l.5-1.5a.5.5 0 0 1 .632-.317m-3.5 1.5a.5.5 0 0 1 .316.633l-.5 1.5a.5.5 0 0 1-.948-.316l.5-1.5a.5.5 0 0 1 .632-.317m6 0a.5.5 0 0 1 .316.633l-.5 1.5a.5.5 0 1 1-.948-.316l.5-1.5a.5.5 0 0 1 .632-.317m.747-8.498a5.001 5.001 0 0 0-9.499-1.004A3.5 3.5 0 1 0 3.5 11H13a3 3 0 0 0 .405-5.973M8.5 2a4 4 0 0 1 3.976 3.555.5.5 0 0 0 .5.445H13a2 2 0 0 1 0 4H3.5a2.5 2.5 0 1 1 .605-4.926.5.5 0 0 0 .596-.329A4 4 0 0 1 8.5 2"/>
-                                            </svg>
-                                            {{context.weather.rain}} mm</div>
-                                            <h5 class='titleFooter'>Rain<h5>
-                                        </div>
-                                    </div>
+                    <!-- CITY INFO  -->
+                    <div class="card">
+                        <div class="row pt-3 px-2 row-cols-4 row-cols-sm-auto text-center d-flex justify-content-between" >
+                            <div class="col" style='width:fit-content' >
+                                <div style="white-space: nowrap;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-geo-alt" viewBox="0 0 16 16">
+                                    <path d="M12.166 8.94c-.524 1.062-1.234 2.12-1.96 3.07A32 32 0 0 1 8 14.58a32 32 0 0 1-2.206-2.57c-.726-.95-1.436-2.008-1.96-3.07C3.304 7.867 3 6.862 3 6a5 5 0 0 1 10 0c0 .862-.305 1.867-.834 2.94M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10"/>
+                                    <path d="M8 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4m0 1a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
+                                    </svg>
+                                    {% if context.disaster_city %}
+                                    {{ context.disaster_city }},
+                                    {% else %}
+                                    {{ context.disaster_state }},
+                                    {% endif %}
+                                    {{ context.disaster_country }}</div>
+                                <h5 class='titleFooter'> Location<h5>
                             </div>
-
-                            {% comment %} <div class="col-2 d-flex d-flex align-items-center justify-content-center">
-                                <button class="btn btn-primary" onclick="window.print();">Generate Report</button>
-                            </div> {% endcomment %}
+                            <div class="col" style='width:fit-content' >
+                                <div style="white-space: nowrap;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-calendar3" viewBox="0 0 16 16">
+                                    <path d="M14 0H2a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2M1 3.857C1 3.384 1.448 3 2 3h12c.552 0 1 .384 1 .857v10.286c0 .473-.448.857-1 .857H2c-.552 0-1-.384-1-.857z"/>
+                                    <path d="M6.5 7a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2m-9 3a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2m-9 3a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2"/>
+                                </svg>
+                                {{ context.disaster_date }}</div>
+                                <h5 class='titleFooter'> Date<h5>
+                            </div>
+                            <div class="col" style='width:fit-content' >
+                                <div style="white-space: nowrap;">
+                                
+                                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor"
+                                    class="bi bi-people" viewBox="0 0 16 16">
+                                    <path
+                                        d="M15 14s1 0 1-1-1-4-5-4-5 3-5 4 1 1 1 1zm-7.978-1L7 12.996c.001-.264.167-1.03.76-1.72C8.312 10.629 9.282 10 11 10c1.717 0 2.687.63 3.24 1.276.593.69.758 1.457.76 1.72l-.008.002-.014.002zM11 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4m3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0M6.936 9.28a6 6 0 0 0-1.23-.247A7 7 0 0 0 5 9c-4 0-5 3-5 4q0 1 1 1h4.216A2.24 2.24 0 0 1 5 13c0-1.01.377-2.042 1.09-2.904.243-.294.526-.569.846-.816M4.92 10A5.5 5.5 0 0 0 4 13H1c0-.26.164-1.03.76-1.724.545-.636 1.492-1.256 3.16-1.275ZM1.5 5.5a3 3 0 1 1 6 0 3 3 0 0 1-6 0m3-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4" />
+                                </svg>
+                                    {% if context.population != -1 %}
+                                        {{ context.population }}
+                                    {% endif %} </div>
+                                <h5 class='titleFooter'> Population<h5>
+                            </div>
+                            <div class="col" style='width:fit-content' >
+                                <div style="white-space: nowrap;">
+                                
+                                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor"
+                                    class="bi bi-thermometer" viewBox="0 0 16 16">
+                                    <path d="M8 14a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3" />
+                                    <path
+                                        d="M8 0a2.5 2.5 0 0 0-2.5 2.5v7.55a3.5 3.5 0 1 0 5 0V2.5A2.5 2.5 0 0 0 8 0M6.5 2.5a1.5 1.5 0 1 1 3 0v7.987l.167.15a2.5 2.5 0 1 1-3.333 0l.166-.15z" />
+                                </svg>{{context.weather.temperature}}°C</div>
+                                <h5 class='titleFooter'>Temperature<h5>
+                            </div>
+                            <div class="col" style='width:fit-content' >
+                                <div style="white-space: nowrap;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle" viewBox="0 0 16 16">
+                                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                                        <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0"/>
+                                    </svg> {{context.weather.description}}</div>
+                                <h5 class='titleFooter'>Description<h5>
+                            </div> 
+                            <div class="col" style='width:fit-content' >
+                                <div style="white-space: nowrap;">
+                                
+                                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor"
+                                    class="bi bi-wind" viewBox="0 0 16 16">
+                                    <path
+                                        d="M12.5 2A2.5 2.5 0 0 0 10 4.5a.5.5 0 0 1-1 0A3.5 3.5 0 1 1 12.5 8H.5a.5.5 0 0 1 0-1h12a2.5 2.5 0 0 0 0-5m-7 1a1 1 0 0 0-1 1 .5.5 0 0 1-1 0 2 2 0 1 1 2 2h-5a.5.5 0 0 1 0-1h5a1 1 0 0 0 0-2M0 9.5A.5.5 0 0 1 .5 9h10.042a3 3 0 1 1-3 3 .5.5 0 0 1 1 0 2 2 0 1 0 2-2H.5a.5.5 0 0 1-.5-.5" />
+                                </svg> {{context.weather.wind}}</div>
+                                <h5 class='titleFooter'>Wind Speed<h5>
+                            </div>
+                            <div class="col" style='width:fit-content' >
+                                <div style="white-space: nowrap;">
+                                
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor"
+                                        class="bi bi-moisture" viewBox="0 0 16 16">
+                                        <path
+                                            d="M13.5 0a.5.5 0 0 0 0 1H15v2.75h-.5a.5.5 0 0 0 0 1h.5V7.5h-1.5a.5.5 0 0 0 0 1H15v2.75h-.5a.5.5 0 0 0 0 1h.5V15h-1.5a.5.5 0 0 0 0 1h2a.5.5 0 0 0 .5-.5V.5a.5.5 0 0 0-.5-.5zM7 1.5l.364-.343a.5.5 0 0 0-.728 0l-.002.002-.006.007-.022.023-.08.088a29 29 0 0 0-1.274 1.517c-.769.983-1.714 2.325-2.385 3.727C2.368 7.564 2 8.682 2 9.733 2 12.614 4.212 15 7 15s5-2.386 5-5.267c0-1.05-.368-2.169-.867-3.212-.671-1.402-1.616-2.744-2.385-3.727a29 29 0 0 0-1.354-1.605l-.022-.023-.006-.007-.002-.001zm0 0-.364-.343zm-.016.766L7 2.247l.016.019c.24.274.572.667.944 1.144.611.781 1.32 1.776 1.901 2.827H4.14c.58-1.051 1.29-2.046 1.9-2.827.373-.477.706-.87.945-1.144zM3 9.733c0-.755.244-1.612.638-2.496h6.724c.395.884.638 1.741.638 2.496C11 12.117 9.182 14 7 14s-4-1.883-4-4.267" />
+                                    </svg>
+                                    {{context.weather.humidity}}%
+                                </div>
+                                <h5 class='titleFooter'>Humidity<h5>
+                            </div>
+                            <div class="col" style='width:fit-content' >
+                                <div style="white-space: nowrap;">
+                                
+                                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-cloud-drizzle" viewBox="0 0 16 16">
+                                    <path d="M4.158 12.025a.5.5 0 0 1 .316.633l-.5 1.5a.5.5 0 0 1-.948-.316l.5-1.5a.5.5 0 0 1 .632-.317m6 0a.5.5 0 0 1 .316.633l-.5 1.5a.5.5 0 0 1-.948-.316l.5-1.5a.5.5 0 0 1 .632-.317m-3.5 1.5a.5.5 0 0 1 .316.633l-.5 1.5a.5.5 0 0 1-.948-.316l.5-1.5a.5.5 0 0 1 .632-.317m6 0a.5.5 0 0 1 .316.633l-.5 1.5a.5.5 0 1 1-.948-.316l.5-1.5a.5.5 0 0 1 .632-.317m.747-8.498a5.001 5.001 0 0 0-9.499-1.004A3.5 3.5 0 1 0 3.5 11H13a3 3 0 0 0 .405-5.973M8.5 2a4 4 0 0 1 3.976 3.555.5.5 0 0 0 .5.445H13a2 2 0 0 1 0 4H3.5a2.5 2.5 0 1 1 .605-4.926.5.5 0 0 0 .596-.329A4 4 0 0 1 8.5 2"/>
+                                </svg>
+                                {{context.weather.rain}} mm</div>
+                                <h5 class='titleFooter'>Rain<h5>
+                            </div>
+                            
+                            <div id='genReportBtn' class="col" style='width:fit-content,white-space: nowrap;'>
+                                {% comment %} d-flex d-flex align-items-center justify-content-center"> {% endcomment %}
+                                <!-- Generate Report Button -->
+                                <button class="btn btn-primary" onclick="generateReport()">Generate Report</button>
+                            </div>
                         </div>
                     </div>
                 </div>
                     <!-- ASSESSMENT ROW 1 -->
                 <div class="row pe-0 me-0 mt-1" style='height:85%'>
                     <div class="col-md-8 ps-3 pe-0">
-                        <div class="row w-100 mt-2 mb-2"style="white-space: nowrap;height:40%">
+                        <div id='stats' class="row w-100 mt-2 mb-2"style="white-space: nowrap;height:40%">
                             <div class="col-md-6 ps-0 pe-2 h-100 rounded" >
                                 <div class='card h-100'>
                                     <h5 id="damageassessmentresults" class='card-title ps-3 pt-2'>Damage Assessment Results</h5>
@@ -147,7 +145,7 @@
                         <div id="criticallydamagedareas" class='row w-100 mt-1' style='height:43%' >
                             <div class='card ' >
                                 <h5 class='card-title ps-3 pt-2 '>Critically Damaged Areas</h5>
-                                <div class="card-body"style="max-height:40vh; overflow-y: auto;">
+                                <div id = 'criticallydamagedareasCard' class="card-body"style="max-height:40vh; overflow-y: auto;">
                                     <div class="table-responsive">
                                         <table class="table">
                                             <thead class="thead-light">
@@ -178,7 +176,7 @@
                         </div>
                     </div>
                     <div class="col pe-0 me-0">
-                        <div class="row mb-2" style='height:15%'>
+                        <div id='rightFirst' class="row row-cols-2 mb-2" style='height:15%'>
                             <div class="col-md-6 ps-0 pe-1 my-2 pb-2">
                                 <div class="card h-100  py-0 mx-0">
                                     <div class="card-body d-flex align-items-center px-1 py-1">
@@ -208,7 +206,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="row mb-2" style='height:15%'>
+                        <div id='rightSecond' class="row row-cols-2 mb-2" style='height:15%'>
                             <div class="col-md-6 ps-0 pe-1 my-2 pb-2">
                                 <div class="card h-100 py-0 mx-0">
                                     <div class="card-body d-flex align-items-center px-1 py-1">
@@ -246,7 +244,7 @@
                             </div>
                         </div>
                         
-                        <div class="row mt-3 " style='height:70%'>
+                        <div id='rightThird' class="row  mt-3 " style='height:70%'>
                             <div class="col px-0">
                                 <div class="card ">
                                     <div class="card-body">
@@ -294,6 +292,43 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
+    function generateReport() {
+        const navbar = document.getElementById("navbar");
+        const body = document.getElementById("bodyDiv");
+        const stats = document.getElementById("stats");
+        const criticallydamagedareas = document.getElementById("criticallydamagedareas");
+        const criticallydamagedareasCard = document.getElementById("criticallydamagedareasCard");
+        const rightFirst = document.getElementById("rightFirst");
+        const rightSecond = document.getElementById("rightSecond");
+        const rightThird = document.getElementById("rightThird");
+        const genReportBtn = document.getElementById("genReportBtn");
+
+        navbar.style.display = 'none';
+        genReportBtn.style.display = 'none';
+        body.style.marginLeft = '0';
+        stats.style.height = 'auto';
+        criticallydamagedareas.style.height ='auto';
+        criticallydamagedareasCard.style.maxHeight = 'none';
+        criticallydamagedareasCard.style.overflowY = 'visible';
+        rightFirst.style.height = 'auto';
+        rightSecond.style.height = 'auto';
+        rightThird.style.height = 'auto';
+        
+        window.print();
+
+        navbar.style.display ='inline';
+        genReportBtn.style.display ='inline';
+        body.style.marginLeft = '9%';
+        stats.style.height = '40%';
+        criticallydamagedareas.style.height='43%';
+        criticallydamagedareasCard.style.maxHeight = '40vh';
+        criticallydamagedareasCard.style.overflowY = 'auto';
+        rightFirst.style.height = '15%';
+        rightSecond.style.height = '15%';
+        rightThird.style.height = '70%';
+    }
+
+
     // variabes
     var context = {{ context | safe }};
     var disasterType = context.disaster_type;
