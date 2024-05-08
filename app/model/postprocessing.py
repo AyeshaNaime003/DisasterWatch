@@ -1,7 +1,7 @@
 import numpy as np
 import torch
 import cv2
-
+import time
 
 def preprocess_inputs(x):
   """
@@ -45,7 +45,6 @@ def get_dmg_msk(img1, img2, model):
     # check whether to use device agnostic code or not
     msk = model(img)
     msk = torch.sigmoid(msk)
-    # print(f"SHAPE: {msk.shape}")
     msknp = msk.cpu().numpy().transpose((0, 2, 3, 1))
 
     return msknp
@@ -61,7 +60,6 @@ def postprocess_per_img(img):
         Returns:
         dmg_msk: the processed and colored mask
     """
-    print(f"in postprocess_per_img, the input shape is {img.shape}")
     # seperating the masks
     seg_msk = img[0, :, :, 0]
     green_msk = img[0, :, :, 1]
@@ -89,8 +87,6 @@ def postprocess_per_img(img):
             cv2.drawContours(smooth_edge_msk, [approx], -1, (255), -1)  # fill contours
         # save the output mask
         output_msks.append(smooth_edge_msk)
-    print(f"output len: {len(output_msks)}")
-    print(f"output shape: {output_msks[0].shape}")
     return output_msks
 
 def assign_colors(msks):
@@ -98,11 +94,8 @@ def assign_colors(msks):
   This function assigns colors to each segmentation mask of each class and returns a combined colored mask.
   """
   height = msks[0].shape[0]
-  # print(f"height: {height}")
   width = msks[0].shape[1]
-  # print(f"width: {width}")
   colored_msk = np.zeros((height, width, 3), dtype=np.uint8)
-  # print(f"shape: {colored_msk.shape}")
 
   # assign colors
   colored_msk[msks[1] > 0.5] = [0, 200, 0] # green
@@ -117,7 +110,16 @@ def postprocessing(pre_image, post_image, model):
   """
   Wrapper function which performs all the operations required for post-processing the image sequentially.
   """
+  start_time = time.time()
   model_output = get_dmg_msk(pre_image, post_image, model)
+  end_time = time.time()
+  inference_time = end_time - start_time
+  print(f"Model Inference Time: {inference_time} seconds")
+
+  start_time = time.time()
   output_msks = postprocess_per_img(model_output)
-#   final_msk = assign_colors(output_msks)
+  end_time = time.time()
+  preprocessing_time = end_time - start_time
+  print(f"Preprocessing Time: {preprocessing_time} seconds")
+  
   return output_msks

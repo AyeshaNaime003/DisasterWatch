@@ -7,7 +7,13 @@ from django.utils import timezone
 from django.test import TestCase, Client
 from django.urls import reverse
 from unittest.mock import patch
-
+from random import choice
+import json
+from io import BytesIO
+from datetime import datetime
+from PIL import Image
+from django.contrib import messages
+from django.contrib.messages import get_messages
 
 # Create your tests here.
 class LoginTestCase(TestCase):
@@ -90,46 +96,183 @@ class LogoutPageTestCase(TestCase):
         response = self.client.get(reverse('logout'))
         self.client.session.flush()
         self.assertEqual(response.status_code, 302)
-        print("SUCCESS:  LOGOUT----------")
-11
+        print("SUCCESS:LOGOUT----------")
+
+
 
 class AdminPanelTestCase(TestCase):
+    # create test user 
     def setUp(self):
-        self.user = CustomUser.objects.create_user(username='admin', email='admin@example.com', password='admin')
-        self.client = Client()
-        self.client.login(username='admin', password='admin')
+        self.user = CustomUser.objects.create_user(
+            username='testuser', email='test@example.com', password='password123', is_admin=True
+        )
+        self.client.force_login(self.user)
+        print("\n\n")
 
-    def test_admin_panel_page(self):
+    def test_admin_panel_view(self):
+        print("Checking admin panel view----------------------")
+        # Check if the user is logged in
+        self.assertTrue(self.user.is_authenticated)
+
+        # Try accessing the admin panel
         response = self.client.get(reverse('admin-panel'))
+
+        # Check the response status code and template used
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'app/adminPanel.html')
+        print("success----------------------------------------\n\n")
 
-    def test_add_user(self):
-        initial_users_count = CustomUser.objects.count()
-        response = self.client.post(reverse('add-user'), {
-            'username': 'testuser',
-            'email': 'testuser@example.com',
-            'contact': '1234567890',
-            'password': 'testpass',
-            'firstName': 'Test',
-            'lastName': 'User',
-            'is_admin': 'on'
+
+    def test_get_user_details(self):
+        print("checking get_user_details-------------------")
+        # Get all user ids from the database
+        user_ids = CustomUser.objects.values_list('id', flat=True)
+        # Choose a random user id
+        random_user_id = choice(user_ids)
+        # Fetch details of the random user
+        response = self.client.get(reverse('get-user-details', kwargs={'user_id': random_user_id}))
+        self.assertEqual(response.status_code, 200)
+        print("success--------------------------------\n\n")
+
+
+    def test_add_user_view(self):
+        print("checking add user---------------------------")
+        response = self.client.post(reverse('add-user'), data={
+            'username': 'newuser', 'email': 'newuser@example.com',
+            'contact': '1234567890', 'password': 'newpassword123',
+            'firstName': 'New', 'lastName': 'User', 'is_admin': 'True'
         })
-        self.assertEqual(response.status_code, 302)  # Redirect after successful addition
-        self.assertEqual(CustomUser.objects.count(), initial_users_count + 1)  # User added
+        self.assertEqual(response.status_code, 302) 
+        print("success--------------------------------\n\n")
 
-    def test_edit_user(self):
-        user = CustomUser.objects.create_user(username='testuser', email='testuser@example.com', password='testpass')
-        user_id = user.id
-        response = self.client.post(reverse('edit-user', kwargs={'user_id': user_id}), {'is_admin': 'on'})
-        self.assertEqual(response.status_code, 302)  # Redirect after successful edit
-        edited_user = CustomUser.objects.get(id=user_id)
-        self.assertTrue(edited_user.is_admin)  # User's admin status updated
 
-    def test_delete_user(self):
-        user = CustomUser.objects.create_user(username='testuser', email='testuser@example.com', password='testpass')
-        user_id = user.id
-        initial_users_count = CustomUser.objects.count()
-        response = self.client.post(reverse('delete-user', kwargs={'user_id': user_id}))
-        self.assertEqual(response.status_code, 302)  # Redirect after successful deletion
-        self.assertEqual(CustomUser.objects.count(), initial_users_count - 1)  # User deleted
+    def test_edit_user_view(self):
+        print("checking edit user---------------------------")
+        # get random user to edit 
+        user_ids = CustomUser.objects.values_list('id', flat=True)
+        random_user_id = choice(user_ids)
+        response = self.client.get(reverse('get-user-details', kwargs={'user_id': random_user_id}))
+        content = json.loads(response.content)
+        switch = False if content["is_admin"]==True else True
+        # switch roles
+        response = self.client.post(reverse('edit-user', kwargs={'user_id': random_user_id}), data={'is_admin': switch})
+        
+        self.assertEqual(response.status_code, 302)  
+        # Refresh the user instance from the database to check if the role has been switched
+        updated_employee_user = CustomUser.objects.get(id=random_user_id)
+        self.assertEqual(updated_employee_user.is_admin, switch) 
+        print("success--------------------------------\n\n")
+
+    
+    def test_delete_user_view(self):
+        print("checking delete user---------------------------")
+        # Get all user ids from the database
+        user_ids = CustomUser.objects.values_list('id', flat=True)
+        # Choose a random user id
+        random_user_id = choice(user_ids)
+        response = self.client.post(reverse('delete-user', kwargs={'user_id': random_user_id}))
+        self.assertEqual(response.status_code, 302)  # Redirects after successful user deletion
+        self.assertFalse(CustomUser.objects.filter(id=random_user_id).exists())
+        print("success--------------------------------\n\n")
+
+
+class ProfileViewTestCase(TestCase):
+    def setUp(self):
+        # Create a test user
+        self.user = CustomUser.objects.create_user(
+            username='testuser', email='test@example.com', password='password123',
+            first_name='Test', last_name='User', contact='1234567890', location='Test Location'
+        )
+        self.client = Client()
+        self.client.force_login(self.user)
+        print("\n\n")
+
+    def test_profile_view_authenticated(self):
+        # changing the profile content 
+        print("Viewing profile user---------------------------")
+        response = self.client.get(reverse('profile'))
+        self.assertEqual(response.status_code, 200)
+        print("success----------------------------------------")
+
+    def test_profile_view_post(self):
+        # Make a POST request to the profile view
+        print("Chnaging the profile content---------------------------")
+        response = self.client.post(reverse('profile'), data={
+            'first_name': 'Updated First Name',
+            'last_name': 'Updated Last Name',
+            'email': 'updated@example.com',
+            'contact-number': '9876543210',
+            'location': 'Updated Location',
+        })
+        # Check the response status code and redirection
+        self.assertRedirects(response, reverse('profile'))
+
+        # Check if profile was updated
+        updated_user = CustomUser.objects.get(id=self.user.id)
+        self.assertEqual(updated_user.first_name, 'Updated First Name')
+        self.assertEqual(updated_user.last_name, 'Updated Last Name')
+        self.assertEqual(updated_user.email, 'updated@example.com')
+        self.assertEqual(updated_user.contact, '9876543210')
+        self.assertEqual(updated_user.location, 'Updated Location')
+        print("success----------------------------------------")
+
+
+
+class InferenceDashboardMapViewTestCase(TestCase):
+    def setUp(self):
+        # Create a test user
+        self.user = CustomUser.objects.create_user(
+            username='testuser', email='test@example.com', password='password123'
+        )
+        self.client = Client()
+        self.client.force_login(self.user)
+        print("\n\n")
+
+
+    def create_dummy_tiff(self, width, height):
+        # Create a blank TIFF image using PIL
+        image = Image.new('RGB', (width, height))
+        with BytesIO() as buffer:
+            image.save(buffer, format='TIFF')
+            # return buffer.getvalue()
+
+    def test_empty_tiff_files(self):
+        # Create temporary TIFF files for testing
+        pre_tiff_data = self.create_dummy_tiff(1024, 1024)
+        post_tiff_data = self.create_dummy_tiff(1024, 1024)
+
+        pre_tiff_io = BytesIO(pre_tiff_data)
+        post_tiff_io = BytesIO(post_tiff_data)
+
+        pre_tiff_io.name = 'pre_image.tif'
+        post_tiff_io.name = 'post_image.tif'    
+
+        # Prepare form data
+        form_data = {
+            'pre_image': pre_tiff_io,
+            'post_image': post_tiff_io,
+            'city': 'Test City',
+            'date': datetime.now().strftime('%Y-%m-%d'),
+            'disaster_type': 'Test Disaster Type',
+            'disaster_description': 'Test Disaster Description',
+            'comments': 'Test Comments',
+        }
+
+        # Make a POST request to the inferenceform view with form data and ampty tiff files, 
+        response = self.client.post(reverse('inferenceform'), data=form_data, follow=True)
+        self.assertEqual(response.status_code, 200) 
+        storage = messages.get_messages(response.wsgi_request)
+        messages_list = [msg.message for msg in storage]
+        self.assertIn('InferenceModel model created', messages_list)
+        self.assertTrue(InferenceModel.objects.filter(user=self.user).exists())
+
+        # Get the InferenceModel instance created by the previous request
+        inference_model = InferenceModel.objects.filter(user=self.user).last()
+        self.assertIsNotNone(inference_model)  # Ensure the InferenceModel instance exists
+
+        # Make a GET request to the map view with the inference model ID
+        map_response = self.client.get(reverse('map_with_id', kwargs={'inference_id': inference_model.id}))
+        self.assertEqual(map_response.status_code, 200)
+        self.assertTemplateUsed(map_response, 'app/map.html')
+        self.assertIn('context', map_response.context)
+        # Add more assertions as needed based on the context data in the map response

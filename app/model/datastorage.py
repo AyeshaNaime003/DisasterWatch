@@ -55,7 +55,7 @@ def get_polygons(mask, transform, rdp=True):
 
     # GET THE CONTOURS IN THE MASK
     contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    print(f"number of contours in the mask {len(contours)}")
+    print(f"number of contours in the mask: {len(contours)}")
     # GET THE COORDINATES, CENTER LAT, CENTER LONG, AND ADDRESS OF EACH POLYGON 
     polygons = []
     for contour in contours:

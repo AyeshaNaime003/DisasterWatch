@@ -107,7 +107,7 @@ def addUser(request):
         password = request.POST.get('password')
         fName = request.POST.get('firstName')
         lName = request.POST.get('lastName')
-        is_admin = request.POST.get('is_admin') 
+        is_admin = bool(request.POST.get('is_admin') )
         try:
             user = CustomUser.objects.create_user(username=username, email=email, password=password, first_name=fName, last_name=lName, contact=contact, is_admin=is_admin)
             messages.success(request, f"User '{username}' added successfully!")
@@ -191,15 +191,15 @@ def map_with_id(request, inference_id):
         return HttpResponse("Inference model not found", status=404)
     else:
         results = json.loads(inference_model.results)
+        classes = ["green", "yellow", "orange", "red"]
+        classes_count = [len(results[cls]) for cls in classes]
+        print(f"Classes count: {classes_count}")
         address_components = None
-        if len(results["green"])>0:
-             address_components = list(results["green"][0]["address"].keys())
-        elif len(results["yellow"])>0:
-             address_components = list(results["yellow"][0]["address"].keys())
-        elif len(results["orange"])>0:
-             address_components = list(results["orange"][0]["address"].keys())
-        else:
-             address_components = list(results["red"][0]["address"].keys())
+        if sum(classes_count) > 0:
+            address_components = [
+                results[color][0]["address"].keys() 
+                for color in results.keys() 
+                if len(results[color]) > 0]
         print(f"address cmponents: {address_components}")
 
         weather = request.session.get('weather')
@@ -223,7 +223,6 @@ def map_with_id(request, inference_id):
 
 
 def get_critically_damaged_areas(results, address_components):
-    # address_components = address_components[::-1]
     all_addresses = [point["address"] for color in results.keys() for point in results[color]]
     for index, component in enumerate(address_components):
         presentInAll=all([True if component in address.keys() else False for address in all_addresses])
@@ -266,24 +265,20 @@ def get_critically_damaged_areas(results, address_components):
         sortedComponentRevised.append(componentData_formatted)
     return sortedComponentRevised, chosen_component
 
-
 def get_extreme_points(coordinates):
    # Define a reference point (e.g., the center of the polygon)
     reference_point = (sum(coord[0] for coord in coordinates) / len(coordinates),
                        sum(coord[1] for coord in coordinates) / len(coordinates))
-
     # Define a custom key function to calculate the polar angle from the reference point
     def polar_angle(coord):
         dy = coord[0] - reference_point[0]
         dx = coord[1] - reference_point[1]
         return (atan2(dy, dx) + 2 * pi) % (2 * pi)  # Ensure angle is in the range [0, 2*pi)
-
     # Sort the coordinates in clockwise order based on the polar angle from the reference point
     sorted_coordinates = sorted(coordinates, key=polar_angle, reverse=True)
     nested_lists = [[coord[0], coord[1]] for coord in sorted_coordinates]
 
     return nested_lists
-
 
 EARTH_RADIUS_IN_METERS = 6378137
 EARTH_CIRCUMFERENCE_IN_METERS = 2 * EARTH_RADIUS_IN_METERS * pi
@@ -306,6 +301,18 @@ def area_calculator(points):
             area = abs(area)
     return area
 
+def get_address_components(results, classes_count):
+    address_components = None
+    if sum(classes_count)>0:
+        if len(classes_count[0])>0:
+            address_components = list(results["green"][0]["address"].keys())
+        elif classes_count[1]>0:
+            address_components = list(results["yellow"][0]["address"].keys())
+        elif classes_count[2]>0:
+            address_components = list(results["orange"][0]["address"].keys())
+        else:
+            address_components = list(results["red"][0]["address"].keys())
+    return address_components
 
 @login_required(login_url="login/")
 def dashboard_with_id(request, inference_id):
@@ -314,37 +321,31 @@ def dashboard_with_id(request, inference_id):
     if not inference_model:
         return HttpResponse("Inference model not found", status=404)
     else:
+        # get results
+        results = json.loads(inference_model.results)
+        # get the classes count form the results
+        classes = ["green", "yellow", "orange", "red"]
+        classes_count = [len(results[cls]) for cls in classes]
+        print(f"Classes count: {classes_count}")
+        # Damage area data: critisally damaged areas and total damaged area
+        totalDamagedBuildings = classes_count[0]+classes_count[1]+ classes_count[3]
+        if totalDamagedBuildings>0:
+            boundary_coordinates = get_extreme_points([(point["center_lat"], point["center_long"]) for color, points in results.items() if color != "green" for point in points])
+            sorted_critically_damaged_areas, chosen_component = get_critically_damaged_areas(results, get_address_components(results, classes_count))
+            chosen_component = chosen_component.capitalize()
+            total_damaged_area = int(area_calculator(boundary_coordinates))/ 1e6 if totalDamagedBuildings>3 else 0
+        else: 
+            boundary_coordinates, sorted_critically_damaged_areas, chosen_component = None, None, None
+            total_damaged_area = 0
         # formatting the data for api calls
         disaster_time = inference_model.disaster_date.strftime('%Y/%m/%d') if inference_model.disaster_date else None
         disaster_city = inference_model.disaster_city
         disaster_state = inference_model.disaster_state
-        results = json.loads(inference_model.results)
-        classes = ["green", "yellow", "orange", "red"]
-        address_components = None
-        yellowCount = len(results["yellow"])
-        orangeCount = len(results["orange"])
-        totalDamagedBuildings = yellowCount+orangeCount+ len(results["red"])
-        if len(results["green"])>0:
-             address_components = list(results["green"][0]["address"].keys())
-        elif yellowCount>0:
-             address_components = list(results["yellow"][0]["address"].keys())
-        elif orangeCount>0:
-             address_components = list(results["orange"][0]["address"].keys())
-        else:
-             address_components = list(results["red"][0]["address"].keys())
-       
-        
-        boundary_coordinates = get_extreme_points([(point["center_lat"], point["center_long"]) for color, points in results.items() if color != "green" for point in points])
-
-        # chart
-        classes_count = [len(results[cls]) for cls in classes]
-        class_none = [0, 0, 0, 0]
-
         weather = get_weather(disaster_city if disaster_city else disaster_state, date_str=disaster_time)
         population = get_population(disaster_city if disaster_city else disaster_state)
         request.session['weather'] = weather
         request.session['population'] = population
-        sorted_critically_damaged_areas, chosen_component = get_critically_damaged_areas(results, address_components)
+        
         # data to send to front end
         return render(request, 'app/dashboard.html', {"context": {
             'inference_id': inference_model.id,
@@ -361,16 +362,24 @@ def dashboard_with_id(request, inference_id):
             'population': population if population is not None else "None",
             'building_count': sum(classes_count),
             'damaged_count': sum(classes_count[1:]),
-            'graph_data': classes_count if results else class_none,
+            'graph_data': classes_count,
             'boundary_coordinates': boundary_coordinates,
             "disaster_areas": sorted_critically_damaged_areas,
-            "chosen_component": chosen_component.capitalize(), 
-            "total_damaged_area": int(area_calculator(boundary_coordinates))/ 1e6 if totalDamagedBuildings>3 else 0, 
+            "chosen_component": chosen_component, 
+            "total_damaged_area": total_damaged_area, 
             }
         })
 
 
-
+def tiff_has_geospatial_info(tiff_path):
+    try:
+        dataset = gdal.Open(tiff_path)
+        if dataset is not None:
+            # Check if the TIFF file has geospatial information
+            return dataset.GetProjection() != ''
+    except Exception as e:
+        print(f"Error checking geospatial info: {e}")
+    return False
 
 @login_required(login_url="login/")
 def inferenceform(request):
@@ -384,6 +393,10 @@ def inferenceform(request):
         disaster_description = request.POST['disaster_description']
         disaster_comments = request.POST['comments']
         
+        if not (tiff_has_geospatial_info(pre_image.name) and tiff_has_geospatial_info(post_image.name)):
+            messages.error(request, "Uploaded TIFF files do not contain geospatial information.")
+            return redirect("inferenceform")
+
         # Save the tiff files temporarily in media root
         file_name = f"{disaster_date}_{disaster_city}_{disaster_type}"
         pre_path = os.path.join(MEDIA_ROOT, 'tiff', file_name+"_pre.tif")
@@ -411,41 +424,45 @@ def inferenceform(request):
                                             dec_depth=8).to(device)
 
         loaded_model.load_state_dict(torch.load(os.path.join(model_dir, "checkpoint.pth"), map_location=torch.device('cpu')))
-        start = time.time()
         processed_output_masks = postprocessing(pre_image, post_image, loaded_model)
-        end = time.time()
-        elapsed_time = end - start 
-        print(f"Inference time: {elapsed_time} seconds")
 
         # data storage
+        start = time.time()
         transform = get_tif_transform(pre_path)
         classes = ['green', 'yellow', 'orange', 'red']
         results={}
-        last_polygons_in_mask_address = None
+
+        mask_address = None
         for index, mask in enumerate(processed_output_masks[1: ]):
             color = classes[index]
             polygons_in_mask = get_polygons(mask, transform, rdp=False)
             color_count = len(polygons_in_mask)
             print(f"{color}: {color_count}")
-            if last_polygons_in_mask_address is None and color_count>0:
-                last_polygons_in_mask_address = polygons_in_mask[0]['address']
+            if mask_address is None and color_count>0:
+                mask_address = polygons_in_mask[0]['address']
             results[color] = polygons_in_mask
-            # break
+        print()
+        end = time.time()
+        addressing_time = end-start
+        print(f"Addressing Time: {addressing_time} seconds")
+        
+        # middle of the tiff files to be the centre of the map
         tif_middle_latitude, tif_middle_longitude = pixels_to_coordinates(transform, (h/2, w/2))
         
-        # Get the value for "city" if it exists, otherwise get "region" or "town" with an empty string as default
-        disaster_city = last_polygons_in_mask_address.get("city", last_polygons_in_mask_address.get("region", last_polygons_in_mask_address.get("town", "")))
-
-        address_components = last_polygons_in_mask_address.keys()
-        print(address_components)
+        if mask_address:
+            disaster_city = mask_address.get("city", mask_address.get("region", mask_address.get("town", ""))) 
+            disaster_state = mask_address.get("state", mask_address.get("county", "")),
+            disaster_country = mask_address["country"]
+        else:
+            disaster_city, disaster_state, disaster_country = disaster_city, "", ""
         try:
             # Create and save an instance of InferenceModel
             inference_model_instance = InferenceModel.objects.create(
                 user = request.user,
                 disaster_date = disaster_date,
                 disaster_city =  disaster_city,
-                disaster_state = last_polygons_in_mask_address.get("state", last_polygons_in_mask_address.get("county", "")),
-                disaster_country = last_polygons_in_mask_address["country"],
+                disaster_state = disaster_state,
+                disaster_country = disaster_country,
                 disaster_type = disaster_type,
                 disaster_description = disaster_description,
                 disaster_comments = disaster_comments,
