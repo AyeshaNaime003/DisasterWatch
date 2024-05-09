@@ -20,6 +20,11 @@ from django.urls import reverse
 from django.http import HttpResponse
 from math import pi, cos, radians, atan2
 from importlib.machinery import SourceFileLoader
+import pdfkit
+from django.http import HttpResponse
+from django.template.loader import get_template
+from django.template import Context
+from django.conf import settings
 
 
 cwd = os.getcwd()
@@ -484,7 +489,26 @@ def inferenceform(request):
         return render(request, "app/inferenceform.html")
 
 
+def generate_pdf(request):
+    # Render the HTML template with the context
+    template = get_template('index.html')
+    html = template.render({'context': context})  # Assuming 'context' is your data
+    
+    # Configure PDF options
+    options = {
+        'page-size': 'Legal',
+        'orientation': 'Landscape',
+        'encoding': "UTF-8",
+    }
+    
+    # Generate PDF
+    pdf = pdfkit.from_string(html, False, options=options)
 
+    # Create a response with PDF as attachment
+    response = HttpResponse(pdf, content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="report.pdf"'
+
+    return response
 
 
 
