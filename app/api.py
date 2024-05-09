@@ -1,6 +1,5 @@
 
 import requests
-import time
 import datetime
 from dateutil import parser
 # WEATHER - openweathermap

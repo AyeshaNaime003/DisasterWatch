@@ -14,6 +14,16 @@ from datetime import datetime
 from PIL import Image
 from django.contrib import messages
 from django.contrib.messages import get_messages
+import os
+from django.conf import settings
+from ..inference.preprocessing import *
+
+
+
+
+
+
+
 
 # Create your tests here.
 class LoginTestCase(TestCase):
@@ -23,9 +33,10 @@ class LoginTestCase(TestCase):
             username='dell',
             password='dell'
         )
+    
     def test_login_successful(self):
         # Mock the authenticate function to return the test user
-        print("TESTING SUCCESSFUL LOGIN------------------------------------------------------")
+        print("TESTING SUCCESSFUL LOGIN----------------------------------------------")
         with patch('app.views.authenticate') as mock_authenticate:
             mock_authenticate.return_value = self.user
             # Simulate a POST request to loginPage with correct credentials
@@ -33,11 +44,10 @@ class LoginTestCase(TestCase):
                                         {'username': self.user.username, 'password': self.user.password})
             # Check if the user is redirected to the home page
             self.assertRedirects(response, reverse('home'))
-        print("LOGIN SUCCESSFUL------------------------------------------------------\n\n")
+        print("LOGIN SUCCESSFUL------------------------------------------------\n\n")
             
-
     def test_login_wrong_username(self):
-        print("TESTING WRONG USERNAME------------------------------------------------------")
+        print("TESTING WRONG USERNAME--------------------------------------------------")
         # Simulate a POST request to loginPage with incorrect credentials
         response = self.client.post(reverse('login'), {'username': 'invaliduser', "password": self.user.password})
         # print(response)
@@ -46,10 +56,10 @@ class LoginTestCase(TestCase):
         messages = get_messages(response.wsgi_request)
         error_messages = [msg.message for msg in messages if msg.level == 40]  # 40 corresponds to the ERROR level
         self.assertIn("Invalid credentials", error_messages)
-        print("WRONG USERNAME SUCESSFUL------------------------------------------------------\n\n")
+        print("WRONG USERNAME SUCESSFUL--------------------------------------------------\n\n")
 
     def test_login_wrong_password(self):
-        print("TESTING WRONG PASSWORD------------------------------------------------------")
+        print("TESTING WRONG PASSWORD-------------------------------------------------")
         # Simulate a POST request to loginPage with incorrect credentials
         response = self.client.post(reverse('login'), {'username': self.user.username, 'password': "invalidpassword"})
         # print(response)
@@ -58,30 +68,10 @@ class LoginTestCase(TestCase):
         messages = get_messages(response.wsgi_request)
         error_messages = [msg.message for msg in messages if msg.level == 40]  # 40 corresponds to the ERROR level
         self.assertIn("Invalid credentials", error_messages)
-        print("WRONG PASSWORD SUCESSFUL------------------------------------------------------\n\n")
+        print("WRONG PASSWORD SUCESSFUL-------------------------------------------------\n\n")
 
 
-class HomeViewTestCase(TestCase):
-    def setUp(self):
-        self.client = Client()
-        self.user = CustomUser.objects.create_user(username='dell', password='dell')
 
-    def test_home_view_with_authenticated_user(self):
-        print("TESTING AUTHENTICATED HOME------------------------------------------------------")
-        # login
-        self.client.login(username='dell', password='dell')
-        # go to home page
-        response = self.client.get(reverse('home'))
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'app/home.html')
-        print("SUCCESS: AUTHENTICATED HOME------------------------------------------------------\n\n")
-
-
-    def test_home_view_with_unauthenticated_user(self):
-        print("TESTING UNAUTHENTICATED HOME------------------------------------------------------")
-        response = self.client.get(reverse('home'))
-        self.assertRedirects(response, '/login/?next=%2F', status_code=302)
-        print("SUCCESS: UNAUTHENTICATED HOME------------------------------------------------------\n\n")
 
 class LogoutPageTestCase(TestCase):
     def setUp(self):
@@ -97,6 +87,34 @@ class LogoutPageTestCase(TestCase):
         self.client.session.flush()
         self.assertEqual(response.status_code, 302)
         print("SUCCESS:LOGOUT----------")
+
+
+
+
+
+
+class HomeViewTestCase(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.user = CustomUser.objects.create_user(username='dell', password='dell')
+
+
+    def test_home_view_with_authenticated_user(self):
+        print("TESTING AUTHENTICATED HOME--------------------------------------------------")
+        # login
+        self.client.login(username='dell', password='dell')
+        # go to home page
+        response = self.client.get(reverse('home'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'app/home.html')
+        print("SUCCESS: AUTHENTICATED HOME--------------------------------------------------\n\n")
+
+
+    def test_home_view_with_unauthenticated_user(self):
+        print("TESTING UNAUTHENTICATED HOME------------------------------------------------------")
+        response = self.client.get(reverse('home'))
+        self.assertRedirects(response, '/login/?next=%2F', status_code=302)
+        print("SUCCESS: UNAUTHENTICATED HOME------------------------------------------------------\n\n")
 
 
 
@@ -234,7 +252,8 @@ class InferenceDashboardMapViewTestCase(TestCase):
         image = Image.new('RGB', (width, height))
         with BytesIO() as buffer:
             image.save(buffer, format='TIFF')
-            # return buffer.getvalue()
+            return buffer.getvalue()
+
 
     def test_empty_tiff_files(self):
         # Create temporary TIFF files for testing
@@ -243,11 +262,44 @@ class InferenceDashboardMapViewTestCase(TestCase):
 
         pre_tiff_io = BytesIO(pre_tiff_data)
         post_tiff_io = BytesIO(post_tiff_data)
+        print(type(pre_tiff_data))
 
         pre_tiff_io.name = 'pre_image.tif'
         post_tiff_io.name = 'post_image.tif'    
 
         # Prepare form data
+        form_data = {
+            'city': 'Test City',
+            'date': datetime.now().strftime('%Y-%m-%d'),
+            'disaster_type': 'Test Disaster Type',
+            'disaster_description': 'Test Disaster Description',
+            'comments': 'Test Comments',
+            'pre_image': pre_tiff_io,
+            'post_image': post_tiff_io,
+        }
+        # Make a POST request to the inferenceform view with form data and ampty tiff files, 
+        response = self.client.post(reverse('inferenceform'), data=form_data, follow=False)
+        storage = messages.get_messages(response.wsgi_request)
+        messages_list = [msg.message for msg in storage]
+        self.assertIn('Uploaded TIFF files do not contain geospatial information.', messages_list)
+        self.assertRedirects(response, reverse('inferenceform'))
+
+
+    def test_select_tiff_files(self):
+        # Get the path to the directory containing sample TIFF files
+        sample_tiff_dir = os.path.join(settings.BASE_DIR, "app", "test_batches")
+
+        # Get a list of sample TIFF files in the directory
+        sample_tiff_files = [file for file in os.listdir(sample_tiff_dir) if file.endswith('.tif') and "pre" in file]
+        for index, file_name in enumerate(sample_tiff_files):
+            print(f"{index+1}: {file_name}")
+        pre = sample_tiff_files[int(input("Please tell which disaster you want to test: "))-1]
+        post = pre.replace("pre", "post")
+
+        with open(os.path.join(sample_tiff_dir, pre), 'rb') as pre_file, open(os.path.join(sample_tiff_dir, post), 'rb') as post_file:
+            pre_tiff_io = BytesIO(pre_file.read())
+            post_tiff_io = BytesIO(post_file.read())
+        
         form_data = {
             'pre_image': pre_tiff_io,
             'post_image': post_tiff_io,
@@ -257,16 +309,11 @@ class InferenceDashboardMapViewTestCase(TestCase):
             'disaster_description': 'Test Disaster Description',
             'comments': 'Test Comments',
         }
-
-        # Make a POST request to the inferenceform view with form data and ampty tiff files, 
+    
         response = self.client.post(reverse('inferenceform'), data=form_data, follow=True)
-        self.assertEqual(response.status_code, 200) 
-        storage = messages.get_messages(response.wsgi_request)
-        messages_list = [msg.message for msg in storage]
+        messages_list = [msg.message for msg in messages.get_messages(response.wsgi_request)]
         self.assertIn('InferenceModel model created', messages_list)
-        self.assertTrue(InferenceModel.objects.filter(user=self.user).exists())
 
-        # Get the InferenceModel instance created by the previous request
         inference_model = InferenceModel.objects.filter(user=self.user).last()
         self.assertIsNotNone(inference_model)  # Ensure the InferenceModel instance exists
 
@@ -275,4 +322,3 @@ class InferenceDashboardMapViewTestCase(TestCase):
         self.assertEqual(map_response.status_code, 200)
         self.assertTemplateUsed(map_response, 'app/map.html')
         self.assertIn('context', map_response.context)
-        # Add more assertions as needed based on the context data in the map response

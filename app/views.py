@@ -11,10 +11,10 @@ import os
 import torch
 import json
 from server.settings import *
-from .model.preprocessing import *
-from .model.postprocessing import *
-from .model.datastorage import *
-from .model.models import BASE_Transformer_UNet
+from .inference.preprocessing import *
+from .inference.postprocessing import *
+from .inference.datastorage import *
+from .inference.models import BASE_Transformer_UNet
 from .api import *
 from django.urls import reverse
 from django.http import HttpResponse
@@ -28,7 +28,7 @@ from django.conf import settings
 
 
 cwd = os.getcwd()
-model_dir = os.path.join(cwd, "app", "model")
+model_dir = os.path.join(cwd, "app", "inference")
 bitmodule = SourceFileLoader('bitmodule', os.path.join(model_dir, "bit_resnet.py")).load_module()
 
 
@@ -204,7 +204,8 @@ def map_with_id(request, inference_id):
             address_components = [
                 results[color][0]["address"].keys() 
                 for color in results.keys() 
-                if len(results[color]) > 0]
+                if len(results[color]) > 0][0]
+            address_components=list(address_components)
         print(f"address cmponents: {address_components}")
 
         weather = request.session.get('weather')
@@ -309,7 +310,7 @@ def area_calculator(points):
 def get_address_components(results, classes_count):
     address_components = None
     if sum(classes_count)>0:
-        if len(classes_count[0])>0:
+        if classes_count[0]>0:
             address_components = list(results["green"][0]["address"].keys())
         elif classes_count[1]>0:
             address_components = list(results["yellow"][0]["address"].keys())
@@ -397,10 +398,6 @@ def inferenceform(request):
         disaster_type = request.POST['disaster_type']
         disaster_description = request.POST['disaster_description']
         disaster_comments = request.POST['comments']
-        
-        if not (tiff_has_geospatial_info(pre_image.name) and tiff_has_geospatial_info(post_image.name)):
-            messages.error(request, "Uploaded TIFF files do not contain geospatial information.")
-            return redirect("inferenceform")
 
         # Save the tiff files temporarily in media root
         file_name = f"{disaster_date}_{disaster_city}_{disaster_type}"
@@ -413,6 +410,11 @@ def inferenceform(request):
             for chunk in post_image.chunks():
                 f.write(chunk)
         print("Pre and post tifs saved in media")
+
+        if not (tiff_has_geospatial_info(pre_path) and tiff_has_geospatial_info(post_path)):
+            messages.error(request, "Uploaded TIFF files do not contain geospatial information.")
+            print("Uploaded TIFF files do not contain geospatial information")
+            return redirect("inferenceform")
 
         # convert to image
         pre_image, post_image = tif_to_img(pre_path, post_path)
@@ -429,8 +431,11 @@ def inferenceform(request):
                                             dec_depth=8).to(device)
 
         loaded_model.load_state_dict(torch.load(os.path.join(model_dir, "checkpoint.pth"), map_location=torch.device('cpu')))
-        processed_output_masks = postprocessing(pre_image, post_image, loaded_model)
+        processed_output_masks, inference_time, postprocessing_time = postprocessing(pre_image, post_image, loaded_model)
+        print(f"Model Inference Time: {inference_time} seconds")
+        print(f"Preprocessing Time: {postprocessing_time} seconds")
 
+        
         # data storage
         start = time.time()
         transform = get_tif_transform(pre_path)
@@ -489,26 +494,6 @@ def inferenceform(request):
         return render(request, "app/inferenceform.html")
 
 
-def generate_pdf(request):
-    # Render the HTML template with the context
-    template = get_template('index.html')
-    html = template.render({'context': context})  # Assuming 'context' is your data
-    
-    # Configure PDF options
-    options = {
-        'page-size': 'Legal',
-        'orientation': 'Landscape',
-        'encoding': "UTF-8",
-    }
-    
-    # Generate PDF
-    pdf = pdfkit.from_string(html, False, options=options)
-
-    # Create a response with PDF as attachment
-    response = HttpResponse(pdf, content_type='application/pdf')
-    response['Content-Disposition'] = 'attachment; filename="report.pdf"'
-
-    return response
 
 
 
