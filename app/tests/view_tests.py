@@ -322,3 +322,7 @@ class InferenceDashboardMapViewTestCase(TestCase):
         self.assertEqual(map_response.status_code, 200)
         self.assertTemplateUsed(map_response, 'app/map.html')
         self.assertIn('context', map_response.context)
+
+
+
+
