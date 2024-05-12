@@ -1,8 +1,8 @@
 # DisasterWatch
 
-virtualenv env
-pip install django
-env/scripts/activate
+create virtual env: virtualenv env
+activate: env/scripts/activate
+installations: pip install -r requirements
 
 make server:
 django-admin startproject server ./
