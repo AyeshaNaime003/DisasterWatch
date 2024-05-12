@@ -2,6 +2,7 @@ import cv2
 import rasterio 
 import numpy as np
 import requests
+import json
 
 def get_tif_transform(file_name):
     with rasterio.open(file_name) as tif:
@@ -15,13 +16,13 @@ def get_address(latitude, longitude):
     FORMAT="json"
     LANG="en-US"
     base_url = f"https://nominatim.openstreetmap.org/reverse?format={FORMAT}&lat={latitude}&lon={longitude}&zoom=18&addressdetails=1&accept-language={LANG}"
-    # print(base_url)
     # Send a GET request to the API
     response = requests.get(base_url)
+    print(base_url, response)
     # Check if the request was successful (status code 200)
     address = None
     try:
-        address = response.json()["address"] 
+        address = json.loads(response.content)["address"] 
     except ValueError as e:
         print(response.status_code, e)
     finally:
