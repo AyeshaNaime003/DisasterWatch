@@ -1,1 +1,1 @@
-web: gunicorn DisasterWatch.wsgi
+web: gunicorn server.wsgi
