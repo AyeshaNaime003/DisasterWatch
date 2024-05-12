@@ -155,3 +155,4 @@ LEAFLET_CONFIG = {
 
 # GEOCODER_TIMEOUT = 10  # Increase the timeout value (in seconds)
 SESSION_COOKIE_AGE = 60*60*2  # 2 hour timeout
+
