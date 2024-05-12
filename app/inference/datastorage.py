@@ -15,18 +15,16 @@ def get_address(latitude, longitude):
     FORMAT="json"
     LANG="en-US"
     base_url = f"https://nominatim.openstreetmap.org/reverse?format={FORMAT}&lat={latitude}&lon={longitude}&zoom=18&addressdetails=1&accept-language={LANG}"
+    print(base_url)
     # Send a GET request to the API
     response = requests.get(base_url)
     # Check if the request was successful (status code 200)
     data = None
-    if response.status_code == 200:
-        try:
-            data = response.json()["address"] 
-            return response.status_code, data
-        except ValueError as e:
-            return 404, data
-    else:
+    try:
+        data = response.json()["address"] 
         return response.status_code, data
+    except ValueError as e:
+        return 404, data
 
 def format_address(address):
     components = list(address.keys()).copy()[::-1]
@@ -61,11 +59,11 @@ def get_polygons(mask, transform, rdp=True):
     polygons = []
     for contour in contours:
         contour_points = np.squeeze(contour)
-        if len(contour_points)>6:
-            approx = np.squeeze(cv2.approxPolyDP(contour_points, 0.001, True)).tolist()
+        if len(contour_points)>4:
+            # approx = np.squeeze(cv2.approxPolyDP(contour_points, 0.001, True)).tolist()
 
             coordinates_of_polygon=[]
-            for x,y in approx:
+            for x,y in contour_points:
                 approx_lat, approx_long = pixels_to_coordinates(transform, (x, y))   
                 correct_lat, correct_long = approx_lat+LAT_OFFSET, approx_long+LONG_OFFSET
                 coordinates_of_polygon.append((correct_lat, correct_long))
@@ -77,6 +75,7 @@ def get_polygons(mask, transform, rdp=True):
             # ADDRESS
             status_code, address = get_address(center_lat, center_long)
             if status_code!=200:
+                print(f"cant get address for {(center_lat, center_long)}, continue")
                 continue
             else: 
                 formatted_address = format_address(address)

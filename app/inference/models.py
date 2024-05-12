@@ -5,7 +5,7 @@ import torch.nn.functional as F
 from importlib.machinery import SourceFileLoader
 import os
 import sys
-from osgeo import gdal
+# from osgeo import gdal
 # from preprocessing import tif_to_img
 # from postprocessing import postprocessing
 # # import time

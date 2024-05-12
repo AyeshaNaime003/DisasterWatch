@@ -25,7 +25,7 @@ from django.http import HttpResponse
 from django.template.loader import get_template
 from django.template import Context
 from django.conf import settings
-
+import rasterio
 
 cwd = os.getcwd()
 model_dir = os.path.join(cwd, "app", "inference")
@@ -377,15 +377,25 @@ def dashboard_with_id(request, inference_id):
         })
 
 
+# def tiff_has_geospatial_info(tiff_path):
+#     try:
+#         dataset = gdal.Open(tiff_path)
+#         if dataset is not None:
+#             # Check if the TIFF file has geospatial information
+#             return dataset.GetProjection() != ''
+#     except Exception as e:
+#         print(f"Error checking geospatial info: {e}")
+#     return False
+
 def tiff_has_geospatial_info(tiff_path):
     try:
-        dataset = gdal.Open(tiff_path)
-        if dataset is not None:
+        with rasterio.open(tiff_path) as dataset:
             # Check if the TIFF file has geospatial information
-            return dataset.GetProjection() != ''
+            return dataset.crs is not None
     except Exception as e:
         print(f"Error checking geospatial info: {e}")
     return False
+
 
 @login_required(login_url="login/")
 def inferenceform(request):
@@ -418,6 +428,8 @@ def inferenceform(request):
 
         # convert to image
         pre_image, post_image = tif_to_img(pre_path, post_path)
+        print(pre_image.shape)
+        print(type(pre_image))
         h, w = post_image.shape[0], post_image.shape[1]
         
         # model and inference
@@ -458,7 +470,9 @@ def inferenceform(request):
         
         # middle of the tiff files to be the centre of the map
         tif_middle_latitude, tif_middle_longitude = pixels_to_coordinates(transform, (h/2, w/2))
-        
+        tiff_address = get_address(tif_middle_latitude, tif_middle_longitude)
+        print((tif_middle_latitude, tif_middle_longitude, tiff_address))
+        # disaster_city = tiff_address.get("city", tiff_address)
         if mask_address:
             disaster_city = mask_address.get("city", mask_address.get("region", mask_address.get("town", ""))) 
             disaster_state = mask_address.get("state", mask_address.get("county", "")),
