@@ -15,16 +15,19 @@ def get_address(latitude, longitude):
     FORMAT="json"
     LANG="en-US"
     base_url = f"https://nominatim.openstreetmap.org/reverse?format={FORMAT}&lat={latitude}&lon={longitude}&zoom=18&addressdetails=1&accept-language={LANG}"
-    print(base_url)
+    # print(base_url)
     # Send a GET request to the API
     response = requests.get(base_url)
     # Check if the request was successful (status code 200)
-    data = None
+    address = None
     try:
-        data = response.json()["address"] 
-        return response.status_code, data
+        address = response.json()["address"] 
     except ValueError as e:
-        return 404, data
+        print(response.status_code, e)
+    finally:
+        return address
+
+
 
 def format_address(address):
     components = list(address.keys()).copy()[::-1]
@@ -42,6 +45,8 @@ def format_address(address):
         formatted_address = {}
         for i in final_components:
             formatted_address[i] = address[i]
+        key_map_dict = {state_substitute: 'state', city_substitute: 'city'}
+        d = {(key_map_dict[k] if k in key_map_dict else k): v for k, v in formatted_address.items()}
         return formatted_address
     except Exception as e:
         print(f"An error occurred: {e}")
@@ -60,8 +65,6 @@ def get_polygons(mask, transform, rdp=True):
     for contour in contours:
         contour_points = np.squeeze(contour)
         if len(contour_points)>4:
-            # approx = np.squeeze(cv2.approxPolyDP(contour_points, 0.001, True)).tolist()
-
             coordinates_of_polygon=[]
             for x,y in contour_points:
                 approx_lat, approx_long = pixels_to_coordinates(transform, (x, y))   
@@ -73,13 +76,12 @@ def get_polygons(mask, transform, rdp=True):
             center_long = sum(point[1] for point in coordinates_of_polygon) / len(coordinates_of_polygon)
             
             # ADDRESS
-            status_code, address = get_address(center_lat, center_long)
-            if status_code!=200:
-                print(f"cant get address for {(center_lat, center_long)}, continue")
+            address = get_address(center_lat, center_long)
+            if address is None:
+                print(f"cant get address for {(center_lat, center_long)} because address is {address}, continue")
                 continue
             else: 
                 formatted_address = format_address(address)
-                
                 # APPEND ALL DATA OF THE POLYGON IN POLYGONS
                 polygons.append({
                     'coordinates': coordinates_of_polygon,

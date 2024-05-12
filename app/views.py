@@ -283,7 +283,6 @@ def get_extreme_points(coordinates):
     # Sort the coordinates in clockwise order based on the polar angle from the reference point
     sorted_coordinates = sorted(coordinates, key=polar_angle, reverse=True)
     nested_lists = [[coord[0], coord[1]] for coord in sorted_coordinates]
-
     return nested_lists
 
 EARTH_RADIUS_IN_METERS = 6378137
@@ -334,7 +333,7 @@ def dashboard_with_id(request, inference_id):
         classes_count = [len(results[cls]) for cls in classes]
         print(f"Classes count: {classes_count}")
         # Damage area data: critisally damaged areas and total damaged area
-        totalDamagedBuildings = classes_count[0]+classes_count[1]+ classes_count[3]
+        totalDamagedBuildings = classes_count[1]+classes_count[2]+ classes_count[3]
         if totalDamagedBuildings>0:
             boundary_coordinates = get_extreme_points([(point["center_lat"], point["center_long"]) for color, points in results.items() if color != "green" for point in points])
             sorted_critically_damaged_areas, chosen_component = get_critically_damaged_areas(results, get_address_components(results, classes_count))
@@ -454,14 +453,14 @@ def inferenceform(request):
         classes = ['green', 'yellow', 'orange', 'red']
         results={}
 
-        mask_address = None
+        # mask_address = None
         for index, mask in enumerate(processed_output_masks[1: ]):
             color = classes[index]
             polygons_in_mask = get_polygons(mask, transform, rdp=False)
             color_count = len(polygons_in_mask)
             print(f"{color}: {color_count}")
-            if mask_address is None and color_count>0:
-                mask_address = polygons_in_mask[0]['address']
+            # if mask_address is None and color_count>0:
+            #     mask_address = polygons_in_mask[0]['address']
             results[color] = polygons_in_mask
         print()
         end = time.time()
@@ -470,13 +469,16 @@ def inferenceform(request):
         
         # middle of the tiff files to be the centre of the map
         tif_middle_latitude, tif_middle_longitude = pixels_to_coordinates(transform, (h/2, w/2))
-        tiff_address = get_address(tif_middle_latitude, tif_middle_longitude)
-        print((tif_middle_latitude, tif_middle_longitude, tiff_address))
-        # disaster_city = tiff_address.get("city", tiff_address)
-        if mask_address:
-            disaster_city = mask_address.get("city", mask_address.get("region", mask_address.get("town", ""))) 
-            disaster_state = mask_address.get("state", mask_address.get("county", "")),
-            disaster_country = mask_address["country"]
+        middle_address = get_address(tif_middle_latitude, tif_middle_longitude)
+        print(f"middle address: {(tif_middle_latitude, tif_middle_longitude, middle_address)}")
+        if middle_address:
+            disaster_city = middle_address.get("city", disaster_city) 
+            disaster_state = middle_address.get("state")
+            disaster_country = middle_address["country"]
+        # if mask_address:
+        #     disaster_city = mask_address.get("city", mask_address.get("region", mask_address.get("town", ""))) 
+        #     disaster_state = mask_address.get("state", mask_address.get("county", "")),
+        #     disaster_country = mask_address["country"]
         else:
             disaster_city, disaster_state, disaster_country = disaster_city, "", ""
         try:
