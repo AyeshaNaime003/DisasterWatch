@@ -1,0 +1,96 @@
+/* Error Page */
+section.errorpage h2 {
+    color: var(--light-black);
+}
+
+section.errorpage h2 i {
+    color: var(--lovely-blue-deeper);
+}
+
+/* Profile Picture Container */
+.profile-picture-container {
+    display: flex;
+    justify-content: center; /* Align horizontally */
+    align-items: center; /* Align vertically */
+    /* height: 200px; Adjust the height as needed */
+}
+
+.profile-picture-container img {
+    border-radius: 50%;
+    position: relative;
+    transition: filter 0.3s;
+    width: 150px; /* Ensure the image doesn't exceed container width */
+    height: 150px; /* Ensure the image doesn't exceed container height */
+}
+
+.profile-picture-container:hover img {
+    filter: brightness(0.6);
+
+}
+
+
+/* Alert Messages */
+.alert {
+    padding: 10px;
+    margin: 10px 0;
+    margin-top: 0px;
+    border-radius: 5px;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+
+/* .custom-padding {
+    padding-left:0;
+    margin-left:0;
+    padding-right: 10px
+} */
+
+.profileDiv {
+    background-color: #f3f3f5;
+    border-width: 0;
+    border-radius: 15px;
+}
+
+.tableDiv {
+    border-width: 0;
+}
+
+.pageTitle {
+    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-size: 30pt;
+    color: rgb(56, 56, 56);
+}
+
+.titleFooter {
+    font-family: "Assistant", sans-serif;
+    font-size: small;
+    color:gray;
+    padding-left: 0;
+}
+
+div label {
+    color: gray;
+    margin-bottom: 0px;
+    padding: 0;
+}
+
+.noInference {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height:100%;
+    width:100%;
+}
+
+.card {
+    border-width: 0;
+}
