@@ -2,6 +2,7 @@
 import requests
 import datetime
 from dateutil import parser
+
 # WEATHER - openweathermap
 def unix_to_humanreadable(unix_timestamp):
     return datetime.datetime.utcfromtimestamp(unix_timestamp).strftime('%Y-%m-%d %H:%M:%S')

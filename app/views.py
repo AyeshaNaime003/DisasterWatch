@@ -34,7 +34,7 @@ bitmodule = SourceFileLoader('bitmodule', os.path.join(model_dir, "bit_resnet.py
 
 
 def loginPage(request):
-    # loggin the use in
+    # login the use in
     if request.method=="POST":
         username = request.POST.get('username')
         password = request.POST.get('password')
@@ -271,6 +271,7 @@ def get_critically_damaged_areas(results, address_components):
         sortedComponentRevised.append(componentData_formatted)
     return sortedComponentRevised, chosen_component
 
+
 def get_extreme_points(coordinates):
    # Define a reference point (e.g., the center of the polygon)
     reference_point = (sum(coord[0] for coord in coordinates) / len(coordinates),
@@ -284,6 +285,7 @@ def get_extreme_points(coordinates):
     sorted_coordinates = sorted(coordinates, key=polar_angle, reverse=True)
     nested_lists = [[coord[0], coord[1]] for coord in sorted_coordinates]
     return nested_lists
+
 
 EARTH_RADIUS_IN_METERS = 6378137
 EARTH_CIRCUMFERENCE_IN_METERS = 2 * EARTH_RADIUS_IN_METERS * pi
@@ -318,6 +320,7 @@ def get_address_components(results, classes_count):
         else:
             address_components = list(results["red"][0]["address"].keys())
     return address_components
+
 
 @login_required(login_url="login/")
 def dashboard_with_id(request, inference_id):

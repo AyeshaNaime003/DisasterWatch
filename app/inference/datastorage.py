@@ -18,16 +18,15 @@ def get_address(latitude, longitude):
     base_url = f"https://nominatim.openstreetmap.org/reverse?format={FORMAT}&lat={latitude}&lon={longitude}&zoom=18&addressdetails=1&accept-language={LANG}"
     # Send a GET request to the API
     response = requests.get(base_url)
-    print(base_url, response)
     # Check if the request was successful (status code 200)
     address = None
     try:
         address = json.loads(response.content)["address"] 
     except ValueError as e:
-        print(response.status_code, e)
+        print(base_url, response)
+        print(e)
     finally:
         return address
-
 
 
 def format_address(address):
