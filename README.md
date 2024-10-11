@@ -25,10 +25,9 @@ DisasterWatch simplifies disaster assessment by providing an easy-to-use platfor
 
 ## Technologies Used
 - Django
-- GDAL
 - Rasterio
-- Plotly
-- GDAL
+- Nominatim
+- SQlite
 - Python
 
 ## Installation
