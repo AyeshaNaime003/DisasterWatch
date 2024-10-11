@@ -1,0 +1,58 @@
+{% extends 'index.html' %}
+
+{% load static %}
+
+
+{% block title %}Login{% endblock title %}
+{% block body %}
+<link href="{% static '/styles/login.css' %}" rel="stylesheet"/>
+
+<div class="container-fluid outer-login-container">
+    <div class="container inner-login-container">
+        <div class="row">
+            <div class="col-md-5 d-lg-block d-none text-center cycle-img-container">
+                <img src="{% static '/assets/disaster-cycle.png' %}" alt="">
+            </div>
+            <div class="col-md-7 col-12 py-3 form-container text-center">
+                <img class="logo" src="{% static '/assets/logo.png' %}" alt="logo">
+                <h1> DisasterWatch</h5>
+                <h2 class="text-center">Login</h2>
+               
+                <form action="" method="POST">
+                    {% csrf_token %}
+                   <div class="form-group px-5 flex-column text-center">
+                    <input class="form-control my-2" type="text" name="username" placeholder="Username">    
+                    <input class="form-control my-2" type="Password" name="password" placeholder="Password">   
+                    <input type="submit" class="btn btn-primary my-2" > 
+                   </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Error messages -->
+{% if messages %}
+    {% for message in messages %}
+        <div id="alert-container" class="position-fixed top-0 start-50 translate-middle-x mt-4" style="z-index: 1050">
+            <div class="alert {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% endif %}"
+                role="alert">
+                {{ message }}
+            </div>
+        </div>
+    {% endfor %}
+    <script>
+        // Automatically remove alert after 5 seconds
+        $(document).ready(function () {
+            setTimeout(function () {
+                $('#alert-container').fadeOut();
+            }, 2000);
+        });
+    </script>
+
+
+
+{% endif %}
+
+{% endblock body %}
