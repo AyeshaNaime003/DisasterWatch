@@ -50,7 +50,36 @@
 
 
 <!-- Error messages -->
+<div id="alert-container" class="position-fixed top-0 start-50 translate-middle-x mt-4" style="z-index: 1050; display: none;">
+    <div id="alert" class="alert alert-danger" role="alert"></div>
+</div>
 
+<script>
+    function validateLogin(event) {
+        event.preventDefault(); // Prevent the form from submitting
+
+        // Get username and password values
+        const username = document.getElementById("username").value;
+        const password = document.getElementById("password").value;
+
+        // Check if both username and password are "dell"
+        if (username === "dell" && password === "dell") {
+            // Redirect to home.html
+            window.location.href = "home.html";
+        } else {
+            // Show error message
+            const alertContainer = document.getElementById("alert-container");
+            const alertMessage = document.getElementById("alert");
+            alertMessage.textContent = "Invalid username or password.";
+            alertContainer.style.display = "block";
+
+            // Automatically remove alert after 2 seconds
+            setTimeout(() => {
+                alertContainer.style.display = "none";
+            }, 2000);
+        }
+    }
+</script>
 
 
     <!-- <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script> -->
