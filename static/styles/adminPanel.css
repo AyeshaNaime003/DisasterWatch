@@ -1,0 +1,43 @@
+.text-end p {
+    font-size: small;
+    color: grey; 
+}
+
+.card {
+display: flex;
+}
+
+.btn {
+    margin-top:10px;
+}
+
+.noInference {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height:200px;
+    width:100%;
+}
+
+.pageTitle {
+    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-size: 30pt;
+    color: rgb(56, 56, 56);
+}
+
+.titleFooter {
+    font-family: "Assistant", sans-serif;
+    font-size: small;
+    color:gray;
+}
+
+.blue-border{
+    border:1px solid rgb(185, 185, 185);
+}
+
+#addUserForm {
+    /* background-color: rgb(238, 242, 245); */
+    border-radius: 10px;
+    padding-right: 20px;
+}
+
