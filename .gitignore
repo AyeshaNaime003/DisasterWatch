@@ -1,5 +1,4 @@
 env/    
-db.sqlite3
 /app/test-batches
 /app/tests
 /app/__pycache__/
