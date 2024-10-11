@@ -50,5 +50,5 @@ python manage.py migrate
 python manage.py runserver
 ```
 ## Awards and Honours
-DisasterWatch won 2nd position in the Industry Adjudged 2024 Open House
+DisasterWatch won 2nd position in the NUST's Industry Adjudged 2024 Open House
 
