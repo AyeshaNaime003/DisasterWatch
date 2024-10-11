@@ -1,26 +1,95 @@
-{% extends 'index.html' %}
-{% load static %}
-{% block title %}Home{% endblock title %}
-{% block body %}
-<link href="{% static '/styles/home2.css' %}" rel="stylesheet" />
-<script src="{% static '/javascript/news.js' %}"></script>
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <!-- BOOSTRAP -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <!-- MAIN CSS -->
+    <link href="static/styles/main.css" rel="stylesheet"/>
+    <!-- GOOGLE FONTS -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@200..800&family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- JQUERY -->
+    <script src="static/javascript/jquery-3.7.1.js"></script>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">    
+    <!--Animated icons-->
+    <script src="https://cdn.lordicon.com/lordicon.js"></script>
+
+</head>
+<body >
+    
+<link href="static/styles/home2.css" rel="stylesheet" />
+<script src="static/javascript/news.js"></script>
 
 <div id="homepage" class="container-fluid">
   <div class="row main-row">
     <!-- NAVBAR -->
-    {% include 'app/navbar2.html' %}
+    
+<link href="static/styles/navbar2.css" rel="stylesheet" />
+
+<div id='navbar' class="col-md-1 px-0 rounded fixed-div" >
+  <div class="card w-100 h-100 mx-0 ">
+    <img class="logo d-none d-md-block mx-auto mt-1 py-lg-5 mb-lg-4" src="static/assets/logo.png" width="50px">
+    
+    <ul class="nav nav-pills flex-row flex-md-column mt-3 mb-auto justify-content-evenly text-center">
+      <li class="nav-item  active ">
+        <a href="home.html" class="nav-link">
+          <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-house my-1" viewBox="0 0 16 16">
+            <path d="M8.707 1.5a1 1 0 0 0-1.414 0L.646 8.146a.5.5 0 0 0 .708.708L2 8.207V13.5A1.5 1.5 0 0 0 3.5 15h9a1.5 1.5 0 0 0 1.5-1.5V8.207l.646.647a.5.5 0 0 0 .708-.708L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293zM13 7.207V13.5a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5V7.207l5-5z"/>
+          </svg>
+        </a>
+        <p class= 'iconHelp'>Home</p>
+      </li> 
+      
+      <!-- Show Admin Panel link if user is authenticated and is an admin -->
+      <li class="nav-item ">
+        <a href="adminPanel.html" class="nav-link">
+          <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-gear" viewBox="0 0 16 16">
+            <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492M5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0"/>
+            <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115z"/>
+          </svg>
+        </a>
+        <p class= 'iconHelp'>Admin Panel</p>
+      </li>
+      
+      <li class="nav-item  ">
+        <a href="profile.html" class="nav-link">
+          <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-person my-1" viewBox="0 0 16 16">
+            <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6m2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0m4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4m-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10s-3.516.68-4.168 1.332c-.678.678-.83 1.418-.832 1.664z"/>
+          </svg>
+        </a>
+        <p class= 'iconHelp'>Profile</p>
+      </li>
+      <li class="nav-item ">
+        <a href="help.html" class="nav-link">
+          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-question my-1" viewBox="0 0 16 16">
+            <path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286m1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94"/>
+          </svg>  
+        </a>
+        <p class= 'iconHelp'>Help</p>
+      </li>
+      <li class="nav-item">
+        <a href="index.html" class="nav-link">
+          <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-door-closed" viewBox="0 0 16 16">
+            <path d="M3 2a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v13h1.5a.5.5 0 0 1 0 1h-13a.5.5 0 0 1 0-1H3zm1 13h8V2H4z"/>
+            <path d="M9 9a1 1 0 1 0 2 0 1 1 0 0 0-2 0"/>
+          </svg>
+        </a>
+        <p class= 'iconHelp'>Logout</p>
+      </li>
+    </ul>  
+  </div>
+</div>
     <!-- MAIN CONTENT -->
     <div class="col-md-11 mt-1 home-container" style='margin-left:9%'>
         <!-- error -->
       <div class="container error-container">
-        {% if messages %}
-        {% for message in messages %}
-        <p class="alert {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% endif %}"
-          role="alert">
-          {{ message }}
-          {% endfor %}
-          </ul>
-          {% endif %}
+        
       </div>
 
       <!-- ABOUT US -->
@@ -42,7 +111,7 @@
             make informed decisions and take proactive measures. Join us in our mission to create a safer, more
             resilient world.
           </p>
-          <a href="{% url 'inferenceform' %}" class="btn btn-primary">Run Analysis</a>
+          <a href="inferenceform.html" class="btn btn-primary">Run Analysis</a>
         </div>
       </div>
 
@@ -55,12 +124,7 @@
             <button type="button" data-bs-target="#news-carousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
             <button type="button" data-bs-target="#news-carousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
             <button type="button" data-bs-target="#news-carousel" data-bs-slide-to="3" aria-label="Slide 3"></button>
-            {% comment %} <button type="button" data-bs-target="#news-carousel" data-bs-slide-to="4" aria-label="Slide 3"></button> 
-            <button type="button" data-bs-target="#news-carousel" data-bs-slide-to="5" aria-label="Slide 2"></button>
-            <button type="button" data-bs-target="#news-carousel" data-bs-slide-to="6" aria-label="Slide 3"></button>
-            <button type="button" data-bs-target="#news-carousel" data-bs-slide-to="7" aria-label="Slide 3"></button>
-            <button type="button" data-bs-target="#news-carousel" data-bs-slide-to="8" aria-label="Slide 3"></button>
-            <button type="button" data-bs-target="#news-carousel" data-bs-slide-to="9" aria-label="Slide 3"></button> {% endcomment %}
+            
           </div>
           <div class="carousel-inner" id="news-carousel-inner">
               <!-- News articles will be dynamically added here -->
@@ -83,4 +147,9 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 
 
-{% endblock body %}
+
+    <!-- <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>        
+</body>
+</html>
