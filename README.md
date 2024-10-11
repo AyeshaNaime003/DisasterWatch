@@ -1,67 +1,55 @@
-# DisasterWatch
+# __DisasterWatch: AI Driven Webservice for Disaster Damage Assessment__
 
-create virtual env: virtualenv env
-activate: env/scripts/activate
-installations: pip install -r requirements
+#### Link to Static Website: [https://ayeshanaime003.github.io/DisasterWatch/](https://ayeshanaime003.github.io/DisasterWatch/)
+<span style="color:red;">Note: Use username and password "dell" to view the site</span>
 
-make server:
-django-admin startproject server ./
- 
-make app->frontend
-django-admin startapp app
+Dashboard:![!dashboard](./static/assets/dashboard.png)
 
-confugure the app in the settings
-"app.apps.AppConfig"
-
-make template dir alongside app and server
-configure so the server can see the template:   BASE_DIR/'templates' in setting.py
-will house index.html which load main css file and extend different templates
-
-pages:
-login_>authenticate, login(carries user info)
-home->sidebar,[LINKS NOT WORKING]
-get sentinel2 imagery form,
-stats,
-map
-
-static dir in the main project dir, will house css files and assets
-configure to project using static file dirs in settings.py
-link to template file using {load static} and <link href="{% static '/styles/login.css' %}" rel="stylesheet"/>
+Map:
+![!dashboard](./static/assets/map.png)
 
 
-login: get to go to the page, post to sent form data to view, using django's builtin functions, authenticate the valid user and then login(create session id)
+## Summary
+In the face of increasing natural disasters such as floods, wildfires, and hurricanes, real-time monitoring of affected areas is crucial for emergency response, relief coordination, and damage assessment. 
 
+DisasterWatch simplifies disaster assessment by providing an easy-to-use platform that allows users to upload satellite imagery of affected areas. Users can see the statistic of the disaster using the dashboard and see details of the regions using the map. Powered by Django, Mapbox, and GDAL, DisasterWatch enables fast, accurate disaster response and helps authorities and communities make informed decisions during critical moments.
 
-map api: 
- 2) plotly: real time, satellite style using mapbox token, draw polygons, hover in the midpoint
-geopy to get address from the latitude and lonitude of the polygon midpoint, display only landmark(if any) and street name
-from the tiff file get the top left lat and lon, use these to calculate the affine trasnform matrix, xy->lan and lon, draw polygons
+## Features
+- Login and logout
+- Regular diaster related news 
+- Admin panel
+- Admin Priveleges: adding, editing the role of other users and deleting users and view login history of all users
+- User can change their profile
+- User can view their previous dashboards
+- User can upload satellite images for the segmentation model: shows dahsboard and map 
 
+## Technologies Used
+- Django
+- GDAL
+- Rasterio
+- Plotly
+- GDAL
+- Python
 
-SUGGESTIONS:
-home page links not working
-let user toggle between two styles of map viewing: satellite and open-street-map
-ISSUES:
-page wont load until all the addressses are retrived
-To run this project, you need to install GDAL. Follow the steps below:
+## Installation
+#### 1. Clone the repository:
+```bash
+git clone https://github.com/AyeshaNaime003/DisasterWatch.git
+```
+#### 2. Create virtual environment, activate it and installl dependencies: 
+```bash
+python -m venv env
+env/scripts/activate
+pip install -r requirements
+```
+#### 3. Make migrations:
+```bash
+python manage.py migrate
+```
+## Usage
+```bash
+python manage.py runserver
+```
+## Awards and Honours
+DisasterWatch won 2nd position in the Industry Adjudged 2024 Open House
 
-### 1. Download GDAL Wheel File
-NEW LINK:https:/colle/github.com/cgohlke/geospatial-wheels/?tab=readme-ov-file EW LINK BELOW
-- Visit [Python Extension Packages for Windows - Christoph Gohlke](https://www.lfd.uci.edu/~gohlke/pythonlibs/).
-- Search for GDAL and download the appropriate wheel file based on your Python version and system architecture. For example, for Python 3.9 on a 64-bit system, download `GDAL-3.4.3-cp39-cp39-win_amd64.whl`.
-
-### 2. Place Wheel File in Your Project Directory
-
-- Move the downloaded wheel file (`GDAL-3.4.3-cp39-cp39-win_amd64.whl`) into your project directory.
-
-### 3. Install GDAL Using pip
-
-- Open a command prompt or terminal.
-- Navigate to your project directory using the `cd` command.
-- Run the following command to install GDAL using `pip`:
-
-  ```bash
-  pip install GDAL-3.4.3-cp39-cp39-win_amd64.whl
-
-
-  python manage.py test tests.test_cases
