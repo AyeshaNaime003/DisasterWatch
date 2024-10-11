@@ -1,8 +1,0 @@
-env/    
-db.sqlite3
-/app/test-batches
-/app/tests
-/app/__pycache__/
-/app/inference/__pycache__/
-/app/migrations/__pycache__/
-/server/__pycache__/
