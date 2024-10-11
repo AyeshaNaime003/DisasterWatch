@@ -378,17 +378,6 @@ def dashboard_with_id(request, inference_id):
             }
         })
 
-
-# def tiff_has_geospatial_info(tiff_path):
-#     try:
-#         dataset = gdal.Open(tiff_path)
-#         if dataset is not None:
-#             # Check if the TIFF file has geospatial information
-#             return dataset.GetProjection() != ''
-#     except Exception as e:
-#         print(f"Error checking geospatial info: {e}")
-#     return False
-
 def tiff_has_geospatial_info(tiff_path):
     try:
         with rasterio.open(tiff_path) as dataset:
@@ -462,8 +451,6 @@ def inferenceform(request):
             polygons_in_mask = get_polygons(mask, transform, rdp=False)
             color_count = len(polygons_in_mask)
             print(f"{color}: {color_count}")
-            # if mask_address is None and color_count>0:
-            #     mask_address = polygons_in_mask[0]['address']
             results[color] = polygons_in_mask
         print()
         end = time.time()
@@ -478,10 +465,6 @@ def inferenceform(request):
             disaster_city = middle_address.get("city", disaster_city) 
             disaster_state = middle_address.get("state")
             disaster_country = middle_address["country"]
-        # if mask_address:
-        #     disaster_city = mask_address.get("city", mask_address.get("region", mask_address.get("town", ""))) 
-        #     disaster_state = mask_address.get("state", mask_address.get("county", "")),
-        #     disaster_country = mask_address["country"]
         else:
             disaster_city, disaster_state, disaster_country = disaster_city, "", ""
         try:

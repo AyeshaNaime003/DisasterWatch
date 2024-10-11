@@ -114,12 +114,10 @@ def postprocessing(pre_image, post_image, model):
   model_output = get_dmg_msk(pre_image, post_image, model)
   end_time = time.time()
   inference_time = end_time - start_time
-  # print(f"Model Inference Time: {inference_time} seconds")
 
   start_time = time.time()
   output_msks = postprocess_per_img(model_output)
   end_time = time.time()
   postprocessing_time = end_time - start_time
-  # print(f"Preprocessing Time: {postprocessing_time} seconds")
   
   return output_msks, inference_time, postprocessing_time

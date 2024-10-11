@@ -5,13 +5,6 @@ import torch.nn.functional as F
 from importlib.machinery import SourceFileLoader
 import os
 import sys
-# from osgeo import gdal
-# from preprocessing import tif_to_img
-# from postprocessing import postprocessing
-# # import time
-# import matplotlib.pyplot as plt
-# from datastorage import get_tif_transform, get_polygons, pixels_to_coordinates
-# import cv2
 
 
 print(os.getcwd())
